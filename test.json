@@ -1,0 +1,309 @@
+{
+    "locations": [
+        {
+            "id": "loc_1",
+            "name": "John Smith's Office",
+            "description": "A spacious, modern office with a panoramic view of the city. Impeccably organized, but now a crime scene.",
+            "connectedLocations": [
+                "loc_2",
+                "loc_5"
+            ],
+            "clues": [
+                "clue_7",
+                "clue_8",
+                "clue_11"
+            ],
+            "characters": [
+                "char_4",
+                "char_3"
+            ]
+        },
+        {
+            "id": "loc_2",
+            "name": "Robert Johnson's Office",
+            "description": "A slightly smaller but equally stylish office, reflecting a driven and ambitious personality.",
+            "connectedLocations": [
+                "loc_1",
+                "loc_5"
+            ],
+            "clues": [
+                "clue_2",
+                "clue_15"
+            ],
+            "characters": [
+                "char_2"
+            ]
+        },
+        {
+            "id": "loc_3",
+            "name": "David Miller's Apartment",
+            "description": "A small, cluttered apartment filled with computer equipment and coding books.",
+            "connectedLocations": [],
+            "clues": [
+                "clue_12",
+                "clue_17"
+            ],
+            "characters": [
+                "char_1"
+            ]
+        },
+        {
+            "id": "loc_4",
+            "name": "Michael Davis's Apartment",
+            "description": "An expensively furnished penthouse apartment with evidence of a lavish lifestyle.",
+            "connectedLocations": [],
+            "clues": [
+                "clue_5",
+                "clue_9"
+            ],
+            "characters": [
+                "char_5"
+            ]
+        },
+        {
+            "id": "loc_5",
+            "name": "TechCorp Building",
+            "description": "The main building for the corporation.",
+            "connectedLocations": [
+                "loc_1",
+                "loc_2",
+                "loc_5"
+            ],
+            "clues": [
+                "clue_1",
+                "clue_14"
+            ],
+            "characters": [
+                "char_6"
+            ]
+        },
+        {
+            "id": "loc_6",
+            "name": "Alice White's Office",
+            "description": "Clean and orderly lab space",
+            "connectedLocations": [],
+            "clues": [
+                "clue_4",
+                "clue_6",
+                "clue_10",
+                "clue_13",
+                "clue_18"
+            ],
+            "characters": [
+                "char_8"
+            ]
+        }
+    ],
+    "characters": [
+        {
+            "id": "char_1",
+            "name": "David Miller",
+            "description": "A quiet, introverted programmer with a strained relationship with the victim.",
+            "role": "suspect",
+            "alibi": "Claims to have been at home working on his computer all night.",
+            "knownClues": [
+                "clue_12",
+                "clue_17"
+            ]
+        },
+        {
+            "id": "char_2",
+            "name": "Robert Johnson",
+            "description": "The victim's business partner, known for his ambition and occasional ruthlessness.",
+            "role": "suspect",
+            "alibi": "Confirmed by security footage and staff at the restaurant.",
+            "knownClues": [
+                "clue_2",
+                "clue_15"
+            ]
+        },
+        {
+            "id": "char_3",
+            "name": "Emily Carter",
+            "description": "The victim's personal assistant, efficient and discreet. Seemed genuinely shocked by the news.",
+            "role": "witness",
+            "alibi": "Confirmed by her roommate, Sarah Chen.",
+            "knownClues": [
+                "clue_3",
+                "clue_11"
+            ]
+        },
+        {
+            "id": "char_4",
+            "name": "John Smith",
+            "description": "The victim. CEO of TechCorp Industries.",
+            "role": "victim",
+            "alibi": null,
+            "knownClues": []
+        },
+        {
+            "id": "char_5",
+            "name": "Michael Davis",
+            "description": "An investor in TechCorp, known for gambling debts and risky investments.",
+            "role": "suspect",
+            "alibi": "Claims to have been at a bar across town, no witnesses.",
+            "knownClues": [
+                "clue_5",
+                "clue_9"
+            ]
+        },
+        {
+            "id": "char_6",
+            "name": "Gary Wilson",
+            "description": "A security guard at TechCorp",
+            "role": "witness",
+            "alibi": "Working the night shift at the TechCorp Security Desk. Security Footage confirms this.",
+            "knownClues": [
+                "clue_1"
+            ]
+        },
+        {
+            "id": "char_7",
+            "name": "Jane Howard",
+            "description": "The CFO of TechCorp",
+            "role": "witness",
+            "alibi": "Confirmed to be at a Conference in Chicago",
+            "knownClues": []
+        },
+        {
+            "id": "char_8",
+            "name": "Alice White",
+            "description": "Head of Research and Development",
+            "role": "suspect",
+            "alibi": "Claims to be working late in her office. Has no witnesses.",
+            "knownClues": [
+                "clue_4",
+                "clue_18"
+            ]
+        },
+        {
+            "id": "char_9",
+            "name": "Kevin Brown",
+            "description": "Head of Marketing for TechCorp.",
+            "role": "witness",
+            "alibi": "Playing poker with friends. Multiple witness statements supporting this.",
+            "knownClues": []
+        }
+    ],
+    "clues": [
+        {
+            "id": "clue_1",
+            "name": "Security Footage of Fire Exit",
+            "description": "Security footage shows the fire exit was opened from the inside around the time of the murder.",
+            "type": "physical"
+        },
+        {
+            "id": "clue_2",
+            "name": "Robert's Contract",
+            "description": "A contract showing Robert Johnson was secretly in deep debt, and would have greatly benefited from John Smith's death.",
+            "type": "physical"
+        },
+        {
+            "id": "clue_3",
+            "name": "Emily's Testimony",
+            "description": "Emily Carter claims John Smith was increasingly stressed and working late nights before his death.",
+            "type": "testimony"
+        },
+        {
+            "id": "clue_4",
+            "name": "Alice's Testimony",
+            "description": "Alice White says they had a disagreement about the direction of the company. John was planning to change the focus away from her department.",
+            "type": "testimony"
+        },
+        {
+            "id": "clue_5",
+            "name": "Michael's Threatening Text",
+            "description": "A threatening message on Michael Davis's phone indicating John Smith wanted to cut him out of a deal.",
+            "type": "physical"
+        },
+        {
+            "id": "clue_6",
+            "name": "Fingerprints on Knife",
+            "description": "DNA analysis identifies Alice White's fingerprints on the murder weapon.",
+            "type": "physical"
+        },
+        {
+            "id": "clue_7",
+            "name": "Bloody Knife",
+            "description": "The murder weapon, a knife from the TechCorp Kitchen, was found near his body.",
+            "type": "physical"
+        },
+        {
+            "id": "clue_8",
+            "name": "Locked Office",
+            "description": "John Smith's office was locked from the inside.",
+            "type": "physical"
+        },
+        {
+            "id": "clue_9",
+            "name": "Michael's Bank Records",
+            "description": "Bank records show Michael Davis made unusual large deposits shortly after John Smith's death.",
+            "type": "physical"
+        },
+        {
+            "id": "clue_10",
+            "name": "Erased File",
+            "description": "A partially erased file on John Smith's computer mentioning Alice White's project was over budget and behind schedule.",
+            "type": "physical"
+        },
+        {
+            "id": "clue_11",
+            "name": "Missing Pen",
+            "description": "Emily Carter mentioned John always carried a rare, custom-made pen. The pen is now missing from the office.",
+            "type": "physical"
+        },
+        {
+            "id": "clue_12",
+            "name": "David's Access Card",
+            "description": "David Miller's access card history showing he entered TechCorp after hours on the night of the murder.",
+            "type": "physical"
+        },
+        {
+            "id": "clue_13",
+            "name": "Poison Traces",
+            "description": "A discarded lab coat found in Alice White's office with traces of a fast acting poison on it.",
+            "type": "physical"
+        },
+        {
+            "id": "clue_14",
+            "name": "Disabled Security Camera",
+            "description": "A security camera near the elevator was disabled on the night of the murder between 11:00 PM and 11:30 PM.",
+            "type": "physical"
+        },
+        {
+            "id": "clue_15",
+            "name": "Robert's Admission",
+            "description": "Robert Johnson overheard admitting to another Investor that he now has controlling Shares of TechCorp. A very profitable outcome if John Died.",
+            "type": "testimony"
+        },
+        {
+            "id": "clue_16",
+            "name": "Autopsy Report",
+            "description": "John Smith's autopsy reveals he was poisoned. However, there was also evidence of a knife wound.",
+            "type": "physical"
+        },
+        {
+            "id": "clue_17",
+            "name": "David's Angry Emails",
+            "description": "David Miller had several angry email exchanges with John Smith over intellectual property rights to a program he wrote.",
+            "type": "physical"
+        },
+        {
+            "id": "clue_18",
+            "name": "Alice's Detailed Notes",
+            "description": "Alice White's plan to use the poison was discovered and recorded in her computer.",
+            "type": "physical"
+        }
+    ],
+    "mystery": {
+        "title": "Locked Doors, Poisoned Words",
+        "description": "The CEO of TechCorp Industries, John Smith, has been found dead in his locked office. Was it a rival, employee, or someone closer to him?",
+        "victim": "char_4",
+        "crime": "Murder"
+    },
+    "solution": {
+        "culpritId": "char_8",
+        "motive": "Alice White feared losing control of her department and the direction of TechCorp. She killed John Smith to save her project and maintain her influence within the company. She used her knowledege of chemistry to poison and then stabbed the victim to make it look like someone else did it.",
+        "method": "Alice White poisoned John Smith with a fast-acting poison found in a lab coat discarded in her office. Then, to confuse investigators, she stabbed John Smith with a knife."
+    }
+}
