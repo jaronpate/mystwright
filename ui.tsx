@@ -272,6 +272,7 @@ Commands:
                         isInConversation: true
                     }));
                     setMessages([]);
+                    clearTerm();
                 } else {
                     setMessages(prev => [
                         ...prev,
@@ -326,8 +327,7 @@ Commands:
 
 // Export function to render the UI
 export function renderMystwrightUI(world: World, state: GameState) {
-    // Clear terminal
-    process.stdout.write('\x1Bc');
+    clearTerm();
     
     // Render full height UI using available options
     render(
@@ -338,4 +338,9 @@ export function renderMystwrightUI(world: World, state: GameState) {
             patchConsole: true
         }
     );
+}
+
+function clearTerm(){
+    // Clear terminal
+    process.stdout.write('\x1Bc');
 }

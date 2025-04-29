@@ -729,7 +729,7 @@ export async function playVoiceForCharacter(character: Character, text: string):
         voice: character.voice ?? 'Joseph',
         voice_settings: {
             speed: 1.15,
-            stability: 0.4
+            stability: 0.3
         },
         text,
         apply_text_normalization: 'on',
