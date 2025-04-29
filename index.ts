@@ -54,6 +54,7 @@ type APIWorldResponse = {
         id: string;
         name: string;
         description: string;
+        personality: string;
         role: 'suspect' | 'witness' | 'victim';
         alibi?: string;
         knownClues?: string[];
@@ -175,6 +176,7 @@ async function generateWorld(config: GenerateWorldConfig = {}): Promise<World> {
                             id: { type: 'string' },
                             name: { type: 'string' },
                             description: { type: 'string' },
+                            personality: { type: 'string' },
                             role: { 
                                 type: 'string', 
                                 enum: ['suspect', 'witness', 'victim']
@@ -185,7 +187,7 @@ async function generateWorld(config: GenerateWorldConfig = {}): Promise<World> {
                                 items: { type: 'string' }
                             }
                         },
-                        required: ['id', 'name', 'description', 'role', 'alibi', 'knownClues'],
+                        required: ['id', 'name', 'description', 'personality', 'role', 'alibi', 'knownClues'],
                         additionalProperties: false
                     }
                 },
@@ -648,8 +650,6 @@ export async function getNextDialogueWithCharacter(character: Character, world: 
     }
 
     const data = await response.json() as OpenRouterResponse;
-
-    console.log('OpenRouter API response:', JSON.stringify(data, null, 4));
 
     if (data.error) {
         console.error('OpenRouter API error:', data.error);

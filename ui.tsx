@@ -10,14 +10,14 @@ type Message = {
 };
 
 // UI Components
-const InfoPanel = ({ world, state }: { world: World, state: GameState }) => {
+const InfoPanel = ({ world, state, height, width }: { world: World, state: GameState, height?: string | number, width?: string | number }) => {
     const { mystery, locations, characters, clues } = world;
     const currentLocation = state.currentLocation 
         ? locations.get(state.currentLocation) ?? null
         : null;
     
     return (
-        <Box flexDirection="column" width="40%" height={process.stdout.rows} padding={1} borderStyle="classic" borderColor="white">
+        <Box flexDirection="column" height={height} width={width} padding={1} borderStyle="classic" borderColor="white">
             <Box>
                 <Text bold inverse color="blue">{mystery.title}</Text>
             </Box>
@@ -52,50 +52,39 @@ const InfoPanel = ({ world, state }: { world: World, state: GameState }) => {
                         );
                     })}
                 </Box>
-            </Box>
-            {/* Location list */}
-            <Box flexDirection="column" marginBottom={1}>
-                <Text color="blue" bold underline>Points of Interest:</Text>
-                {Array.from(locations.values()).map((location) => {
-                    return (
-                        <Text key={location.id} color="white">{location.name}</Text>
-                    );
-                })}
-            </Box>
-            {/* Known Clue list */}
-            <Box flexDirection="column" marginBottom={1}>
-                <Text color="blue" bold underline>What you know:</Text>
-                {state.cluesFound.map(clueId => {
-                    const clue = clues.get(clueId);
-
-                    return (
-                        <Text color="white">{clue ? clue.name : 'Unknown Clue'}</Text>
-                    );
-                })}
-            </Box>
-            
-            {currentLocation && (
-                <>
-                    <Box>
-                        <Text color="blue" bold>Location: {currentLocation.name}</Text>
-                    </Box>
-                    <Box>
-                        <Text>{currentLocation.description}</Text>
-                    </Box>
-                    <Newline />
-                </>
-            )}
-            
-            {state.cluesFound.length > 0 && (
-                <Box flexDirection="column">
-                    {state.cluesFound.map(clueId => {
-                        const clue = clues.get(clueId);
-                        return clue ? (
-                            <Text key={clue.id}>• {clue.name}</Text>
-                        ) : null;
+                {/* Location list */}
+                <Box flexDirection="column" marginBottom={1}>
+                    <Text color="blue" bold underline>Points of Interest:</Text>
+                    {Array.from(locations.values()).map((location) => {
+                        return (
+                            <Text key={location.id} color="white">{location.name}</Text>
+                        );
                     })}
                 </Box>
-            )}
+                {/* Known Clue list */}
+                <Box flexDirection="column" marginBottom={1}>
+                    <Text color="blue" bold underline>What you know:</Text>
+                    {state.cluesFound.map(clueId => {
+                        const clue = clues.get(clueId);
+
+                        return (
+                            <Text color="white">{clue ? clue.name : 'Unknown Clue'}</Text>
+                        );
+                    })}
+                </Box>
+                
+                {currentLocation && (
+                    <>
+                        <Box>
+                            <Text color="blue" bold>Location: {currentLocation.name}</Text>
+                        </Box>
+                        <Box>
+                            <Text>{currentLocation.description}</Text>
+                        </Box>
+                        <Newline />
+                    </>
+                )}
+            </Box>
         </Box>
     );
 };
@@ -106,14 +95,18 @@ const ChatPanel = ({
     setInput,
     onSubmit,
     gameState,
-    world
+    world,
+    height,
+    width
 }: { 
-    messages: Array<Message>, 
-    input: string, 
-    setInput: (input: string) => void, 
+    messages: Array<Message>; 
+    input: string;
+    setInput: (input: string) => void,
     onSubmit: () => void,
     gameState: GameState,
-    world: World
+    world: World,
+    height?: string | number,
+    width?: string | number
 }) => {
     useInput((val, key) => {
         if (key.return) {
@@ -140,7 +133,7 @@ const ChatPanel = ({
     const currentCharacter = (gameState.currentCharacter ? world.characters.get(gameState.currentCharacter) : null) ?? null;
     
     return (
-        <Box flexDirection="column" height={process.stdout.rows} width="60%" paddingLeft={1}>
+        <Box flexDirection="column" height={height} width={width} paddingLeft={1}>
             {/* Chat History */}
             <Box 
                 flexDirection="column" 
@@ -171,20 +164,20 @@ const ChatPanel = ({
                     // Different styling based on message type
                     if (msg.type === 'system') {
                         return (
-                            <Box flexDirection='column' key={i} width={'70%'}>
+                            <Box flexDirection='column' key={i} width={'80%'}>
                                 <Text inverse color="blue">{msg.text}</Text>
                             </Box>
                         );
                     } else if (msg.type === 'user') {
                         return (
-                            <Box flexDirection='column' key={i}  width={'70%'} alignSelf='flex-end'>
+                            <Box flexDirection='column' key={i} alignSelf='flex-end'>
                                 <Text color="white">{msg.text}</Text>
                             </Box>
                         );
                     } else {
                         // NPC message 
                         return (
-                            <Box flexDirection='column' key={i} marginY={1} width={'70%'}>
+                            <Box flexDirection='column' key={i} marginY={1} width={'80%'}>
                                 <Text>{msg.sender}: </Text>
                                 <Text color="blue" inverse>{msg.text}</Text>
                             </Box>
@@ -195,7 +188,7 @@ const ChatPanel = ({
             
             {/* Input prompt area */}
             <Box flexDirection="column" justifyContent='flex-end' alignItems='flex-start'>
-                <Box borderStyle="round" borderColor="white" borderDimColor height={3} width="100%">
+                <Box borderStyle="round" borderColor="white" borderDimColor height={3} width="100%" paddingX={1}>
                     <Text color="white" dimColor>
                         {'> '}
                     </Text>
@@ -244,6 +237,9 @@ const MystwrightUI = ({ world, state }: { world: World, state: GameState }) => {
     const handleCommand = async () => {
         if (!input.trim()) return;
 
+        // Clear input
+        setInput('');
+
         if (input.startsWith('/')) {
             const strings = input.toLowerCase().slice(1).split(' ');
             const command = strings[0];
@@ -274,6 +270,7 @@ Commands:
                         currentCharacter: character.id,
                         isInConversation: true
                     }));
+                    setMessages([]);
                 } else {
                     setMessages(prev => [
                         ...prev,
@@ -291,9 +288,7 @@ Commands:
             setMessages(prev => [...prev, { type: 'user', text: input }]);
 
             if (gameState.isInConversation && currentCharacter) {
-                console.log(`requesting next dialogue from ${currentCharacter.name}`);
                 const response = await getNextDialogueWithCharacter(currentCharacter, world, gameState, input);
-                console.log(`Response: ${response}`);
 
                 if (response) {
                     setMessages(prev => [
@@ -310,14 +305,10 @@ Commands:
                 // Not in conversation - process normal game commands
             }
         }
-        
-        // Clear input
-        setInput('');
     };
     
     return (
-        <Box flexDirection="row" height={process.stdout.rows} width="100%">
-            <InfoPanel world={world} state={gameState} />
+        <Box flexDirection="column" width="100%">
             <ChatPanel 
                 messages={messages}
                 input={input}
@@ -326,6 +317,7 @@ Commands:
                 gameState={gameState}
                 world={world}
             />
+            <InfoPanel world={world} state={gameState}/>
         </Box>
     );
 };
