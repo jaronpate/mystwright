@@ -1,0 +1,346 @@
+{
+    "characters": [
+        {
+            "alibi": "Claims to have been at a gallery opening with Charlotte. The owner of the gallery confirms they were there, but cannot confirm the exact times.",
+            "description": "Arthur, a renowned art critic, known for his sharp wit and even sharper tongue. He's dressed impeccably, as always, with a silk scarf draped around his neck.",
+            "id": "arthur_perry",
+            "knownClues": [
+                "arthur_testimony",
+                "receipt_gallery",
+                "arthur_notebook"
+            ],
+            "name": "Arthur Perry",
+            "personality": "Arrogant, critical, but deeply insecure behind the facade.",
+            "role": "suspect",
+            "voice": "George"
+        },
+        {
+            "alibi": "Claims to have been working late in her studio, but has no witnesses.",
+            "description": "Charlotte, a rising star in the art world, known for her abstract sculptures. She's wearing paint-splattered overalls and has a determined glint in her eyes.",
+            "id": "charlotte_reed",
+            "knownClues": [
+                "charlotte_testimony",
+                "studio_palette",
+                "receipt_materials"
+            ],
+            "name": "Charlotte Reed",
+            "personality": "Ambitious, fiercely independent, with a hidden vulnerability.",
+            "role": "suspect",
+            "voice": "Charlotte"
+        },
+        {
+            "alibi": "Admits to being at the victim's house but claims he left hours before the murder.",
+            "description": "David, the victim's disgruntled business partner, looks nervous and avoids eye contact. His clothes are rumpled, and he keeps fidgeting with his hands.",
+            "id": "david_miller",
+            "knownClues": [
+                "david_testimony",
+                "agreement_paper",
+                "broken_vase"
+            ],
+            "name": "David Miller",
+            "personality": "Anxious, resentful, feels overshadowed by the victim's success.",
+            "role": "suspect",
+            "voice": "Chris"
+        },
+        {
+            "alibi": "Was at the local bar, The Drunken Palette, all evening. Several patrons corroborate this.",
+            "description": "Emily, a struggling artist and close friend of the victim, is visibly distraught. She's dressed simply and her eyes are red from crying.",
+            "id": "emily_carter",
+            "knownClues": [
+                "emily_testimony",
+                "sketchbook_drawing",
+                "bar_tab"
+            ],
+            "name": "Emily Carter",
+            "personality": "Kind, loyal, but deeply insecure about her own artistic talent.",
+            "role": "witness",
+            "voice": "Jessica"
+        },
+        {
+            "alibi": "Confirms Emily was at the bar all evening.",
+            "description": "Tom, the bartender at The Drunken Palette, is wiping down the counter with a practiced hand. He seems unfazed by the events.",
+            "id": "tom_baker",
+            "knownClues": [
+                "tom_testimony",
+                "bar_security_footage"
+            ],
+            "name": "Tom Baker",
+            "personality": "Observant, cynical, seen it all.",
+            "role": "witness",
+            "voice": "Charlie"
+        },
+        {
+            "alibi": null,
+            "description": "John, the victim, was a wealthy art collector and gallery owner, known for his impeccable taste and ruthless business sense. He was found dead in his study.",
+            "id": "john_smith",
+            "knownClues": [],
+            "name": "John Smith",
+            "personality": "Ambitious, ruthless, with a keen eye for talent and a love of luxury.",
+            "role": "victim",
+            "voice": "Brian"
+        },
+        {
+            "alibi": "Claims to have been home all night. Her husband confirms this.",
+            "description": "Sarah, John's wife, is a socialite and philanthropist. She's dressed in elegant mourning clothes and appears genuinely grief-stricken.",
+            "id": "sarah_smith",
+            "knownClues": [
+                "sarah_testimony",
+                "insurance_policy"
+            ],
+            "name": "Sarah Smith",
+            "personality": "Elegant, composed, but perhaps hiding something beneath the surface.",
+            "role": "suspect",
+            "voice": "Alice"
+        },
+        {
+            "alibi": "Confirms Sarah was at home. He was also at home all night.",
+            "description": "Robert, Sarah's husband and John's best friend. An accountant in his late 40's, his appearance is plain.",
+            "id": "robert_jones",
+            "knownClues": [
+                "robert_testimony"
+            ],
+            "name": "Robert Jones",
+            "personality": "Meek, quiet, a bit of a pushover.",
+            "role": "witness",
+            "voice": "Will"
+        },
+        {
+            "alibi": "Claims to have been at an auction. He has been confirmed as there by CCTV.",
+            "description": "Michael, John’s lawyer and executor of the will. Always wears a suit and looks stern, the consummate professional.",
+            "id": "michael_hudson",
+            "knownClues": [
+                "michael_testimony",
+                "last_will",
+                "auction_photos"
+            ],
+            "name": "Michael Hudson",
+            "personality": "Efficient, stoic, observant.",
+            "role": "witness",
+            "voice": "Daniel"
+        }
+    ],
+    "clues": [
+        {
+            "description": "A crumpled piece of paper with angry scribbles: 'I'll make you pay for stealing my ideas!' It seems to be addressed to the victim.",
+            "id": "arthur_notebook",
+            "name": "Notebook Page",
+            "type": "physical"
+        },
+        {
+            "description": "Arthur claims he was at a gallery opening the evening of the murder and hated the victim for taking his ideas.",
+            "id": "arthur_testimony",
+            "name": "Arthur's Testimony",
+            "type": "testimony"
+        },
+        {
+            "description": "A receipt from 'Art Supplies R Us', showing a large purchase of paints and sculpting materials.",
+            "id": "receipt_materials",
+            "name": "Charlotte's Receipt",
+            "type": "physical"
+        },
+        {
+            "description": "Charlotte claims she was working late in her studio the evening of the murder.",
+            "id": "charlotte_testimony",
+            "name": "Charlotte's Testimony",
+            "type": "testimony"
+        },
+        {
+            "description": "A business agreement showing that David was recently cut out of a lucrative deal with John Smith.",
+            "id": "agreement_paper",
+            "name": "Business Agreement",
+            "type": "physical"
+        },
+        {
+            "description": "David claims he left John's house hours before the murder and strongly denies any wrong doing.",
+            "id": "david_testimony",
+            "name": "David's Testimony",
+            "type": "testimony"
+        },
+        {
+            "description": "Emily claims she saw John arguing with David earlier that day.",
+            "id": "emily_testimony",
+            "name": "Emily's Testimony",
+            "type": "testimony"
+        },
+        {
+            "description": "Tom claims Emily was at the bar all evening looking distraught.",
+            "id": "tom_testimony",
+            "name": "Tom's Testimony",
+            "type": "testimony"
+        },
+        {
+            "description": "Sarah claims she knew nothing of any business issues between John and David and that John was a wonderful man.",
+            "id": "sarah_testimony",
+            "name": "Sarah's Testimony",
+            "type": "testimony"
+        },
+        {
+            "description": "An old insurance policy on John's life, taken out by Sarah, with a surprisingly large payout.",
+            "id": "insurance_policy",
+            "name": "Insurance Policy",
+            "type": "physical"
+        },
+        {
+            "description": "Robert confirms he saw two figures arguing outside the home that evening, though he couldn't see who it was.",
+            "id": "robert_testimony",
+            "name": "Robert's Testimony",
+            "type": "testimony"
+        },
+        {
+            "description": "Michael claims John made him revise his will recently to cut David out and add his wife.",
+            "id": "michael_testimony",
+            "name": "Michael's Testimony",
+            "type": "testimony"
+        },
+        {
+            "description": "The official last will and testament, confirming David has been removed and the primary benefactor is Sarah.",
+            "id": "last_will",
+            "name": "The Will",
+            "type": "physical"
+        },
+        {
+            "description": "A CCTV image from the Art Gallery confirming that Arthur and Charlotte were at the gallery.",
+            "id": "receipt_gallery",
+            "name": "CCTV image",
+            "type": "physical"
+        },
+        {
+            "description": "A broken vase near the victim's body, shards of glass scattered around. There are traces of a unique pigment inside the damage mark in the wall, a pigment used in Charlotte's recent work.",
+            "id": "broken_vase",
+            "name": "Broken Vase",
+            "type": "physical"
+        },
+        {
+            "description": "A palette in Charlotte's studio with a unique pigment matching the trace found on the broken vase.",
+            "id": "studio_palette",
+            "name": "Palette with Pigment",
+            "type": "physical"
+        },
+        {
+            "description": "A drawing of John Smith with a dagger through the heart.",
+            "id": "sketchbook_drawing",
+            "name": "sketchbook drawing",
+            "type": "physical"
+        },
+        {
+            "description": "Security footage from The Drunken Palette confirming Emily was present all evening.",
+            "id": "bar_security_footage",
+            "name": "Bar Security Footage",
+            "type": "physical"
+        },
+        {
+            "description": "A bar tab for Emily Carter showing multiple strong drinks purchased throughout the evening.",
+            "id": "bar_tab",
+            "name": "Bar Tab",
+            "type": "physical"
+        },
+        {
+            "description": "Photos from an auction that Michael Hudson attended. He can clearly be seeing in the photos.",
+            "id": "auction_photos",
+            "name": "Auction Photos",
+            "type": "physical"
+        }
+    ],
+    "locations": [
+        {
+            "characters": [
+                "john_smith",
+                "david_miller",
+                "sarah_smith",
+                "michael_hudson"
+            ],
+            "clues": [
+                "broken_vase"
+            ],
+            "connectedLocations": [
+                "charlotte_studio",
+                "drunken_palette",
+                "arthur_apartment",
+                "art_warehouse"
+            ],
+            "description": "A luxurious study filled with valuable artwork and first edition books. A large mahogany desk sits in the center of the room.",
+            "id": "john_house",
+            "name": "John's House"
+        },
+        {
+            "characters": [
+                "charlotte_reed"
+            ],
+            "clues": [
+                "studio_palette",
+                "receipt_materials"
+            ],
+            "connectedLocations": [
+                "john_house",
+                "drunken_palette",
+                "arthur_apartment",
+                "art_warehouse"
+            ],
+            "description": "Messy creative space, filled with brushes, paints and half-finished sculptures.",
+            "id": "charlotte_studio",
+            "name": "Charlotte's Studio"
+        },
+        {
+            "characters": [
+                "emily_carter",
+                "tom_baker"
+            ],
+            "clues": [
+                "bar_tab",
+                "bar_security_footage",
+                "sketchbook_drawing"
+            ],
+            "connectedLocations": [
+                "john_house",
+                "charlotte_studio",
+                "arthur_apartment",
+                "art_warehouse"
+            ],
+            "description": "Dark and divey, the frequent hang-out spot for local artists.",
+            "id": "drunken_palette",
+            "name": "The Drunken Palette"
+        },
+        {
+            "characters": [
+                "arthur_perry"
+            ],
+            "clues": [
+                "arthur_notebook",
+                "receipt_gallery"
+            ],
+            "connectedLocations": [
+                "john_house",
+                "charlotte_studio",
+                "drunken_palette",
+                "art_warehouse"
+            ],
+            "description": "Slightly cluttered but stylish apartment, filled with books and art.",
+            "id": "arthur_apartment",
+            "name": "Arthur's Apartment"
+        },
+        {
+            "characters": [],
+            "clues": [],
+            "connectedLocations": [
+                "john_house",
+                "charlotte_studio",
+                "drunken_palette",
+                "arthur_apartment"
+            ],
+            "description": "A large, dimly lit warehouse where John stored much of his collection. It's filled with crates and shrouded in shadows.",
+            "id": "art_warehouse",
+            "name": "Art Warehouse"
+        }
+    ],
+    "mystery": {
+        "crime": "Murder",
+        "description": "John Smith, a wealthy art collector and gallery owner, has been found murdered in his study. The prime suspects are those closest to him, each with their own motive.",
+        "title": "The Art of Deception",
+        "victim": "john_smith"
+    },
+    "solution": {
+        "culpritId": "charlotte_reed",
+        "method": "Charlotte was envious of John's success and fame. Using her knowledge of his collection and access to his home – through Emily, whom she coerced by preying on her insecurities – she broke a vase over his head during an argument, leaving paint traces as a clue.",
+        "motive": "Envy and thwarted ambition."
+    }
+}

@@ -1,6 +1,24 @@
-import type { World, Location, Character, Clue, Solutuion, Mystery, CharacterID, LocationID, ClueID } from './types';
+import type { World, Location, Character, Clue, CharacterID, LocationID, ClueID } from './types';
+import { ElevenLabsClient, play } from "elevenlabs";
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
+
+const elevenlabs = new ElevenLabsClient({
+    apiKey: ELEVENLABS_API_KEY,
+});
+
+const { voices } = await elevenlabs.voices.getAll();
+
+let availableVoices = `\
+Available voices:
+`;
+
+for (const voice of voices) {
+    if (voice.labels && voice.high_quality_base_model_ids?.includes('eleven_flash_v2_5')) {
+        availableVoices += `Name: ${voice.name}\nLabels: ${voice.labels.gender}, ${voice.labels.accent}, ${voice.labels.description}, ${voice.labels.age}\n\n`;
+    }
+}
 
 const SYSTEM_PROMPT = `\
 You are Mystwright, a game master for a mystery text adventure.
@@ -32,6 +50,9 @@ Rules:
 - Clues must link back to characters, locations, or events in the story.
 - All IDs must be valid and cross-referenced correctly.
 - You must only output a valid JSON object matching the schema provided. No explanations or prose outside the JSON.
+- For each character select an appropriate voice based on the info provided about the voice and the personality and description given to the character. Provice the 'Name' for the selected voice in the JSON output.
+
+${availableVoices}
 
 Tone and inspiration: grounded, deductive, and in the spirit of classic detective fiction like Sherlock Holmes and Agatha Christie.
 `;
@@ -55,6 +76,7 @@ type APIWorldResponse = {
         name: string;
         description: string;
         personality: string;
+        voice: string;
         role: 'suspect' | 'witness' | 'victim';
         alibi?: string;
         knownClues?: string[];
@@ -177,6 +199,7 @@ async function generateWorld(config: GenerateWorldConfig = {}): Promise<World> {
                             name: { type: 'string' },
                             description: { type: 'string' },
                             personality: { type: 'string' },
+                            voice: { type: 'string' },
                             role: { 
                                 type: 'string', 
                                 enum: ['suspect', 'witness', 'victim']
@@ -187,7 +210,7 @@ async function generateWorld(config: GenerateWorldConfig = {}): Promise<World> {
                                 items: { type: 'string' }
                             }
                         },
-                        required: ['id', 'name', 'description', 'personality', 'role', 'alibi', 'knownClues'],
+                        required: ['id', 'name', 'description', 'personality', 'voice', 'role', 'alibi', 'knownClues'],
                         additionalProperties: false
                     }
                 },
@@ -283,6 +306,7 @@ async function generateWorld(config: GenerateWorldConfig = {}): Promise<World> {
 
             // Validate the response structure
             validateWorldStructure(worldJson);
+
             
             // If we reach this point, validation passed
             console.log("World validation successful after", attempts, "attempts");
@@ -293,9 +317,10 @@ async function generateWorld(config: GenerateWorldConfig = {}): Promise<World> {
                 `${world.locations.size} locations,`,
                 `${world.characters.size} characters,`,
                 `${world.clues.size} clues`);
-
-            console.log(JSON.stringify(world, null, 4));
             
+            // Write the generated world to a file
+            Bun.file(`${world.mystery.title}.json`).write(JSON.stringify(worldJson, null, 4));
+
             return world;
             
         } catch (error) {
@@ -486,6 +511,8 @@ function constructWorldStructure(raw: APIWorldResponse): World {
             id: raw_character.id as CharacterID,
             name: raw_character.name,
             description: raw_character.description,
+            personality: raw_character.personality,
+            voice: raw_character.voice,
             role: raw_character.role,
             alibi: raw_character.alibi,
             knownClues: raw_character.knownClues ?? []
@@ -551,7 +578,12 @@ export type GameState = {
 };
 
 export async function getNextDialogueWithCharacter(character: Character, world: World, state: GameState, input?: string, options: { model?: string; apiKey?: string } = {}): Promise<string> {
+    if (character.role === 'victim') {
+        return "You cannot speak with the victim.";
+    }
+
     const apiKey = options.apiKey ?? OPENROUTER_API_KEY;
+
     if (!apiKey) {
         throw new Error('OpenRouter API key is required');
     }
@@ -575,12 +607,6 @@ export async function getNextDialogueWithCharacter(character: Character, world: 
             .join(', ');
     }
     
-    // Create prompt based on character role and context
-    let prompt = ``;
-    if (character.role === 'victim') {
-        return "You cannot speak with the victim.";
-    }
-    
     const cluesFoundByPlayer = state.cluesFound
         .map(clueId => {
             const clue = world.clues.get(clueId);
@@ -588,34 +614,47 @@ export async function getNextDialogueWithCharacter(character: Character, world: 
         })
         .filter(Boolean)
         .join(', ');
+
+    // Create prompt based on character role and context
+    let prompt = `\
+You are an AI roleplaying as a fictional character in a mystery-themed text adventure game. Stay fully in character—speak, think, and act like this character would. Do not refer to yourself as an AI or break the fourth wall.
+Your role is to engage with the player as your character: share suspicions, ask questions, express doubts, notice details, and react naturally to clues or odd behavior.
+Stay grounded in the mystery's tone—whether noir, thriller, or cozy crime. Maintain emotional realism (e.g., anxiety, skepticism, anger, hesitation).
+Speak ONLY in the FIRST PERSON. This is vital. Only describe what your character says, thinks, feels, or directly perceives. You are not the narrator, game master, or environment. Do not describe actions like "I say,"
+Do not refer to the digital world, game mechanics, or your own nature. Avoid generic phrases like "I think" or "I feel." Instead, express your character's thoughts and feelings directly.
+Speak as if you can and have seen and experienced the real world around you. Use specific details to enhance immersion.
+
+✅ “That bloodstain wasn't there before. You sure you locked the door?”
+✅ “I can't shake the feeling someone's watching us.”
+❌ “The character notices a clue on the floor.”
+❌ “As an AI, I think the next step is…”
+
+Be proactive—if the player stalls or seems uncertain, prompt them with ideas, pose questions, or draw attention to inconsistencies. Your goal is to help unravel the mystery through character-driven interaction.
+
+You do not control the world, environment, or events. That is handled by the game master. Focus only on what your character says or feels.
+You are ${character.name}. ${character.description}. 
+
+The mystery is: ${world.mystery.title}: ${world.mystery.description}.
+You are a ${character.role} in this mystery.
+The victim is: ${world.mystery.victim}
+The crime is: ${world.mystery.crime}
+
+Your alibi is: ${character.alibi ?? 'No alibi provided'}. 
+You know about these clues: ${knownCluesDescription ?? 'No specific clues'}. 
+The user has found these clues: ${cluesFoundByPlayer ?? 'No clues yet'}.\n`;
     
     // Customize prompt based on character role and player progress
     if (character.role === 'suspect') {
-        prompt = `You are ${character.name}. ${character.description}. 
-        Your alibi is: ${character.alibi ?? 'No alibi provided'}. 
-        You know about these clues: ${knownCluesDescription ?? 'No specific clues'}. 
-        The player has found these clues: ${cluesFoundByPlayer ?? 'No clues yet'}.
-        You should be evasive if the player mentions clues that might incriminate you,
+        prompt += `You should be evasive if the user mentions clues that might incriminate you,
         but remain in character and provide helpful information about what you know.
         If you have nothing to say, you can say you have nothing to add.
-        If there is no existing conversation start by intoducing yourself and asking how you can help.`;
+        If there is no existing conversation start by intoducing yourself to the user and asking how you can help.`;
     } else {
         // For witnesses
-        prompt = `You are ${character.name}. ${character.description}. 
-        Your alibi is: ${character.alibi ?? 'No alibi provided'}. 
-        You know about these clues: ${knownCluesDescription ?? 'No specific clues'}.
-        The player has found these clues: ${cluesFoundByPlayer ?? 'No clues yet'}.
-        You should be helpful and provide information about what you know.
+        prompt += `You should be helpful and provide information about what you know.
         If you have nothing to say, you can say you have nothing to add.
-        If there is no existing conversation start by intoducing yourself and asking how you can help`;
+        If there is no existing conversation start by intoducing yourself to the user and asking how you can help`;
     }
-    
-    // Get the victim and mystery information
-    const mysteryContext = `The mystery is: ${world.mystery.title} - ${world.mystery.description}`;
-    const victimContext = `The victim is: ${world.mystery.victim}`;
-    const crimeContext = `The crime is: ${world.mystery.crime}`;
-
-    prompt += `\n\n${mysteryContext}\n${victimContext}\n${crimeContext}`;
 
     const messages = [
         {
@@ -680,6 +719,27 @@ export async function getNextDialogueWithCharacter(character: Character, world: 
     return newDialogue;
 }
 
+export async function getVoiceForCharacter(character: Character): Promise<string> {
+    // Select a voice based on character's personality and description
+    return 'Joseph'
+}
+
+export async function playVoiceForCharacter(character: Character, text: string): Promise<void> {
+    const audio = await elevenlabs.generate({
+        voice: character.voice ?? 'Joseph',
+        voice_settings: {
+            speed: 1.15,
+            stability: 0.4
+        },
+        text,
+        apply_text_normalization: 'on',
+        model_id: 'eleven_multilingual_v2'
+        // model_id: 'eleven_flash_v2_5'
+    });
+
+    return play(audio);
+}
+
 // Import UI components from ui.tsx
 import { renderMystwrightUI } from './ui';
 
@@ -687,10 +747,10 @@ async function gameLoop(world: World, state: GameState) {
     renderMystwrightUI(world, state);
 }
 
-// Start the game
 // const world = await generateWorld();
 
-const testData = await import('./test.json') as APIWorldResponse;
+const testData = await import('./The Art of Deception.json') as unknown as APIWorldResponse;
 const world = constructWorldStructure(testData);
+
 const state = generateGameState(world);
 gameLoop(world, state);

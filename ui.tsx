@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { render, Box, Text, useInput, useApp, Newline } from 'ink';
-import type { World, Location, Character, Clue, CharacterID, LocationID, ClueID } from './types';
-import { getNextDialogueWithCharacter, type GameState } from '.';
+import type { World } from './types';
+import { getNextDialogueWithCharacter, playVoiceForCharacter, type GameState } from '.';
 
 type Message = {
     type: 'system' | 'user' | 'assistant'
@@ -140,25 +140,26 @@ const ChatPanel = ({
                 flexGrow={1}
                 padding={1}
             >
+                {currentCharacter && (
+                    <>
+                        <Box>
+                            <Text color="cyan" bold inverse>Speaking with: {currentCharacter.name}</Text>
+                        </Box>
+                        <Box>
+                            <Text>{currentCharacter.description}</Text>
+                        </Box>
+                    </>
+                )}
 
-            {currentCharacter && (
-                <>
-                    <Box>
-                        <Text color="cyan" bold inverse>Speaking with: {currentCharacter.name}</Text>
-                    </Box>
-                    <Box>
-                        <Text>{currentCharacter.description}</Text>
-                    </Box>
-                </>
-            )}
+                {!currentCharacter && (
+                    <>
+                        <Box>
+                            <Text color="blue" bold inverse>Welcome to Mystwright: {world.mystery.title}</Text>
+                        </Box>
+                    </>
+                )}
 
-            {!currentCharacter && (
-                <>
-                    <Box>
-                        <Text color="blue" bold inverse>Welcome to Mystwright: {world.mystery.title}</Text>
-                    </Box>
-                </>
-            )}
+                <Newline />
 
                 {messages.map((msg, i) => {
                     // Different styling based on message type
@@ -295,6 +296,7 @@ Commands:
                         ...prev,
                         { type: 'assistant', text: response, sender: currentCharacter.name }
                     ]);
+                    playVoiceForCharacter(currentCharacter, response);
                 } else {
                     setMessages(prev => [
                         ...prev,

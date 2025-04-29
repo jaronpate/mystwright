@@ -24,6 +24,8 @@ export interface Character {
     id: CharacterID;
     name: string;
     description: string;
+    personality: string;
+    voice: string;
     role: 'suspect' | 'witness' | 'victim';
     alibi?: string;
     knownClues?: string[];         // IDs of clues they know about
