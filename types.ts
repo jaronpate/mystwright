@@ -51,3 +51,79 @@ export interface World {
     mystery: Mystery;
     solution: Solutuion;
 }
+
+export type APIWorldResponse = {
+    locations: {
+        id: string;
+        name: string;
+        description: string;
+        connectedLocations: string[];
+        clues: string[];
+        characters: string[];
+    }[];
+    characters: {
+        id: string;
+        name: string;
+        description: string;
+        personality: string;
+        voice: string;
+        role: 'suspect' | 'witness' | 'victim';
+        alibi?: string;
+        knownClues?: string[];
+    }[];
+    clues: {
+        id: string;
+        name: string;
+        description: string;
+        type: 'physical' | 'testimony' | 'other';
+    }[];
+    mystery: {
+        title: string;
+        description: string;
+        victim: string;
+        crime: string;
+    };
+    solution: {
+        culpritId: string;
+        motive: string;
+        method: string;
+    };
+};
+
+export type OpenRouterCompletionResponse = {
+    id: string;
+    object: string;
+    created: number;
+    model: string;
+    choices: Array<{
+        index: number;
+        message: {
+            role: string;
+            content: string;
+        };
+        finish_reason: string;
+    }>;
+    usage: {
+        prompt_tokens: number;
+        completion_tokens: number;
+        total_tokens: number;
+    };
+    error?: {
+        message: string;
+        type: string;
+        param?: string;
+        code?: string;
+    };
+};
+
+export type GameState = {
+    currentLocation: LocationID | null;
+    currentCharacter: CharacterID | null;
+    cluesFound: ClueID[];
+    solved: boolean;
+    isInConversation: boolean;
+    dialogueHistory: Record<CharacterID, {
+        role: string;
+        content: string;
+    }[]>;
+};

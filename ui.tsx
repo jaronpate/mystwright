@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { render, Box, Text, useInput, useApp, Newline } from 'ink';
-import type { World } from './types';
-import { getNextDialogueWithCharacter, playVoiceForCharacter, type GameState } from '.';
+import type { GameState, World } from './types';
+import { getNextDialogueWithCharacter, playVoiceForCharacter } from './src/speech';
 
 type Message = {
     type: 'system' | 'user' | 'assistant'
@@ -326,7 +326,7 @@ Commands:
 };
 
 // Export function to render the UI
-export function renderMystwrightUI(world: World, state: GameState) {
+export function renderMystwrightTUI(world: World, state: GameState) {
     clearTerm();
     
     // Render full height UI using available options
