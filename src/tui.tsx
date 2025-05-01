@@ -190,7 +190,7 @@ const ChatPanel = ({
                     <Text color="white" dimColor>
                         {'> '}
                     </Text>
-                    <Text>{input}</Text>
+                    <Text>{input}</Text><Text color="white">▋</Text>
                 </Box>
                 <Box>
                     <Text color="white" dimColor>
