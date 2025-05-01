@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { render, Box, Text, useInput, useApp, Newline } from 'ink';
-import type { GameState, World } from './types';
+import type { GameState, World } from './src/types';
 import { getNextDialogueWithCharacter, playVoiceForCharacter } from './src/speech';
 
 type Message = {

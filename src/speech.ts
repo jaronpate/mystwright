@@ -1,5 +1,5 @@
 import { ElevenLabsClient, play } from "elevenlabs";
-import type { Character, ClueID, GameState, OpenRouterCompletionResponse, World } from "../types";
+import type { Character, ClueID, GameState, OpenRouterCompletionResponse, World } from "./types";
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;

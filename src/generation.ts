@@ -1,5 +1,5 @@
 import { ElevenLabsClient } from "elevenlabs";
-import type { APIWorldResponse, Character, CharacterID, Clue, ClueID, GameState, Location, LocationID, OpenRouterCompletionResponse, World } from "../types";
+import type { APIWorldResponse, Character, CharacterID, Clue, ClueID, GameState, Location, LocationID, OpenRouterCompletionResponse, World } from "./types";
 import { writeRelative } from "./util";
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
