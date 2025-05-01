@@ -164,9 +164,9 @@ export async function playVoiceForCharacter(character: Character, text: string):
     
     const audio = await elevenlabs.generate({
         stream: true,
-        voice: character.voice ?? 'Joseph',
+        voice: character.voice,
         voice_settings: {
-            speed: 1.15,
+            speed: 1.2,
             stability: 0.3
         },
         text,
@@ -174,8 +174,6 @@ export async function playVoiceForCharacter(character: Character, text: string):
         model_id: 'eleven_multilingual_v2'
         // model_id: 'eleven_flash_v2_5'
     });
-
-    await sleep(500); // Wait to hopefully buffer some audio
 
     const proc = spawn(['ffplay', '-autoexit', '-nodisp', '-'], {
         stdin: 'pipe',

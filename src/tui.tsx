@@ -4,9 +4,9 @@ import type { GameState, World } from './types';
 import { getNextDialogueWithCharacter, playVoiceForCharacter } from './speech';
 
 type Message = {
-    type: 'system' | 'user' | 'assistant'
-    text: string;
-    sender?: string; // Optional name of character or player
+    role: 'system' | 'user' | 'assistant'
+    content: string;
+    sender?: string;
 };
 
 // UI Components
@@ -163,24 +163,26 @@ const ChatPanel = ({
 
                 {messages.map((msg, i) => {
                     // Different styling based on message type
-                    if (msg.type === 'system') {
+                    if (msg.role === 'system') {
                         return (
                             <Box flexDirection='column' key={i} width={'80%'}>
-                                <Text inverse color="blue">{msg.text}</Text>
+                                <Text inverse color="blue">{msg.content}</Text>
                             </Box>
                         );
-                    } else if (msg.type === 'user') {
+                    } else if (msg.role === 'user') {
                         return (
                             <Box flexDirection='column' key={i} alignSelf='flex-end'>
-                                <Text color="white">{msg.text}</Text>
+                                <Text color="white">{msg.content}</Text>
                             </Box>
                         );
                     } else {
                         // NPC message 
                         return (
                             <Box flexDirection='column' key={i} marginY={1} width={'80%'}>
-                                <Text>{msg.sender}: </Text>
-                                <Text color="blue" inverse>{msg.text}</Text>
+                                {(msg.sender  || currentCharacter?.name) && (
+                                    <Text>{currentCharacter?.name ?? msg?.sender}: </Text>
+                                )}
+                                <Text color="blue" inverse>{msg.content}</Text>
                             </Box>
                         );
                     }
@@ -250,8 +252,8 @@ const MystwrightUI = ({ world, state }: { world: World, state: GameState }) => {
                 setMessages(prev => [
                     ...prev,
                     {
-                        type: 'system',
-                        text: `\
+                        role: 'system',
+                        content: `\
 Commands:
 - [location name]: Go to a location
 - [character name]: Talk to a character
@@ -276,18 +278,18 @@ Commands:
                 } else {
                     setMessages(prev => [
                         ...prev,
-                        { type: 'system', text: `Character "${characterName}" not found.` }
+                        { role: 'system', content: `Character "${characterName}" not found.` }
                     ]);
                 }
             } else {
                 setMessages(prev => [
                     ...prev,
-                    { type: 'system', text: `Unknown command: ${command}` }
+                    { role: 'system', content: `Unknown command: ${command}` }
                 ]);
             }
         } else {
             // Add player message to chat history
-            setMessages(prev => [...prev, { type: 'user', text: input }]);
+            setMessages(prev => [...prev, { role: 'user', content: input }]);
 
             if (gameState.isInConversation && currentCharacter) {
                 const response = await getNextDialogueWithCharacter(currentCharacter, world, gameState, input);
@@ -295,13 +297,13 @@ Commands:
                 if (response) {
                     setMessages(prev => [
                         ...prev,
-                        { type: 'assistant', text: response, sender: currentCharacter.name }
+                        { role: 'assistant', content: response, sender: currentCharacter.name }
                     ]);
                     await playVoiceForCharacter(currentCharacter, response);
                 } else {
                     setMessages(prev => [
                         ...prev,
-                        { type: 'system', text: `No response from ${currentCharacter.name}` }
+                        { role: 'system', content: `No response from ${currentCharacter.name}` }
                     ]);
                 }
             } else {

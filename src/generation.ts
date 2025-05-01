@@ -486,6 +486,12 @@ export function constructWorldStructure(raw: APIWorldResponse): World {
 }
 
 export function constructGameState(world: World): GameState {
+    const dialogueHistory: Record<CharacterID, Array<{ role: string; content: string }>> = {};
+
+    for (const character of world.characters.values()) {
+        dialogueHistory[character.id] = [];
+    }
+
     // Setup initial game state
     return {
         currentLocation: null,
@@ -493,6 +499,6 @@ export function constructGameState(world: World): GameState {
         cluesFound: [],
         solved: false,
         isInConversation: false,
-        dialogueHistory: {} // Initialize empty dialogue history
+        dialogueHistory
     };
 }
