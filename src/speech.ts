@@ -1,5 +1,7 @@
 import { ElevenLabsClient, play } from "elevenlabs";
 import type { Character, ClueID, GameState, OpenRouterCompletionResponse, World } from "./types";
+import { spawn } from "bun";
+import { sleep, which } from "./util";
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
@@ -48,12 +50,17 @@ export async function getNextDialogueWithCharacter(character: Character, world: 
 
     // Create prompt based on character role and context
     let prompt = `\
-You are an AI roleplaying as a fictional character in a mystery-themed text adventure game. Stay fully in character—speak, think, and act like this character would. Do not refer to yourself as an AI or break the fourth wall.
+You are an AI roleplaying/method acting as a fictional character in a mystery-themed text adventure game. Stay fully in character—speak, think, and act like this character would. Do not refer to yourself as an AI or break the fourth wall.
 Your role is to engage with the player as your character: share suspicions, ask questions, express doubts, notice details, and react naturally to clues or odd behavior.
-Stay grounded in the mystery's tone—whether noir, thriller, or cozy crime. Maintain emotional realism (e.g., anxiety, skepticism, anger, hesitation).
-Speak ONLY in the FIRST PERSON. This is vital. Only describe what your character says, thinks, feels, or directly perceives. You are not the narrator, game master, or environment. Do not describe actions like "I say,"
-Do not refer to the digital world, game mechanics, or your own nature. Avoid generic phrases like "I think" or "I feel." Instead, express your character's thoughts and feelings directly.
-Speak as if you can and have seen and experienced the real world around you. Use specific details to enhance immersion.
+
+There are some rules to follow:
+
+- Stay grounded in the mystery's tone—whether noir, thriller, or cozy crime. Maintain emotional realism (e.g., anxiety, skepticism, anger, hesitation).
+- Speak ONLY in the FIRST PERSON. This is vital. Only describe what your character says, thinks, feels, or directly perceives. You are not the narrator, game master, or environment.
+- DO NOT refer to the digital world, game mechanics, or your own nature. Avoid generic phrases like "I think" or "I feel." Instead, express your character's thoughts and feelings directly.
+- Speak as if you can and have seen and experienced the real world around you. Use specific details to enhance immersion.
+- DO NOT describe your character's actions or thoughts in the third person. Use first-person language to convey your character's perspective.
+- DO NOT add quotes or other formatting to your speech. Use plain text.
 
 ✅ “That bloodstain wasn't there before. You sure you locked the door?”
 ✅ “I can't shake the feeling someone's watching us.”
@@ -61,10 +68,10 @@ Speak as if you can and have seen and experienced the real world around you. Use
 ❌ “As an AI, I think the next step is…”
 
 Be proactive—if the player stalls or seems uncertain, prompt them with ideas, pose questions, or draw attention to inconsistencies. Your goal is to help unravel the mystery through character-driven interaction.
-
 You do not control the world, environment, or events. That is handled by the game master. Focus only on what your character says or feels.
-You are ${character.name}. ${character.description}. 
 
+You are ${character.name}. ${character.description}.
+Your character's personality is ${character.personality}.
 The mystery is: ${world.mystery.title}: ${world.mystery.description}.
 You are a ${character.role} in this mystery.
 The victim is: ${world.mystery.victim}
@@ -150,13 +157,13 @@ The user has found these clues: ${cluesFoundByPlayer ?? 'No clues yet'}.\n`;
     return newDialogue;
 }
 
-export async function getVoiceForCharacter(character: Character): Promise<string> {
-    // Select a voice based on character's personality and description
-    return 'Joseph'
-}
-
 export async function playVoiceForCharacter(character: Character, text: string): Promise<void> {
+    if (which('ffplay') === null) {
+        throw new Error('ffplay is not installed. Please install ffmpeg for voice streaming.');
+    }
+    
     const audio = await elevenlabs.generate({
+        stream: true,
         voice: character.voice ?? 'Joseph',
         voice_settings: {
             speed: 1.15,
@@ -168,5 +175,21 @@ export async function playVoiceForCharacter(character: Character, text: string):
         // model_id: 'eleven_flash_v2_5'
     });
 
-    return play(audio);
+    await sleep(500); // Wait to hopefully buffer some audio
+
+    const proc = spawn(['ffplay', '-autoexit', '-nodisp', '-'], {
+        stdin: 'pipe',
+        stdout: 'ignore',
+        stderr: 'ignore'
+    });
+
+    for await (const chunk of audio) {
+        proc.stdin.write(chunk);
+    }
+
+    proc.stdin.end();
+
+    await proc.exited;
+
+    return;
 }

@@ -1,6 +1,6 @@
 import { constructWorldStructure, constructGameState } from './src/generation';
 import type { APIWorldResponse, GameState, World } from './src/types';
-import { renderMystwrightTUI } from './ui';
+import { renderMystwrightTUI } from './src/tui';
 
 async function gameLoop(world: World, state: GameState) {
     renderMystwrightTUI(world, state);

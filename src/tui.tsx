@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { render, Box, Text, useInput, useApp, Newline } from 'ink';
-import type { GameState, World } from './src/types';
-import { getNextDialogueWithCharacter, playVoiceForCharacter } from './src/speech';
+import type { GameState, World } from './types';
+import { getNextDialogueWithCharacter, playVoiceForCharacter } from './speech';
 
 type Message = {
     type: 'system' | 'user' | 'assistant'
@@ -297,7 +297,7 @@ Commands:
                         ...prev,
                         { type: 'assistant', text: response, sender: currentCharacter.name }
                     ]);
-                    playVoiceForCharacter(currentCharacter, response);
+                    await playVoiceForCharacter(currentCharacter, response);
                 } else {
                     setMessages(prev => [
                         ...prev,
