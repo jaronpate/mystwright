@@ -28,7 +28,7 @@ export interface Character {
     voice: string;
     role: 'suspect' | 'witness' | 'victim';
     alibi?: string;
-    knownClues?: string[];         // IDs of clues they know about
+    knownClues?: ClueID[];         // IDs of clues they know about
 }
 
 export interface Clue {
@@ -51,6 +51,12 @@ export interface World {
     mystery: Mystery;
     solution: Solutuion;
 }
+export type Message = {
+    role: 'system' | 'user' | 'assistant'
+    content: string;
+};
+
+export type MessageUI = Message & { sender?: string; };
 
 export type APIWorldResponse = {
     locations: {
@@ -122,8 +128,10 @@ export type GameState = {
     cluesFound: ClueID[];
     solved: boolean;
     isInConversation: boolean;
-    dialogueHistory: Record<CharacterID, {
-        role: string;
+    memories: {
+        origin_id: string;
+        origin_type: 'location' | 'character' | 'clue';
         content: string;
-    }[]>;
+    }[];
+    dialogueHistory: Record<CharacterID, Message[]>;
 };

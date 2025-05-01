@@ -1,13 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { render, Box, Text, useInput, useApp, Newline } from 'ink';
-import type { GameState, World } from './types';
-import { getNextDialogueWithCharacter, playVoiceForCharacter } from './speech';
-
-type Message = {
-    role: 'system' | 'user' | 'assistant'
-    content: string;
-    sender?: string;
-};
+import { Box, Newline, render, Text, useApp, useInput } from 'ink';
+import { useEffect, useState } from 'react';
+import { getNextDialogueWithCharacter } from './generation';
+import { playVoiceForCharacter } from './speech';
+import type { GameState, MessageUI, World } from './types';
 
 // UI Components
 const InfoPanel = ({ world, state, height, width }: { world: World, state: GameState, height?: string | number, width?: string | number }) => {
@@ -99,7 +94,7 @@ const ChatPanel = ({
     height,
     width
 }: { 
-    messages: Array<Message>; 
+    messages: Array<MessageUI>; 
     input: string;
     setInput: (input: string) => void,
     onSubmit: () => void,
@@ -212,7 +207,7 @@ const ChatPanel = ({
 const MystwrightUI = ({ world, state }: { world: World, state: GameState }) => {
     const { exit } = useApp();
     const [gameState, setGameState] = useState<GameState>(state);
-    const [messages, setMessages] = useState<Array<Message>>([]);
+    const [messages, setMessages] = useState<Array<MessageUI>>([]);
     const [input, setInput] = useState('');
     
     // Add handler for terminal resize
@@ -273,7 +268,7 @@ Commands:
                         currentCharacter: character.id,
                         isInConversation: true
                     }));
-                    setMessages([]);
+                    setMessages(gameState.dialogueHistory[character.id] ?? []);
                     clearTerm();
                 } else {
                     setMessages(prev => [

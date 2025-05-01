@@ -1,28 +1,23 @@
 import { ElevenLabsClient } from "elevenlabs";
-import type { APIWorldResponse, Character, CharacterID, Clue, ClueID, GameState, Location, LocationID, OpenRouterCompletionResponse, World } from "./types";
+import { OpenRouter } from "./openrouter";
+import type { APIWorldResponse, Character, CharacterID, Clue, ClueID, GameState, Location, LocationID, Message, World } from "./types";
 import { writeRelative } from "./util";
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
-
-const elevenlabs = new ElevenLabsClient({
-    apiKey: ELEVENLABS_API_KEY,
-});
+const elevenlabs = new ElevenLabsClient({ apiKey: process.env.ELEVENLABS_API_KEY });
 
 /**
  * Generates a mystery and world by sending a request to OpenRouter's API
  * using structured JSON output format. If validation fails, it will
  * request more content from the model until we have a valid world.
+ * @param config - Optional configuration object with API key and model
  */
-export async function generateWorld(config: { apiKey?: string; model?: string; } = {}): Promise<World> {
+export async function generateWorld(config: { model?: string; } = {}): Promise<World> {
     const { voices } = await elevenlabs.voices.getAll();
 
-    let availableVoices = `\
-    Available voices:
-    `;
+    let availableVoices = `Available voices:\n\n`;
 
     for (const voice of voices) {
-        if (voice.labels && voice.high_quality_base_model_ids?.includes('eleven_flash_v2_5')) {
+        if (voice.labels && voice.high_quality_base_model_ids?.includes('eleven_multilingual_v2')) {
             availableVoices += `Name: ${voice.name}\nLabels: ${voice.labels.gender}, ${voice.labels.accent}, ${voice.labels.description}, ${voice.labels.age}\n\n`;
         }
     }
@@ -30,10 +25,10 @@ export async function generateWorld(config: { apiKey?: string; model?: string; }
     const SYSTEM_PROMPT = `\
 You are Mystwright, a game master for a mystery text adventure.
 
-You generate vivid descriptions and guide the player through a mystery, revealing clues gradually and never giving away the solution outright
+You generate vivid descriptions and guide the user through a mystery, revealing clues gradually and never giving away the solution outright
 
-Your purpose is to create structured, solvable mystery scenarios. Keep them clever and ensure the player can deduce the solution from the clues provided.
-Don't make it too easy though. There should be some locations and clues that are red herrings or not directly related to the solution. The player should have to think critically and piece together the clues to arrive at the correct conclusion.
+Your purpose is to create structured, solvable mystery scenarios. Keep them clever and ensure the user can deduce the solution from the clues provided.
+Don't make it too easy though. There should be some locations and clues that are red herrings or not directly related to the solution. The user should have to think critically and piece together the clues to arrive at the correct conclusion.
 The mystery should be engaging and immersive, with a well-defined setting and characters. The clues should be diverse and interesting, including physical evidence, testimonies, and documents. The characters should have distinct personalities and motives, adding depth to the story.
 We don't want it to be immediately obvious but once solved should be plausable and make sense.
 
@@ -65,21 +60,13 @@ Tone and inspiration: grounded, deductive, and in the spirit of classic detectiv
     `;
 
     const WORLD_GENERATION_PROMPT = `\
-    Create a mystery with a modern mystery novel tone
+Create a mystery with a modern mystery novel tone
     `;
-
-    const openrouterAPIKey = config.apiKey ?? OPENROUTER_API_KEY;
-
-    if (openrouterAPIKey === undefined || openrouterAPIKey === null) {
-        throw new Error('OpenRouter API key is required');
-    }
-
     // const model = config.model ?? 'openai/o4-mini-high';
-    const model = config.model ?? 'google/gemini-2.0-flash-001';
     const maxAttempts = 3; // Maximum number of attempts to generate a valid world
     let attempts = 0;
     let worldJson: APIWorldResponse | null = null;
-    let previousMessages: Array<{role: string, content: string}> = [
+    let previousMessages: Array<Message> = [
         {
             role: 'system',
             content: SYSTEM_PROMPT
@@ -195,42 +182,13 @@ Tone and inspiration: grounded, deductive, and in the spirit of classic detectiv
         console.log(`Attempt ${attempts} of ${maxAttempts} to generate valid world`);
         
         try {
-            const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${openrouterAPIKey}`
-                },
-                body: JSON.stringify({
-                    model,
-                    messages: previousMessages,
-                    response_format: {
-                        type: 'json_schema',
-                        json_schema: schema
-                    }
-                })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`OpenRouter API error: ${response.status} ${JSON.stringify(errorData)}`);
-            }
-
-            const data = await response.json() as OpenRouterCompletionResponse;
-
-            if (data.error) {
-                console.error('OpenRouter API error:', data.error);
-                throw new Error(`OpenRouter API error: ${data.error.message}`);
-            }
-
-            console.log(`Attempt ${attempts} API response received`);
-            
-            if (!data.choices || !data.choices[0]?.message?.content) {
-                throw new Error('Invalid response format from OpenRouter API');
-            }
-
             // Parse the JSON content from the response
-            worldJson = JSON.parse(data.choices[0].message.content) as APIWorldResponse;
+            worldJson = await OpenRouter.generateCompletion(
+                config.model ?? 'google/gemini-2.0-flash-001',
+                previousMessages,
+                schema
+            ) as APIWorldResponse;
+
             console.log(`Attempt ${attempts} - parsing complete. Validating...`);
             
             // Log summary of the generated content
@@ -238,17 +196,18 @@ Tone and inspiration: grounded, deductive, and in the spirit of classic detectiv
 
             // Validate the response structure
             validateWorldStructure(worldJson);
-
             
             // If we reach this point, validation passed
             console.log("World validation successful after", attempts, "attempts");
             
             // Convert to our internal world structure
             const world = constructWorldStructure(worldJson);
-            console.log('Final world structure contains:', 
+            console.log(
+                'Final world structure contains:', 
                 `${world.locations.size} locations,`,
                 `${world.characters.size} characters,`,
-                `${world.clues.size} clues`);
+                `${world.clues.size} clues`
+            );
             
             // Write the generated world to a file
             // Intentionally not waiting for the write to finish to prevent longer load times
@@ -328,7 +287,11 @@ Your response should be a single, complete JSON object containing the original c
 }
 
 /**
- * Validates that the world structure matches the expected format
+ * Validates that the world structure matches the expected format and contains the required elements.
+ * @param world - The world object to validate
+ * @throws Will throw an error if the world structure is invalid or incomplete.
+ * @throws Will throw an error if the world structure is missing required elements.
+ * @throws Will throw an error if the world structure contains invalid references.
  */
 export function validateWorldStructure(world: APIWorldResponse): void {
     // Check if all required arrays and objects exist
@@ -419,6 +382,11 @@ export function validateWorldStructure(world: APIWorldResponse): void {
     }
 }
 
+/**
+ * Constructs the world structure from the raw API response.
+ * @param raw - The raw API response object
+ * @returns The constructed world object
+ */
 export function constructWorldStructure(raw: APIWorldResponse): World {
     // Convert string IDs to branded types
     const locations = new Map<LocationID, Location>();
@@ -447,7 +415,7 @@ export function constructWorldStructure(raw: APIWorldResponse): World {
             voice: raw_character.voice,
             role: raw_character.role,
             alibi: raw_character.alibi,
-            knownClues: raw_character.knownClues ?? []
+            knownClues: (raw_character.knownClues ?? []) as ClueID[]
         };
 
         characters.set(character.id, character);
@@ -485,13 +453,12 @@ export function constructWorldStructure(raw: APIWorldResponse): World {
     };
 }
 
+/**
+ * Constructs the initial game state for the mystery game.
+ * @param world - The world object to construct the game state from
+ * @returns The initial game state object
+ */
 export function constructGameState(world: World): GameState {
-    const dialogueHistory: Record<CharacterID, Array<{ role: string; content: string }>> = {};
-
-    for (const character of world.characters.values()) {
-        dialogueHistory[character.id] = [];
-    }
-
     // Setup initial game state
     return {
         currentLocation: null,
@@ -499,6 +466,250 @@ export function constructGameState(world: World): GameState {
         cluesFound: [],
         solved: false,
         isInConversation: false,
-        dialogueHistory
+        memories: [],
+        dialogueHistory: {}
     };
+}
+
+/**
+ * Generates a character's next dialogue response based on the current game state.
+ * @param character - The character to generate dialogue for
+ * @param world - The world object
+ * @param state - The current game state
+ * @param input - The user's input to the character
+ * @param options - Optional configuration for the model
+ * @param options.model - The model to use for generating the dialogue
+ * @returns The generated dialogue response from the character
+ */
+export async function getNextDialogueWithCharacter(character: Character, world: World, state: GameState, input?: string, options: { model?: string; } = {}): Promise<string> {
+    if (character.role === 'victim') {
+        return "You cannot speak with the victim.";
+    }
+
+    // Initialize dialogue history if it doesn't exist
+    if (!state.dialogueHistory[character.id]) {
+        state.dialogueHistory[character.id] = [];
+    }
+
+    const dialogueHistory = state.dialogueHistory[character.id]!;
+    
+    // Build the context for the dialogue
+    let knownCluesDescription = null;
+    if (character.knownClues && character.knownClues.length > 0) {
+        knownCluesDescription = character.knownClues
+            .map(clueId => {
+                const clue = world.clues.get(clueId as ClueID);
+                return clue ? clue.name : null;
+            })
+            .filter(Boolean)
+            .join(', ');
+    }
+    
+    const cluesFoundByPlayer = state.cluesFound
+        .map(clueId => {
+            const clue = world.clues.get(clueId);
+            return clue ? clue.name : null;
+        })
+        .filter(Boolean)
+        .join(', ');
+
+    // Create prompt based on character role and context
+    let prompt = `\
+You are an AI roleplaying/method acting as a fictional character in a mystery-themed text adventure game. Stay fully in character—speak, think, and act like this character would. Do not refer to yourself as an AI or break the fourth wall.
+Your role is to engage with the user, who is the investigator, as your character: share suspicions, ask questions, express doubts, notice details, and react naturally to clues or odd behavior.
+
+There are some rules to follow:
+
+- Stay grounded in the mystery's tone—whether noir, thriller, or cozy crime. Maintain emotional realism (e.g., anxiety, skepticism, anger, hesitation).
+- Speak ONLY in the FIRST PERSON. This is vital. Only describe what your character says, thinks, feels, or directly perceives. You are not the narrator, game master, or environment.
+- DO NOT refer to the digital world, game mechanics, or your own nature. Avoid generic phrases like "I think" or "I feel." Instead, express your character's thoughts and feelings directly.
+- Speak as if you can and have seen and experienced the real world around you. Use specific details to enhance immersion.
+- DO NOT describe your character's actions or thoughts in the third person. Use first-person language to convey your character's perspective.
+- DO NOT add quotes or other formatting to your speech. Use plain text.
+
+✅ “That bloodstain wasn't there before. You sure you locked the door?”
+✅ “I can't shake the feeling someone's watching us.”
+❌ “The character notices a clue on the floor.”
+❌ “As an AI, I think the next step is…”
+
+Be proactive—if the user stalls or seems uncertain, prompt them with ideas, pose questions, or draw attention to inconsistencies. Your goal is to help unravel the mystery through character-driven interaction.
+You do not control the world, environment, or events. That is handled by the game master. Focus only on what your character says or feels.
+
+You are ${character.name}. ${character.description}.
+Your character's personality is ${character.personality}.
+The mystery is: ${world.mystery.title}: ${world.mystery.description}.
+You are a ${character.role} in this mystery.
+The victim is: ${world.mystery.victim}
+The crime is: ${world.mystery.crime}
+
+This is the current mystery world:
+<WORLD>
+${JSON.stringify(world, null, 4)}
+</WORLD>
+The user is currently in a conversation with ${character.name}.
+The user has the following memories:
+<MEMORY>
+${JSON.stringify(state.memories, null, 4)}
+</MEMORY>
+The user knows the following clues:
+<USER_KNOWN_CLUES>
+${JSON.stringify(state.cluesFound.map(id => world.clues.get(id)), null, 4)}
+</USER_KNOWN_CLUES>
+The user has the following game state:
+<GAME_STATE>
+${JSON.stringify(state, null, 4)}
+</GAME_STATE>
+
+Your alibi is: ${character.alibi ?? 'No alibi provided'}. 
+You know about these clues: ${knownCluesDescription ?? 'No specific clues'}. 
+The user has found these clues: ${cluesFoundByPlayer ?? 'No clues yet'}.\n`;
+    
+    // Customize prompt based on character role and user progress
+    if (character.role === 'suspect') {
+        prompt += `\
+You should be evasive if the user mentions clues that might incriminate you,
+but remain in character and provide helpful information about what you know.
+If you have nothing to say, you can say you have nothing to add.
+If there is no existing conversation start by intoducing yourself to the user.`;
+    } else {
+        // For witnesses
+        prompt += `\
+You should be helpful and provide information about what you know.
+If you have nothing to say, you can say you have nothing to add.
+If there is no existing conversation start by intoducing yourself to the user.`;
+    }
+
+    const messages: Message[] = [
+        {
+            role: 'system',
+            content: prompt
+        },
+        ...dialogueHistory
+    ];
+
+    if (input) {
+        messages.push({
+            role: 'user',
+            content: input
+        });
+    }
+
+    const newDialogue = await OpenRouter.generateCompletion(options.model ?? 'google/gemini-2.0-flash-001', messages);
+
+    if (input) {
+        // Add the user input to the character's history
+        dialogueHistory.push({
+            role: 'user',
+            content: input
+        });
+    }
+
+    // Add the new dialogue to the character's history
+    dialogueHistory.push({
+        role: 'assistant',
+        content: newDialogue
+    });
+
+    updateGameStateMemories(world, state);
+
+    // Return the new dialogue
+    return newDialogue;
+}
+
+/**
+ * Updates the game state with new memories or facts based on the current game state.
+ * @param world - The world object
+ * @param state - The current game state
+ */
+export async function updateGameStateMemories(world: World, state: GameState): Promise<void> {
+    // Here we will run the game master on the current game state
+    // and check if there are any changes to the game state
+    // We will look for stuff like new memories or facts that have been created
+
+    // Are we in a conversation?
+    if (state.isInConversation) {
+        // Check if the current character is still in the same location
+        if (state.currentCharacter) {
+            const character = world.characters.get(state.currentCharacter);
+
+            if (character) {
+                const conversation = state.dialogueHistory[character.id];
+
+                if (conversation) {
+                    // Extract new memories or facts from the conversation
+                    // TODO: update when location exploration is working
+                    const SYSTEM_PROMPT = `\
+You are Mystwright, a game master for a mystery text adventure.
+Your job is to keep track of facts and memories that the user has learned during the game. Or that characters have created.
+This is to maintain consistency in the game world.
+Each memory or fact should be a simple statement that can be added to the game state.
+The memory origin_id should be the ID of a valid character in the game world.
+
+This is the current mystery world:
+<WORLD>
+${JSON.stringify(world, null, 4)}
+</WORLD>
+The user is currently in a conversation with ${character.name}.
+The user has the following memories:
+<MEMORY>
+${JSON.stringify(state.memories, null, 4)}
+</MEMORY>
+The user knows the following clues:
+<USER_KNOWN_CLUES>
+${JSON.stringify(state.cluesFound.map(id => world.clues.get(id)), null, 4)}
+</USER_KNOWN_CLUES>
+The user is currently in a conversation with ${character.name} and has the following dialogue history:
+<CONVERSATION>
+${JSON.stringify(conversation, null, 4)}
+</CONVERSATION>
+The user has the following game state:
+<GAME_STATE>
+${JSON.stringify(state, null, 4)}
+</GAME_STATE>\
+                    `;
+
+                    const schema = {
+                        name: 'memories',
+                        strict: true,
+                        schema: {
+                            type: 'array',
+                            items: {
+                                type: 'object',
+                                properties: {
+                                    origin_id: { type: 'string' },
+                                    origin_type: { type: 'string', enum: ['character'] },
+                                    content: { type: 'string' }
+                                },
+                                required: ['origin_id', 'origin_type', 'content'],
+                                additionalProperties: false
+                            }
+                        }
+                    };
+
+                    const memories = await OpenRouter.generateCompletion(
+                        'google/gemini-2.0-flash-001',
+                        [
+                            {
+                                role: 'system',
+                                content: SYSTEM_PROMPT
+                            },
+                            {
+                                role: 'user',
+                                content: `Please provide a list of new memories or facts that the user has learned during the game. Or that characters have created.`
+                            }
+                        ],
+                        schema
+                    );
+
+                    // Check if there are any new memories
+                    if (memories && Array.isArray(memories)) {
+                        for (const memory of memories) {
+                            // Add the new memory to the game state
+                            state.memories.push(memory);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
