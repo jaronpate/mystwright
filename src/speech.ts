@@ -1,7 +1,7 @@
-import { ElevenLabsClient, play } from "elevenlabs";
+import { ElevenLabsClient } from "elevenlabs";
 import type { Character, ClueID, GameState, OpenRouterCompletionResponse, World } from "./types";
 import { spawn } from "bun";
-import { sleep, which } from "./util";
+import { which } from "./util";
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
@@ -29,7 +29,7 @@ export async function getNextDialogueWithCharacter(character: Character, world: 
     const dialogueHistory = state.dialogueHistory[character.id]!;
     
     // Build the context for the dialogue
-    let knownCluesDescription = '';
+    let knownCluesDescription = null;
     if (character.knownClues && character.knownClues.length > 0) {
         knownCluesDescription = character.knownClues
             .map(clueId => {
