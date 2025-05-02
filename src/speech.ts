@@ -19,7 +19,7 @@ export async function playVoiceForCharacter(character: Character, text: string):
         stream: true,
         voice: character.voice,
         voice_settings: {
-            speed: 1.2,
+            speed: 1.15,
             stability: 0.3
         },
         text,
