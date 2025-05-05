@@ -286,20 +286,26 @@ Commands:
                 setMessages([]);
                 clearTerm();
             } else if (command === 'solve') {
-                const solution = args.join(' ');
-
-                const result = await attemptSolve(world, gameState, solution);
+                const solution = args.join(' ').trim();
 
                 setGameState(prev => ({
                     ...prev,
-                    isSolving: true,
-                    solved: result.solved
+                    isSolving: true
                 }));
 
-                setMessages(prev => [
-                    ...prev,
-                    { role: 'assistant', content: result.response }
-                ]);
+                if (solution.length > 0) {
+                    const result = await attemptSolve(world, gameState, solution);
+    
+                    setGameState(prev => ({
+                        ...prev,
+                        solved: result.solved
+                    }));
+    
+                    setMessages(prev => [
+                        ...prev,
+                        { role: 'assistant', content: result.response }
+                    ]);
+                }
             } else if (command === 'talkto') {
                 const characterName = args.join(' ');
                 const character = Array.from(world.characters.values()).find(c => c.name.toLowerCase().includes(characterName));
