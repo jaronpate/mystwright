@@ -112,7 +112,11 @@ const ChatPanel = ({
                     // Delete up to the last space
                     const lastSpaceIndex = input.lastIndexOf(' ');
                     if (lastSpaceIndex !== -1) {
-                        setInput(input.slice(0, lastSpaceIndex));
+                        if (input.endsWith(' ')) {
+                            setInput(input.slice(0, lastSpaceIndex));
+                        } else {
+                            setInput(input.slice(0, lastSpaceIndex + 1));
+                        }
                     } else {
                         setInput('');
                     }
@@ -190,7 +194,7 @@ const ChatPanel = ({
                     <Text color="white" dimColor>
                         {'> '}
                     </Text>
-                    <Text>{input}</Text><Text color="white">▋</Text>
+                    <Text>{input}</Text><Text color="white">█</Text>
                 </Box>
                 <Box>
                     <Text color="white" dimColor>
@@ -250,14 +254,26 @@ const MystwrightUI = ({ world, state }: { world: World, state: GameState }) => {
                         role: 'system',
                         content: `\
 Commands:
-- [location name]: Go to a location
-- [character name]: Talk to a character
-- examine/look/search: Look for clues
-- solve/accuse [character]: Name the culprit
-- exit/quit: Exit the game
-- help: Show this help message
-`                       },
+- /help: Show this help message
+- /exit: Exit the game
+- /leave: Leave the current conversation
+- /talkto <character>: Start a conversation with a character`
+                    },
                 ]);
+            } else if (command === 'exit') {
+                setMessages(prev => [
+                    ...prev,
+                    { role: 'system', content: 'Exiting the game...' }
+                ]);
+                // Exit the application
+                exit();
+            } else if (command === 'leave') {
+                setGameState(prev => ({
+                    ...prev,
+                    currentCharacter: null,
+                    isInConversation: false
+                }));
+                setMessages([{ role: 'system', content: 'You have left the conversation.' } ]);
             } else if (command === 'talkto') {
                 const characterName = args.join(' ');
                 const character = Array.from(world.characters.values()).find(c => c.name.toLowerCase().includes(characterName));
