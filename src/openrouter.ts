@@ -1,11 +1,11 @@
 import type { OpenRouterCompletionResponse } from "./types";
 
-export async function generateCompletion<T extends Record<string, any> | undefined = undefined>(
+export async function generateCompletion<T extends Record<string, any> | undefined = undefined, K = T extends undefined ? string : Record<string, any> | Array<Record<string, any>>>(
     model: string,
     previousMessages: { role: 'system' | 'user' | 'assistant'; content: string }[],
     schema?: T,
     config: { apiKey?: string } = {}
-): Promise<T extends undefined ? string : Record<string, any> | Array<Record<string, any>>> {
+): Promise<K> {
     const openrouterAPIKey = config.apiKey ?? process.env.OPENROUTER_API_KEY;
 
     if (openrouterAPIKey === undefined || openrouterAPIKey === null) {
@@ -58,9 +58,9 @@ export async function generateCompletion<T extends Record<string, any> | undefin
 
     if (schema) {
         const parsedResponse = JSON.parse(data.choices[0].message.content);
-        return parsedResponse as T extends undefined ? string : Record<string, any>;
+        return parsedResponse as K;
     } else {
-        return data.choices[0].message.content as T extends undefined ? string : Record<string, any>;
+        return data.choices[0].message.content as K;
     }
 }
 

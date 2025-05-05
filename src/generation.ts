@@ -53,6 +53,7 @@ Rules:
 - All IDs must be valid and cross-referenced correctly.
 - You must only output a valid JSON object matching the schema provided. No explanations or prose outside the JSON.
 - For each character select an appropriate voice based on the info provided about the voice and the personality and description given to the character. Provice the 'Name' for the selected voice in the JSON output.
+- There should be multiple ways to solve the mystery, but only one correct solution.
 
 ${availableVoices}
 
@@ -466,6 +467,7 @@ export function constructGameState(world: World): GameState {
         cluesFound: [],
         solved: false,
         isInConversation: false,
+        isSolving: false,
         memories: [],
         dialogueHistory: {}
     };
@@ -610,7 +612,7 @@ If there is no existing conversation start by intoducing yourself to the user.`;
         content: newDialogue
     });
 
-    updateGameStateMemories(world, state);
+    updateGameState(world, state);
 
     // Return the new dialogue
     return newDialogue;
@@ -621,7 +623,7 @@ If there is no existing conversation start by intoducing yourself to the user.`;
  * @param world - The world object
  * @param state - The current game state
  */
-export async function updateGameStateMemories(world: World, state: GameState): Promise<void> {
+export async function updateGameState(world: World, state: GameState): Promise<void> {
     // Here we will run the game master on the current game state
     // and check if there are any changes to the game state
     // We will look for stuff like new memories or facts that have been created
@@ -712,4 +714,92 @@ ${JSON.stringify(state, null, 4)}
             }
         }
     }
+}
+
+export async function attemptSolve(world: World, state: GameState, input: string): Promise<{ solved: boolean; response: string }> {
+    const SYSTEM_PROMPT = `\
+You are Mystwright, a game master for a mystery text adventure.
+The user is making a guess for the solution to the mystery.
+
+This is the current mystery world (this contains privleged information that the user does not have access to):
+<WORLD>
+${JSON.stringify(world, null, 4)}
+</WORLD>
+Currently you are to roleplay as the Judge in a courtroom.
+Provide a response to the user based on their guess.
+
+Reject a guess if it is not based on evidence or if it is not a valid guess. Request more evidence or information if needed.
+Reject a guess if it has insufficient evidence to support it. Request more evidence or information if needed.`
+
+// NOTE: adding this to the pompt causes the model to actually allow guesses with no evidence
+
+// If the guess is correct, respond with a positive confirmation and a brief explanation of how the user solved the mystery and the solved boolean should be set to true.
+// If the guess is incorrect, respond with a negative confirmation and a brief explanation of why the guess is incorrect.
+// If the guess is correct but with insufficient evidence, respond with a neutral confirmation and a brief explanation of what is missing. The mystery is not considered solved in this case.
+
+// There are some rules to follow:
+
+// - The response should be in the first person, as if you are the Judge.
+// - The response should be clear and concise, without unnecessary details.
+// - The response should be in the tone of a courtroom judge, maintaining a formal and authoritative demeanor.
+// - The users supplied guess MUST have enough evidence to support it, or it should be considered incorrect.
+// - DO NOT allow the user to ask for hints or clues. They must provide a guess based on the evidence they have gathered.
+// - DO NOT provide any additional information or context outside of the response to the user's guess.
+// - DO NOT allow a guess made with no evidence and just names to be considered a solved.
+
+    const messages: Message[] = [
+        {
+            role: 'system',
+            content: SYSTEM_PROMPT
+        }
+    ];
+
+    let history = state.dialogueHistory['judge' as CharacterID];
+
+    if (history === null || history === undefined) {
+        history = state.dialogueHistory['judge' as CharacterID] = [];
+    }
+
+    history.push(
+        {
+            role: 'user',
+            content: input
+        }
+    );
+
+    messages.push(...history);
+
+    const response = await OpenRouter.generateCompletion<any, { solved: boolean; response: string }>(
+        'google/gemini-2.0-flash-001',
+        messages,
+        {
+            name: 'attempt-solve-response',
+            strict: true,
+            schema: {
+                type: 'object',
+                properties: {
+                    solved: { type: 'boolean' },
+                    response: { type: 'string' }
+                },
+                required: ['solved', 'response'],
+                additionalProperties: false
+            }
+        }
+    );
+
+    history.push(
+        {
+            role: 'assistant',
+            content: response.response
+        }
+    );
+
+    messages.push(
+        {
+            role: 'assistant',
+            content: response.response
+        }
+    );
+
+    return response;
 }

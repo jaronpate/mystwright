@@ -128,6 +128,7 @@ export type GameState = {
     cluesFound: ClueID[];
     solved: boolean;
     isInConversation: boolean;
+    isSolving: boolean;
     memories: {
         origin_id: string;
         origin_type: 'location' | 'character' | 'clue';

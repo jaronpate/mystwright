@@ -1,6 +1,6 @@
 import { Box, Newline, render, Text, useApp, useInput } from 'ink';
 import { useEffect, useState } from 'react';
-import { getNextDialogueWithCharacter } from './generation';
+import { attemptSolve, getNextDialogueWithCharacter } from './generation';
 import { playVoiceForCharacter } from './speech';
 import type { GameState, MessageUI, World } from './types';
 
@@ -139,24 +139,27 @@ const ChatPanel = ({
                 flexGrow={1}
                 padding={1}
             >
-                {currentCharacter && (
-                    <>
-                        <Box>
+                <Box flexDirection="column" width="100%" marginBottom={1}>
+                    {currentCharacter && (
+                        <Box flexDirection="column">
                             <Text color="cyan" bold inverse>Speaking with: {currentCharacter.name}</Text>
-                        </Box>
-                        <Box>
                             <Text>{currentCharacter.description}</Text>
                         </Box>
-                    </>
-                )}
-
-                {!currentCharacter && (
-                    <>
+                    )}
+                    
+                    {gameState.isSolving && (
+                        <Box flexDirection="column">
+                            <Text color="cyan" bold inverse>Speaking with: The Judge</Text>
+                            <Text color="white">You must convince the judge of your solution.</Text>
+                        </Box>
+                    )}
+                    
+                    {!gameState.isInConversation && !gameState.isSolving && (
                         <Box>
                             <Text color="blue" bold inverse>Welcome to Mystwright: {world.mystery.title}</Text>
                         </Box>
-                    </>
-                )}
+                    )}
+                </Box>
 
                 <Newline />
 
@@ -256,8 +259,10 @@ const MystwrightUI = ({ world, state }: { world: World, state: GameState }) => {
 Commands:
 - /help: Show this help message
 - /exit: Exit the game
+- /clear: Clear the chat history
 - /leave: Leave the current conversation
-- /talkto <character>: Start a conversation with a character`
+- /talkto <character>: Start a conversation with a character
+- /solve <solution>: Attempt to solve the mystery`
                     },
                 ]);
             } else if (command === 'exit') {
@@ -265,15 +270,36 @@ Commands:
                     ...prev,
                     { role: 'system', content: 'Exiting the game...' }
                 ]);
+                clearTerm();
                 // Exit the application
                 exit();
             } else if (command === 'leave') {
                 setGameState(prev => ({
                     ...prev,
                     currentCharacter: null,
-                    isInConversation: false
+                    isInConversation: false,
+                    isSolving: false
                 }));
                 setMessages([{ role: 'system', content: 'You have left the conversation.' } ]);
+                clearTerm();
+            } else if (command === 'clear') {
+                setMessages([]);
+                clearTerm();
+            } else if (command === 'solve') {
+                const solution = args.join(' ');
+
+                const result = await attemptSolve(world, gameState, solution);
+
+                setGameState(prev => ({
+                    ...prev,
+                    isSolving: true,
+                    solved: result.solved
+                }));
+
+                setMessages(prev => [
+                    ...prev,
+                    { role: 'assistant', content: result.response }
+                ]);
             } else if (command === 'talkto') {
                 const characterName = args.join(' ');
                 const character = Array.from(world.characters.values()).find(c => c.name.toLowerCase().includes(characterName));
@@ -302,7 +328,14 @@ Commands:
             // Add player message to chat history
             setMessages(prev => [...prev, { role: 'user', content: input }]);
 
-            if (gameState.isInConversation && currentCharacter) {
+            if (gameState.isSolving) {
+                const result = await attemptSolve(world, gameState, input);
+
+                setMessages(prev => [
+                    ...prev,
+                    { role: 'assistant', content: result.response }
+                ]);
+            } else if (gameState.isInConversation && currentCharacter) {
                 const response = await getNextDialogueWithCharacter(currentCharacter, world, gameState, input);
 
                 if (response) {
