@@ -10,14 +10,14 @@ const elevenlabs = new ElevenLabsClient({
     apiKey: ELEVENLABS_API_KEY,
 });
 
-export async function playVoiceForCharacter(character: Character, text: string): Promise<void> {
+export async function playVoiceForText(voice: string, text: string): Promise<void> {
     if (which('ffplay') === null) {
         throw new Error('ffplay is not installed. Please install ffmpeg for voice streaming.');
     }
     
     const audio = await elevenlabs.generate({
         stream: true,
-        voice: character.voice,
+        voice: voice,
         voice_settings: {
             speed: 1.15,
             stability: 0.3

@@ -1,8 +1,9 @@
 import { Box, Newline, render, Text, useApp, useInput } from 'ink';
 import { useEffect, useState } from 'react';
 import { attemptSolve, getNextDialogueWithCharacter } from './generation';
-import { playVoiceForCharacter } from './speech';
-import type { GameState, MessageUI, World } from './types';
+import { playVoiceForText } from './speech';
+import type { CharacterID, GameState, MessageUI, World } from './types';
+import { JUDGE_CHARACTER_ID, JUDGE_VOICE } from './constants';
 
 // UI Components
 const InfoPanel = ({ world, state, height, width }: { world: World, state: GameState, height?: string | number, width?: string | number }) => {
@@ -293,7 +294,13 @@ Commands:
                     isSolving: true
                 }));
 
+
                 if (solution.length > 0) {
+                    setMessages([
+                        ...gameState.dialogueHistory['judge' as CharacterID] ?? [],
+                        { role: 'user', content: solution }
+                    ]);
+
                     const result = await attemptSolve(world, gameState, solution);
     
                     setGameState(prev => ({
@@ -305,6 +312,10 @@ Commands:
                         ...prev,
                         { role: 'assistant', content: result.response }
                     ]);
+
+                    await playVoiceForText(JUDGE_VOICE, result.response);
+                } else {
+                    setMessages(gameState.dialogueHistory[JUDGE_CHARACTER_ID] ?? []);
                 }
             } else if (command === 'talkto') {
                 const characterName = args.join(' ');
@@ -341,6 +352,8 @@ Commands:
                     ...prev,
                     { role: 'assistant', content: result.response }
                 ]);
+
+                await playVoiceForText('Cornelius', result.response);
             } else if (gameState.isInConversation && currentCharacter) {
                 const response = await getNextDialogueWithCharacter(currentCharacter, world, gameState, input);
 
@@ -349,7 +362,7 @@ Commands:
                         ...prev,
                         { role: 'assistant', content: response, sender: currentCharacter.name }
                     ]);
-                    await playVoiceForCharacter(currentCharacter, response);
+                    await playVoiceForText(currentCharacter.voice, response);
                 } else {
                     setMessages(prev => [
                         ...prev,

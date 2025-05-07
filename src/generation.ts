@@ -2,6 +2,7 @@ import { ElevenLabsClient } from "elevenlabs";
 import { OpenRouter } from "./openrouter";
 import type { APIWorldResponse, Character, CharacterID, Clue, ClueID, GameState, Location, LocationID, Message, World } from "./types";
 import { writeRelative } from "./util";
+import { JUDGE_CHARACTER_ID, JUDGE_VOICE } from "./constants";
 
 const elevenlabs = new ElevenLabsClient({ apiKey: process.env.ELEVENLABS_API_KEY });
 
@@ -17,6 +18,10 @@ export async function generateWorld(config: { model?: string; } = {}): Promise<W
     let availableVoices = `Available voices:\n\n`;
 
     for (const voice of voices) {
+        if (voice.name === JUDGE_VOICE) {
+            continue; // Skip the voice used for the judge
+        }
+
         if (voice.labels && voice.high_quality_base_model_ids?.includes('eleven_multilingual_v2')) {
             availableVoices += `Name: ${voice.name}\nLabels: ${voice.labels.gender}, ${voice.labels.accent}, ${voice.labels.description}, ${voice.labels.age}\n\n`;
         }
@@ -54,6 +59,7 @@ Rules:
 - You must only output a valid JSON object matching the schema provided. No explanations or prose outside the JSON.
 - For each character select an appropriate voice based on the info provided about the voice and the personality and description given to the character. Provice the 'Name' for the selected voice in the JSON output.
 - There should be multiple ways to solve the mystery, but only one correct solution.
+- The character id ${JUDGE_CHARACTER_ID} is reserved. Do not use it for any of characters you create.
 
 ${availableVoices}
 
@@ -754,10 +760,10 @@ Reject a guess if it has insufficient evidence to support it. Request more evide
         }
     ];
 
-    let history = state.dialogueHistory['judge' as CharacterID];
+    let history = state.dialogueHistory[JUDGE_CHARACTER_ID];
 
     if (history === null || history === undefined) {
-        history = state.dialogueHistory['judge' as CharacterID] = [];
+        history = state.dialogueHistory[JUDGE_CHARACTER_ID] = [];
     }
 
     history.push(
