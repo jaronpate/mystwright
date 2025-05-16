@@ -96,7 +96,7 @@ export type APIWorldResponse = {
     };
 };
 
-export type OpenRouterCompletionResponse = {
+export type OpenRouterChatCompletionResponse = {
     id: string;
     object: string;
     created: number;
@@ -122,6 +122,12 @@ export type OpenRouterCompletionResponse = {
     };
 };
 
+export type Memory = {
+    origin_id: string;
+    origin_type: 'location' | 'character' | 'clue';
+    content: string;
+}
+
 export type GameState = {
     currentLocation: LocationID | null;
     currentCharacter: CharacterID | null;
@@ -129,10 +135,15 @@ export type GameState = {
     solved: boolean;
     isInConversation: boolean;
     isSolving: boolean;
-    memories: {
-        origin_id: string;
-        origin_type: 'location' | 'character' | 'clue';
-        content: string;
-    }[];
+    memories: Memory[];
     dialogueHistory: Record<CharacterID, Message[]>;
+};
+
+export type Tool = {
+    type: 'function' | 'action';
+    name: string;
+    description: string;
+    when: string;
+    parameters: Record<string, any>;
+    handler: (args: any) => Promise<any>;
 };

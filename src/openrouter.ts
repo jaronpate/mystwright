@@ -1,10 +1,9 @@
-import type { OpenRouterCompletionResponse } from "./types";
+import type { OpenRouterChatCompletionResponse, Tool } from "./types";
 
 export async function generateCompletion<T extends Record<string, any> | undefined = undefined, K = T extends undefined ? string : Record<string, any> | Array<Record<string, any>>>(
     model: string,
     previousMessages: { role: 'system' | 'user' | 'assistant'; content: string }[],
-    schema?: T,
-    config: { apiKey?: string } = {}
+    config: { apiKey?: string, schema?: T, tools?: Array<Tool> } = {}
 ): Promise<K> {
     const openrouterAPIKey = config.apiKey ?? process.env.OPENROUTER_API_KEY;
 
@@ -24,10 +23,24 @@ export async function generateCompletion<T extends Record<string, any> | undefin
         messages: previousMessages,
     }
 
-    if (schema) {
+    if (config.schema) {
         body.response_format = {
             type: 'json_schema',
-            json_schema: schema
+            json_schema: config.schema
+        }
+    }
+
+    if (config.tools) {
+        body.messages.push({
+            role: 'system',
+            content: `You have access to the following tools: ${config.tools.map(tool => tool.name).join(', ')}.`
+        });
+
+        for (const tool of config.tools) {
+            body.messages.push({
+                role: 'system',
+                content: `Use the tool ${tool.name} when: ${tool.when}.`
+            });
         }
     }
 
@@ -45,7 +58,9 @@ export async function generateCompletion<T extends Record<string, any> | undefin
         throw new Error(`OpenRouter API error: ${response.status} ${JSON.stringify(errorData)}`);
     }
 
-    const data = await response.json() as OpenRouterCompletionResponse;
+    const data = await response.json() as OpenRouterChatCompletionResponse;
+
+    console.log('OpenRouter API response:', JSON.stringify(data, null, 4));
 
     if (data.error) {
         console.error('OpenRouter API error:', data.error);
@@ -56,7 +71,11 @@ export async function generateCompletion<T extends Record<string, any> | undefin
         throw new Error('Invalid response format from OpenRouter API');
     }
 
-    if (schema) {
+    if (data.choices[0].finish_reason === 'tool_call') {
+        // TODO: Handle tool call
+    }
+
+    if (config.schema) {
         const parsedResponse = JSON.parse(data.choices[0].message.content);
         return parsedResponse as K;
     } else {

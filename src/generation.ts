@@ -1,8 +1,11 @@
 import { ElevenLabsClient } from "elevenlabs";
+import OpenAI from "openai";
 import { OpenRouter } from "./openrouter";
-import type { APIWorldResponse, Character, CharacterID, Clue, ClueID, GameState, Location, LocationID, Message, World } from "./types";
+import type { APIWorldResponse, Character, CharacterID, Clue, ClueID, GameState, Location, LocationID, Message, Memory, World } from "./types";
 import { writeRelative } from "./util";
 import { JUDGE_CHARACTER_ID, JUDGE_VOICE } from "./constants";
+
+const openai = new OpenAI();
 
 const elevenlabs = new ElevenLabsClient({ apiKey: process.env.ELEVENLABS_API_KEY });
 
@@ -70,7 +73,7 @@ Tone and inspiration: grounded, deductive, and in the spirit of classic detectiv
 Create a mystery with a modern mystery novel tone
     `;
     // const model = config.model ?? 'openai/o4-mini-high';
-    const maxAttempts = 3; // Maximum number of attempts to generate a valid world
+    const maxAttempts = 5; // Maximum number of attempts to generate a valid world
     let attempts = 0;
     let worldJson: APIWorldResponse | null = null;
     let previousMessages: Array<Message> = [
@@ -193,7 +196,7 @@ Create a mystery with a modern mystery novel tone
             worldJson = await OpenRouter.generateCompletion(
                 config.model ?? 'google/gemini-2.0-flash-001',
                 previousMessages,
-                schema
+                { schema }
             ) as APIWorldResponse;
 
             console.log(`Attempt ${attempts} - parsing complete. Validating...`);
@@ -218,7 +221,20 @@ Create a mystery with a modern mystery novel tone
             
             // Write the generated world to a file
             // Intentionally not waiting for the write to finish to prevent longer load times
-            writeRelative(`../gens/${world.mystery.title}.json`, JSON.stringify(worldJson, null, 4));
+            writeRelative(`../gens/${world.mystery.title}/world.json`, JSON.stringify(worldJson, null, 4));
+
+            console.log('Generating clue images...');
+            await Promise.all(
+                Array.from(world.clues.values()).map(async (clue) => {
+                    if (clue.type === 'physical') {
+                        // Generate an image for the clue
+                        const image = await generateClueImage(clue);
+                        await writeRelative(`../gens/imgs/${world.mystery.title}/${clue.id}-clue-image.png`, image);
+                        console.log(`Generated image for clue ${clue.name} (${clue.id})`);
+                    }
+                })
+            );
+            console.log('All clue images generated successfully.');
 
             return world;
         } catch (error) {
@@ -603,6 +619,26 @@ If there is no existing conversation start by intoducing yourself to the user.`;
         });
     }
 
+    // const tools: Array<Tool> = [
+    //     {
+    //         type: 'function',
+    //         name: 'reveal_clue',
+    //         description: 'Reveal a clue to the user',
+    //         parameters: {
+    //             type: 'object',
+    //             properties: {
+    //                 clueId: {
+    //                     type: 'string',
+    //                     description: 'The ID of the clue to reveal'
+    //                 }
+    //             },
+    //             required: ['clueId']
+    //         },
+    //         when: 'If you menation a clue that the user has not found yet, you can use this function to reveal it to them.',
+    //         handler: async (params: { clueId: ClueID }) => revealClue(world, state, params.clueId)
+    //     }
+    // ];
+
     const newDialogue = await OpenRouter.generateCompletion(options.model ?? 'google/gemini-2.0-flash-001', messages);
 
     if (input) {
@@ -626,11 +662,35 @@ If there is no existing conversation start by intoducing yourself to the user.`;
 }
 
 /**
- * Updates the game state with new memories or facts based on the current game state.
+ * Reveals a clue to the user in the game state.
+ * @param world - The world object
+ * @param state - The current game state
+ * @param clueId - The ID of the clue to reveal
+ * @throws Will throw an error if the clue is not found in the world
+ */
+export function revealClue(world: World, state: GameState, clueId: ClueID): void {
+    const clue = world.clues.get(clueId);
+    if (!clue) {
+        throw new Error(`Clue with ID ${clueId} not found`);
+    }
+    if (!state.cluesFound.includes(clueId)) {
+        state.cluesFound.push(clueId);
+    }
+}
+
+/**
+ * Updates the game state with new memories, facts, and revealed clues based on the current game state.
  * @param world - The world object
  * @param state - The current game state
  */
 export async function updateGameState(world: World, state: GameState): Promise<void> {
+    await Promise.all([
+        updateKnownClues(world, state),
+        updateMemories(world, state)
+    ]);
+}
+
+export async function updateMemories(world: World, state: GameState): Promise<void> {
     // Here we will run the game master on the current game state
     // and check if there are any changes to the game state
     // We will look for stuff like new memories or facts that have been created
@@ -674,11 +734,10 @@ ${JSON.stringify(conversation, null, 4)}
 The user has the following game state:
 <GAME_STATE>
 ${JSON.stringify(state, null, 4)}
-</GAME_STATE>\
-                    `;
+</GAME_STATE>`;
 
-                    const schema = {
-                        name: 'memories',
+                    const memory_schema = {
+                        name: 'memory-update',
                         strict: true,
                         schema: {
                             type: 'array',
@@ -695,6 +754,7 @@ ${JSON.stringify(state, null, 4)}
                         }
                     };
 
+
                     const memories = await OpenRouter.generateCompletion(
                         'google/gemini-2.0-flash-001',
                         [
@@ -704,17 +764,94 @@ ${JSON.stringify(state, null, 4)}
                             },
                             {
                                 role: 'user',
-                                content: `Please provide a list of new memories or facts that the user has learned during the game. Or that characters have created.`
+                                content: `Provide a list of new memories or facts that the user has learned during the game. Or that characters have created.`
                             }
                         ],
-                        schema
-                    );
+                        { schema: memory_schema }
+                    ) as Array<Memory>;
 
                     // Check if there are any new memories
-                    if (memories && Array.isArray(memories)) {
+                    if (memories !== null && memories !== undefined && Array.isArray(memories)) {
                         for (const memory of memories) {
                             // Add the new memory to the game state
                             state.memories.push(memory);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+export async function updateKnownClues(world: World, state: GameState): Promise<void> {
+    // Are we in a conversation?
+    if (state.isInConversation) {
+        // Check if the current character is still in the same location
+        if (state.currentCharacter) {
+            const character = world.characters.get(state.currentCharacter);
+
+            if (character) {
+                const conversation = state.dialogueHistory[character.id];
+
+                if (conversation) {
+                    // Extract new memories or facts from the conversation
+                    // TODO: update when location exploration is working
+                    const SYSTEM_PROMPT = `\
+You are Mystwright, a game master for a mystery text adventure.
+Your job is to keep track of clues that the user has learned during the game. Or that characters have revealed.
+This is to maintain consistency in the game world.
+If the current character has revealed a clue to the user in the conversation return the clue ID in your response.
+
+The user is currently in a conversation with ${character.name} and has the following dialogue history:
+<CONVERSATION>
+${JSON.stringify(conversation, null, 4)}
+</CONVERSATION>
+This character knows the following clues:
+${(character.knownClues) && (`\
+<CHARACTER_KNOWN_CLUES>
+${JSON.stringify(character.knownClues.map(id => world.clues.get(id)), null, 4)}
+</CHARACTER_KNOWN_CLUES>`
+)}
+The user knows the following clues:
+<USER_KNOWN_CLUES>
+${JSON.stringify(state.cluesFound.map(id => world.clues.get(id)), null, 4)}
+</USER_KNOWN_CLUES>
+This is the current mystery world:
+<WORLD>
+${JSON.stringify(world, null, 4)}
+</WORLD>`;
+
+                    const clues_schema = {
+                        name: 'clues-update',
+                        strict: true,
+                        schema: {
+                            type: 'array',
+                            items: {
+                                type: 'string'
+                            },
+                            additionalProperties: false
+                        }
+                    };
+
+                    const clues = await OpenRouter.generateCompletion(
+                        'google/gemini-2.0-flash-001',
+                        [
+                            {
+                                role: 'system',
+                                content: SYSTEM_PROMPT
+                            },
+                            {
+                                role: 'user',
+                                content: `Provide a list of new clues that the user has learned during the game. Or that characters have revealed.`
+                            }
+                        ],
+                        { schema: clues_schema }
+                    ) as Array<ClueID>;
+
+                    // Check if there are any new clues
+                    if (clues !== null && clues !== undefined && Array.isArray(clues)) {
+                        for (const clue of clues) {
+                            revealClue(world, state, clue);
                         }
                     }
                 }
@@ -780,16 +917,18 @@ Reject a guess if it has insufficient evidence to support it. Request more evide
         'google/gemini-2.0-flash-001',
         messages,
         {
-            name: 'attempt-solve-response',
-            strict: true,
             schema: {
-                type: 'object',
-                properties: {
-                    solved: { type: 'boolean' },
-                    response: { type: 'string' }
-                },
-                required: ['solved', 'response'],
-                additionalProperties: false
+                name: 'attempt-solve-response',
+                strict: true,
+                schema: {
+                    type: 'object',
+                    properties: {
+                        solved: { type: 'boolean' },
+                        response: { type: 'string' }
+                    },
+                    required: ['solved', 'response'],
+                    additionalProperties: false
+                }
             }
         }
     );
@@ -809,4 +948,39 @@ Reject a guess if it has insufficient evidence to support it. Request more evide
     );
 
     return response;
+}
+
+export async function generateClueImage(clue: Clue): Promise<Buffer> {
+    const prompt = `\
+You are Mystwright, a game master for a mystery text adventure.
+Your job is to generate a clue image based on the clue description.
+
+Generate an image for the clue: ${clue.name} - ${clue.description}.
+Do not make up any text in the image. The image should in the style of a photograph of evidence taken at a crime scene.
+The image should be a realistic representation of the clue, with no additional elements or distractions.
+The image should be clear and focused on the clue itself.`;
+
+    const result = await openai.images.generate({
+        model: "gpt-image-1",
+        prompt,
+    });
+
+    if (result.data?.[0] === undefined || result.data?.[0] === null) {
+        throw new Error('No image generated');
+    }
+
+    const image_base64 = result.data[0].b64_json;
+
+    if (image_base64 === undefined || image_base64 === null) {
+        throw new Error('No image data returned');
+    }
+
+    const image_bytes = Buffer.from(image_base64, "base64");
+
+    return image_bytes;
+
+    // const image_blob = new Blob([image_bytes], { type: "image/png" });
+    // const image_url = URL.createObjectURL(image_blob);
+
+    // return image_url;
 }

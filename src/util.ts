@@ -6,7 +6,7 @@ import { dirname, join } from "path";
  * @param relativePath - Path relative to the current script file.
  * @param data - The data to write (string, ArrayBuffer, or Blob).
  */
-export async function writeRelative(relativePath: string, data: string | ArrayBuffer | Blob) {
+export async function writeRelative(relativePath: string, data: string | Buffer | ArrayBuffer | Blob) {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = dirname(__filename);
     const fullPath = join(__dirname, relativePath);
@@ -19,6 +19,8 @@ export async function writeRelative(relativePath: string, data: string | ArrayBu
  * @returns The path to the command if found, otherwise null.
  */
 export async function which(cmd: string): Promise<string | null> {
+    return Bun.which(cmd);
+    
     const proc = Bun.spawn(['which', cmd], {
         stdout: 'pipe',
         stderr: 'ignore'

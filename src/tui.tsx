@@ -353,7 +353,7 @@ Commands:
                     { role: 'assistant', content: result.response }
                 ]);
 
-                await playVoiceForText('Cornelius', result.response);
+                await playVoiceForText(JUDGE_VOICE, result.response);
             } else if (gameState.isInConversation && currentCharacter) {
                 const response = await getNextDialogueWithCharacter(currentCharacter, world, gameState, input);
 
@@ -362,15 +362,13 @@ Commands:
                         ...prev,
                         { role: 'assistant', content: response, sender: currentCharacter.name }
                     ]);
-                    await playVoiceForText(currentCharacter.voice, response);
+                    // await playVoiceForText(currentCharacter.voice, response);
                 } else {
                     setMessages(prev => [
                         ...prev,
                         { role: 'system', content: `No response from ${currentCharacter.name}` }
                     ]);
                 }
-            } else {
-                // Not in conversation - process normal game commands
             }
         }
     };
@@ -408,4 +406,5 @@ export function renderMystwrightTUI(world: World, state: GameState) {
 function clearTerm(){
     // Clear terminal
     process.stdout.write('\x1Bc');
+    process.stdout.write('\x1B[?25l');
 }

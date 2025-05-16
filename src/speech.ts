@@ -1,6 +1,5 @@
 import { spawn } from "bun";
 import { ElevenLabsClient } from "elevenlabs";
-import type { Character } from "./types";
 import { which } from "./util";
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
