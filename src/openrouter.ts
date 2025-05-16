@@ -60,7 +60,7 @@ export async function generateCompletion<T extends Record<string, any> | undefin
 
     const data = await response.json() as OpenRouterChatCompletionResponse;
 
-    console.log('OpenRouter API response:', JSON.stringify(data, null, 4));
+    // console.log('OpenRouter API response:', JSON.stringify(data, null, 4));
 
     if (data.error) {
         console.error('OpenRouter API error:', data.error);

@@ -221,7 +221,7 @@ Create a mystery with a modern mystery novel tone
             
             // Write the generated world to a file
             // Intentionally not waiting for the write to finish to prevent longer load times
-            writeRelative(`../gens/${world.mystery.title}/world.json`, JSON.stringify(worldJson, null, 4));
+            writeRelative(import.meta.url, `../gens/${world.mystery.title}/world.json`, JSON.stringify(worldJson, null, 4));
 
             console.log('Generating clue images...');
             await Promise.all(
@@ -229,7 +229,7 @@ Create a mystery with a modern mystery novel tone
                     if (clue.type === 'physical') {
                         // Generate an image for the clue
                         const image = await generateClueImage(clue);
-                        await writeRelative(`../gens/imgs/${world.mystery.title}/${clue.id}-clue-image.png`, image);
+                        await writeRelative(import.meta.url, `../gens/imgs/${world.mystery.title}/${clue.id}-clue-image.png`, image);
                         console.log(`Generated image for clue ${clue.name} (${clue.id})`);
                     }
                 })
@@ -662,23 +662,6 @@ If there is no existing conversation start by intoducing yourself to the user.`;
 }
 
 /**
- * Reveals a clue to the user in the game state.
- * @param world - The world object
- * @param state - The current game state
- * @param clueId - The ID of the clue to reveal
- * @throws Will throw an error if the clue is not found in the world
- */
-export function revealClue(world: World, state: GameState, clueId: ClueID): void {
-    const clue = world.clues.get(clueId);
-    if (!clue) {
-        throw new Error(`Clue with ID ${clueId} not found`);
-    }
-    if (!state.cluesFound.includes(clueId)) {
-        state.cluesFound.push(clueId);
-    }
-}
-
-/**
  * Updates the game state with new memories, facts, and revealed clues based on the current game state.
  * @param world - The world object
  * @param state - The current game state
@@ -860,6 +843,25 @@ ${JSON.stringify(world, null, 4)}
     }
 }
 
+/**
+ * Reveals a clue to the user in the game state.
+ * @param world - The world object
+ * @param state - The current game state
+ * @param clueId - The ID of the clue to reveal
+ * @throws Will throw an error if the clue is not found in the world
+ */
+export function revealClue(world: World, state: GameState, clueId: ClueID): void {
+    const clue = world.clues.get(clueId);
+
+    if (!clue) {
+        throw new Error(`Clue with ID ${clueId} not found`);
+    }
+
+    if (!state.cluesFound.includes(clueId)) {
+        state.cluesFound.push(clueId);
+    }
+}
+
 export async function attemptSolve(world: World, state: GameState, input: string): Promise<{ solved: boolean; response: string }> {
     const SYSTEM_PROMPT = `\
 You are Mystwright, a game master for a mystery text adventure.
@@ -955,8 +957,12 @@ export async function generateClueImage(clue: Clue): Promise<Buffer> {
 You are Mystwright, a game master for a mystery text adventure.
 Your job is to generate a clue image based on the clue description.
 
-Generate an image for the clue: ${clue.name} - ${clue.description}.
+Generate an image for the clue: ${clue.name}.
+The clue description is: ${clue.description}.
+Do not add any additional elements to the image.
+Do not quote the clue description in the image. Use it as a reference for the image.
 Do not make up any text in the image. The image should in the style of a photograph of evidence taken at a crime scene.
+Add a border to the image so it looks like a photograph.
 The image should be a realistic representation of the clue, with no additional elements or distractions.
 The image should be clear and focused on the clue itself.`;
 

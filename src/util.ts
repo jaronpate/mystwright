@@ -6,11 +6,11 @@ import { dirname, join } from "path";
  * @param relativePath - Path relative to the current script file.
  * @param data - The data to write (string, ArrayBuffer, or Blob).
  */
-export async function writeRelative(relativePath: string, data: string | Buffer | ArrayBuffer | Blob) {
-    const __filename = fileURLToPath(import.meta.url);
+export async function writeRelative(callerUrl: string, relativePath: string, data: string | Buffer | ArrayBuffer | Blob): Promise<number> {
+    const __filename = fileURLToPath(callerUrl);
     const __dirname = dirname(__filename);
     const fullPath = join(__dirname, relativePath);
-    await Bun.write(fullPath, data);
+    return await Bun.write(fullPath, data);
 }
 
 /**

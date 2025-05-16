@@ -63,8 +63,10 @@ const InfoPanel = ({ world, state, height, width }: { world: World, state: GameS
                     {state.cluesFound.map(clueId => {
                         const clue = clues.get(clueId);
 
+                        if (!clue) return null;
+
                         return (
-                            <Text color="white">{clue ? clue.name : 'Unknown Clue'}</Text>
+                            <Text key={clue.id} color="white">{clue.name}</Text>
                         );
                     })}
                 </Box>
@@ -217,23 +219,90 @@ const MystwrightUI = ({ world, state }: { world: World, state: GameState }) => {
     const [gameState, setGameState] = useState<GameState>(state);
     const [messages, setMessages] = useState<Array<MessageUI>>([]);
     const [input, setInput] = useState('');
+
+    const helpCommand = () => {
+        setMessages(prev => [
+            ...prev,
+            {
+                role: 'system',
+                content: `\
+Commands:
+- /help: Show this help message
+- /exit: Exit the game
+- /clear: Clear the chat history
+- /leave: Leave the current conversation
+- /talkto <character>: Start a conversation with a character
+- /solve <solution>: Attempt to solve the mystery`
+            }
+        ]);
+    };
+
+    const solveCommand = async (guess?: string) => {
+        setGameState(prev => ({
+            ...prev,
+            isSolving: true
+        }));
+
+
+        if (guess !== undefined && guess !== null && guess.length > 0) {
+            setMessages([
+                ...gameState.dialogueHistory['judge' as CharacterID] ?? [],
+                { role: 'user', content: guess }
+            ]);
+
+            const result = await attemptSolve(world, gameState, guess);
+
+            setGameState(prev => ({
+                ...prev,
+                solved: result.solved
+            }));
+
+            setMessages(prev => [
+                ...prev,
+                { role: 'assistant', content: result.response }
+            ]);
+
+            await playVoiceForText(JUDGE_VOICE, result.response);
+        } else {
+            setMessages(gameState.dialogueHistory[JUDGE_CHARACTER_ID] ?? []);
+        }
+
+    };
+
+    const talkToCommand = async (characterName: string) => {
+        const character = Array.from(world.characters.values()).find(c => c.name.toLowerCase().includes(characterName));
+        
+        if (character) {
+            setGameState(prev => ({
+                ...prev,
+                currentCharacter: character.id,
+                isInConversation: true
+            }));
+            setMessages(gameState.dialogueHistory[character.id] ?? []);
+        } else {
+            setMessages(prev => [
+                ...prev,
+                { role: 'system', content: `Character "${characterName}" not found.` }
+            ]);
+        }
+    };
     
     // Add handler for terminal resize
-    useEffect(() => {
-        // Handler to update component dimensions when terminal is resized
-        const handleResize = () => {
-            // Force a re-render when terminal size changes
-            setMessages([...messages]);
-        };
+    // useEffect(() => {
+    //     // Handler to update component dimensions when terminal is resized
+    //     const handleResize = () => {
+    //         // Force a re-render when terminal size changes
+    //         setMessages([...messages]);
+    //     };
         
-        // Add event listener for terminal resize
-        process.stdout.on('resize', handleResize);
+    //     // Add event listener for terminal resize
+    //     process.stdout.on('resize', handleResize);
         
-        // Clean up event listener
-        return () => {
-            process.stdout.off('resize', handleResize);
-        };
-    }, [messages]);
+    //     // Clean up event listener
+    //     return () => {
+    //         process.stdout.off('resize', handleResize);
+    //     };
+    // }, [messages]);
     
     // Current character reference for easy access
     const currentCharacter = gameState.currentCharacter
@@ -252,20 +321,7 @@ const MystwrightUI = ({ world, state }: { world: World, state: GameState }) => {
             const args = strings.slice(1);
 
             if (command === 'help') {
-                setMessages(prev => [
-                    ...prev,
-                    {
-                        role: 'system',
-                        content: `\
-Commands:
-- /help: Show this help message
-- /exit: Exit the game
-- /clear: Clear the chat history
-- /leave: Leave the current conversation
-- /talkto <character>: Start a conversation with a character
-- /solve <solution>: Attempt to solve the mystery`
-                    },
-                ]);
+                helpCommand();
             } else if (command === 'exit') {
                 setMessages(prev => [
                     ...prev,
@@ -289,52 +345,11 @@ Commands:
             } else if (command === 'solve') {
                 const solution = args.join(' ').trim();
 
-                setGameState(prev => ({
-                    ...prev,
-                    isSolving: true
-                }));
-
-
-                if (solution.length > 0) {
-                    setMessages([
-                        ...gameState.dialogueHistory['judge' as CharacterID] ?? [],
-                        { role: 'user', content: solution }
-                    ]);
-
-                    const result = await attemptSolve(world, gameState, solution);
-    
-                    setGameState(prev => ({
-                        ...prev,
-                        solved: result.solved
-                    }));
-    
-                    setMessages(prev => [
-                        ...prev,
-                        { role: 'assistant', content: result.response }
-                    ]);
-
-                    await playVoiceForText(JUDGE_VOICE, result.response);
-                } else {
-                    setMessages(gameState.dialogueHistory[JUDGE_CHARACTER_ID] ?? []);
-                }
+                await solveCommand(solution);
             } else if (command === 'talkto') {
-                const characterName = args.join(' ');
-                const character = Array.from(world.characters.values()).find(c => c.name.toLowerCase().includes(characterName));
+                const characterName = args.join(' ').trim();
 
-                if (character) {
-                    setGameState(prev => ({
-                        ...prev,
-                        currentCharacter: character.id,
-                        isInConversation: true
-                    }));
-                    setMessages(gameState.dialogueHistory[character.id] ?? []);
-                    clearTerm();
-                } else {
-                    setMessages(prev => [
-                        ...prev,
-                        { role: 'system', content: `Character "${characterName}" not found.` }
-                    ]);
-                }
+                talkToCommand(characterName);
             } else {
                 setMessages(prev => [
                     ...prev,
@@ -392,7 +407,6 @@ Commands:
 export function renderMystwrightTUI(world: World, state: GameState) {
     clearTerm();
     
-    // Render full height UI using available options
     render(
         <MystwrightUI world={world} state={state} />, 
         { 
