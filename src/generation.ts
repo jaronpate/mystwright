@@ -218,7 +218,7 @@ Create a mystery with a modern mystery novel tone
             
             // Write the generated world to a file
             // Intentionally not waiting for the write to finish to prevent longer load times
-            writeRelative(`../gens${world.mystery.title}.json`, JSON.stringify(worldJson, null, 4));
+            writeRelative(`../gens/${world.mystery.title}.json`, JSON.stringify(worldJson, null, 4));
 
             return world;
         } catch (error) {
@@ -524,7 +524,8 @@ export async function getNextDialogueWithCharacter(character: Character, world: 
     // Create prompt based on character role and context
     let prompt = `\
 You are an AI roleplaying/method acting as a fictional character in a mystery-themed text adventure game. Stay fully in character—speak, think, and act like this character would. Do not refer to yourself as an AI or break the fourth wall.
-Your role is to engage with the user, who is the investigator, as your character: share suspicions, ask questions, express doubts, notice details, and react naturally to clues or odd behavior.
+Your role is to engage with the user, who is the detective, as your character: share suspicions, ask questions, express doubts, notice details, and react naturally to clues or odd behavior.
+It is the detective's job to ask questions and gather information in the hope of solving the mystery.
 
 There are some rules to follow:
 

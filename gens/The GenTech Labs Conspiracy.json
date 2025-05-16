@@ -1,0 +1,363 @@
+{
+    "characters": [
+        {
+            "alibi": "Attended a conference in Zurich.",
+            "description": "A renowned scientist, specializing in genetics. Known for his ambitious research and competitive nature.",
+            "id": "dr_alvarez",
+            "knownClues": [
+                "conference_ticket",
+                "zurich_hotel_receipt"
+            ],
+            "name": "Dr. Ricardo Alvarez",
+            "personality": "Arrogant, ambitious, and fiercely competitive.",
+            "role": "suspect",
+            "voice": "Daniel"
+        },
+        {
+            "alibi": "Working in the lab late, confirmed by security footage.",
+            "description": "A young, brilliant researcher working under Dr. Alvarez. Often seen as timid and overlooked.",
+            "id": "sarah_chen",
+            "knownClues": [
+                "security_footage",
+                "lab_notes"
+            ],
+            "name": "Sarah Chen",
+            "personality": "Quiet, intelligent, and often intimidated.",
+            "role": "suspect",
+            "voice": "Sarah"
+        },
+        {
+            "alibi": "Had dinner with his family.",
+            "description": "The head of security for GenTech Labs. Strict adherence to protocol and deeply loyal.",
+            "id": "frank_miller",
+            "knownClues": [
+                "security_report",
+                "home_dinner_receipt"
+            ],
+            "name": "Frank Miller",
+            "personality": "Stern, loyal, and by-the-book.",
+            "role": "witness",
+            "voice": "Brian"
+        },
+        {
+            "alibi": null,
+            "description": "The victim. CEO of GenTech Labs, known for her ruthless business tactics and innovative ideas. Was found dead in her office.",
+            "id": "victoria_lane",
+            "knownClues": [],
+            "name": "Victoria Lane",
+            "personality": "Ruthless, innovative, and demanding.",
+            "role": "victim",
+            "voice": "Alice"
+        },
+        {
+            "alibi": "At home, recovering from an injury.",
+            "description": "Victoria Lane's personal assistant. Dependable and efficient, they had access to Lane's schedule and office.",
+            "id": "alex_roberts",
+            "knownClues": [
+                "prescription_bottle",
+                "blood_sample"
+            ],
+            "name": "Alex Roberts",
+            "personality": "Efficient, observant, and seemingly unflappable.",
+            "role": "suspect",
+            "voice": "River"
+        },
+        {
+            "alibi": "Attending a conference in London.",
+            "description": "GenTech Labs' CFO. Concerned about the company's financial stability.",
+            "id": "oliver_jenkins",
+            "knownClues": [
+                "financial_report",
+                "london_conference_pass"
+            ],
+            "name": "Oliver Jenkins",
+            "personality": "Anxious, pragmatic, and financially astute.",
+            "role": "suspect",
+            "voice": "Charlie"
+        },
+        {
+            "alibi": "Visiting family out of state.",
+            "description": "GenTech Labs' Head of Public Relations. Charismatic and adept at managing the company's image.",
+            "id": "sophia_walker",
+            "knownClues": [
+                "family_photo",
+                "plane_ticket"
+            ],
+            "name": "Sophia Walker",
+            "personality": "Charismatic, quick-thinking, and image-conscious.",
+            "role": "suspect",
+            "voice": "Laura"
+        },
+        {
+            "alibi": "Unknown",
+            "description": "A disgruntled former employee of GenTech Labs, fired for leaking confidential information.",
+            "id": "mark_evans",
+            "knownClues": [
+                "termination_letter",
+                "anonymous_threat"
+            ],
+            "name": "Mark Evans",
+            "personality": "Bitter, resentful, and determined to seek revenge.",
+            "role": "suspect",
+            "voice": "Callum"
+        },
+        {
+            "alibi": "Unknown",
+            "description": "Cleaning staff that were on shift the night of the murder.",
+            "id": "janitor",
+            "knownClues": [
+                "cleaning_schedule",
+                "mop"
+            ],
+            "name": "Maria Rodriguez",
+            "personality": "Quiet, diligent, and hardworking.",
+            "role": "witness",
+            "voice": "Aria"
+        }
+    ],
+    "clues": [
+        {
+            "description": "A broken vial labeled 'Experimental Compound X'.",
+            "id": "broken_vial",
+            "name": "Broken Vial",
+            "type": "physical"
+        },
+        {
+            "description": "Victoria Lane's personal diary, detailing her professional and personal life.",
+            "id": "private_diary",
+            "name": "Victoria's Diary",
+            "type": "other"
+        },
+        {
+            "description": "Security footage showing Sarah Chen working late in the lab on the night of the murder.",
+            "id": "security_footage",
+            "name": "Security Footage",
+            "type": "testimony"
+        },
+        {
+            "description": "A plane ticket confirming Dr. Alvarez's attendance at a conference in Zurich.",
+            "id": "conference_ticket",
+            "name": "Conference Ticket",
+            "type": "physical"
+        },
+        {
+            "description": "A hotel receipt from Zurich under Dr. Alvarez's name.",
+            "id": "zurich_hotel_receipt",
+            "name": "Hotel Receipt",
+            "type": "physical"
+        },
+        {
+            "description": "A report detailing the company's financial struggles and Victoria Lane's cost-cutting measures.",
+            "id": "financial_report",
+            "name": "Financial Report",
+            "type": "other"
+        },
+        {
+            "description": "Sarah Chen's notes on 'Compound X' showing it to be a potentially lethal substance.",
+            "id": "lab_notes",
+            "name": "Lab Notes",
+            "type": "other"
+        },
+        {
+            "description": "Lane's computer shows an email exchange with Mark Evans regarding confidential information.",
+            "id": "email_exchange",
+            "name": "Email Exchange",
+            "type": "other"
+        },
+        {
+            "description": "A termination letter sent to Mark Evans, citing breach of contract.",
+            "id": "termination_letter",
+            "name": "Termination Letter",
+            "type": "physical"
+        },
+        {
+            "description": "An anonymous email threatening Victoria Lane, sent a week before her death.",
+            "id": "anonymous_threat",
+            "name": "Anonymous Threat",
+            "type": "other"
+        },
+        {
+            "description": "Family photo's, confirming Sophia was out of state.",
+            "id": "family_photo",
+            "name": "Family Photo",
+            "type": "other"
+        },
+        {
+            "description": "A plane ticket, confirming Sophia was out of state.",
+            "id": "plane_ticket",
+            "name": "Plane Ticket",
+            "type": "physical"
+        },
+        {
+            "description": "Dinner receipt, confirming Frank was at home.",
+            "id": "home_dinner_receipt",
+            "name": "Dinner Receipt",
+            "type": "physical"
+        },
+        {
+            "description": "Conference pass, confirming Oliver attended the London conference.",
+            "id": "london_conference_pass",
+            "name": "Conference Pass",
+            "type": "physical"
+        },
+        {
+            "description": "Security cameras, confirming Frank was working late that night.",
+            "id": "security_report",
+            "name": "Security Cameras",
+            "type": "testimony"
+        },
+        {
+            "description": "A written schedule with Alex's, confirming their regular working hours.",
+            "id": "prescription_bottle",
+            "name": "Schedule",
+            "type": "other"
+        },
+        {
+            "description": "A recent blood sample that was taken from Alex Roberts.",
+            "id": "blood_sample",
+            "name": "Blood Sample",
+            "type": "physical"
+        },
+        {
+            "description": "The schedule for cleaning. ",
+            "id": "cleaning_schedule",
+            "name": "Cleaning Schedule",
+            "type": "physical"
+        },
+        {
+            "description": "The mop that was used on the night of the murder. ",
+            "id": "mop",
+            "name": "Mop",
+            "type": "physical"
+        },
+        {
+            "description": "A shred of fabric found near the broken vial, matching the material of Sarah Chen's lab coat.",
+            "id": "fabric_scrap",
+            "name": "Fabric Scrap",
+            "type": "physical"
+        }
+    ],
+    "locations": [
+        {
+            "characters": [
+                "victoria_lane",
+                "alex_roberts"
+            ],
+            "clues": [
+                "broken_vial",
+                "private_diary"
+            ],
+            "connectedLocations": [
+                "gen_tech_lab",
+                "security_office"
+            ],
+            "description": "A high-tech office space with panoramic views of the city. A broken vial lies near the victim's body.",
+            "id": "ceo_office",
+            "name": "Victoria Lane's Office"
+        },
+        {
+            "characters": [
+                "dr_alvarez",
+                "sarah_chen"
+            ],
+            "clues": [
+                "lab_notes",
+                "fabric_scrap"
+            ],
+            "connectedLocations": [
+                "ceo_office",
+                "oliver_jenkins_office"
+            ],
+            "description": "A state-of-the-art laboratory with various research equipment. Sarah Chen's lab notes are on her desk.",
+            "id": "gen_tech_lab",
+            "name": "GenTech Labs"
+        },
+        {
+            "characters": [
+                "mark_evans"
+            ],
+            "clues": [
+                "termination_letter",
+                "anonymous_threat",
+                "email_exchange"
+            ],
+            "connectedLocations": [
+                "ceo_office",
+                "mark_evans_local_coffee_shop"
+            ],
+            "description": "A cramped apartment filled with personal belongings. The termination letter and anonymous threat email are found here.",
+            "id": "mark_evans_apartment",
+            "name": "Mark Evans' Apartment"
+        },
+        {
+            "characters": [
+                "frank_miller"
+            ],
+            "clues": [
+                "security_footage",
+                "security_report"
+            ],
+            "connectedLocations": [
+                "ceo_office",
+                "gen_tech_lab"
+            ],
+            "description": "A well-organized office with multiple monitors displaying security feeds. Security reports are neatly stacked on the desk.",
+            "id": "security_office",
+            "name": "Security Office"
+        },
+        {
+            "characters": [
+                "janitor"
+            ],
+            "clues": [
+                "cleaning_schedule",
+                "mop"
+            ],
+            "connectedLocations": [
+                "ceo_office",
+                "security_office"
+            ],
+            "description": "A storgae closet, with various cleaning supplies",
+            "id": "cleaning_closet",
+            "name": "Cleaning Closet"
+        },
+        {
+            "characters": [
+                "oliver_jenkins"
+            ],
+            "clues": [
+                "financial_report"
+            ],
+            "connectedLocations": [
+                "gen_tech_lab",
+                "ceo_office"
+            ],
+            "description": "A tidy office with financial documents and charts. A calculator sits on the desk.",
+            "id": "oliver_jenkins_office",
+            "name": "Oliver Jenkins' Office"
+        },
+        {
+            "characters": [
+                "mark_evans"
+            ],
+            "clues": [],
+            "connectedLocations": [
+                "mark_evans_apartment"
+            ],
+            "description": "A small, local coffee shop where Mark Evans is known to frequent.",
+            "id": "mark_evans_local_coffee_shop",
+            "name": "Local Coffee Shop"
+        }
+    ],
+    "mystery": {
+        "crime": "Murder",
+        "description": "The CEO of GenTech Labs, Victoria Lane, is found dead in her office. The cause of death is suspected to be poisoning with a lethal experimental compound.",
+        "title": "The GenTech Labs Conspiracy",
+        "victim": "victoria_lane"
+    },
+    "solution": {
+        "culpritId": "sarah_chen",
+        "method": "Sarah Chen used her knowledge of Compound X to administer a lethal dose to Victoria Lane, motivated by years of being overlooked and taking credit for her discoveries.",
+        "motive": "Sarah Chen resented Victoria Lane for taking credit for her research and dismissing her ideas. She saw Lane's death as her opportunity to advance her career."
+    }
+}
