@@ -216,6 +216,7 @@ const ChatPanel = ({
 
 const MystwrightUI = ({ world, state }: { world: World, state: GameState }) => {
     const { exit } = useApp();
+    const gameWorld = world;
     const [gameState, setGameState] = useState<GameState>(state);
     const [messages, setMessages] = useState<Array<MessageUI>>([]);
     const [input, setInput] = useState('');
@@ -250,7 +251,7 @@ Commands:
                 { role: 'user', content: guess }
             ]);
 
-            const result = await attemptSolve(world, gameState, guess);
+            const result = await attemptSolve(gameWorld, gameState, guess);
 
             setGameState(prev => ({
                 ...prev,
@@ -270,7 +271,7 @@ Commands:
     };
 
     const talkToCommand = async (characterName: string) => {
-        const character = Array.from(world.characters.values()).find(c => c.name.toLowerCase().includes(characterName));
+        const character = Array.from(gameWorld.characters.values()).find(c => c.name.toLowerCase().includes(characterName));
         
         if (character) {
             setGameState(prev => ({
@@ -306,7 +307,7 @@ Commands:
     
     // Current character reference for easy access
     const currentCharacter = gameState.currentCharacter
-        ? world.characters.get(gameState.currentCharacter) ?? null
+        ? gameWorld.characters.get(gameState.currentCharacter) ?? null
         : null;
     
     const handleCommand = async () => {
@@ -328,7 +329,6 @@ Commands:
                     { role: 'system', content: 'Exiting the game...' }
                 ]);
                 clearTerm();
-                // Exit the application
                 exit();
             } else if (command === 'leave') {
                 setGameState(prev => ({
@@ -344,11 +344,9 @@ Commands:
                 clearTerm();
             } else if (command === 'solve') {
                 const solution = args.join(' ').trim();
-
                 await solveCommand(solution);
             } else if (command === 'talkto') {
                 const characterName = args.join(' ').trim();
-
                 talkToCommand(characterName);
             } else {
                 setMessages(prev => [
@@ -361,7 +359,7 @@ Commands:
             setMessages(prev => [...prev, { role: 'user', content: input }]);
 
             if (gameState.isSolving) {
-                const result = await attemptSolve(world, gameState, input);
+                const result = await attemptSolve(gameWorld, gameState, input);
 
                 setMessages(prev => [
                     ...prev,
@@ -370,7 +368,9 @@ Commands:
 
                 await playVoiceForText(JUDGE_VOICE, result.response);
             } else if (gameState.isInConversation && currentCharacter) {
-                const response = await getNextDialogueWithCharacter(currentCharacter, world, gameState, input);
+                const { response, state } = await getNextDialogueWithCharacter(currentCharacter, gameWorld, gameState, input);
+
+                setGameState(state);
 
                 if (response) {
                     setMessages(prev => [
@@ -396,9 +396,9 @@ Commands:
                 setInput={setInput}
                 onSubmit={handleCommand}
                 gameState={gameState}
-                world={world}
+                world={gameWorld}
             />
-            <InfoPanel world={world} state={gameState}/>
+            <InfoPanel world={gameWorld} state={gameState}/>
         </Box>
     );
 };

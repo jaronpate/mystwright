@@ -3,7 +3,7 @@ import OpenAI from "openai";
 import { OpenRouter } from "./openrouter";
 import type { APIWorldResponse, Character, CharacterID, Clue, ClueID, GameState, Location, LocationID, Message, Memory, World } from "./types";
 import { writeRelative } from "./util";
-import { JUDGE_CHARACTER_ID, JUDGE_VOICE } from "./constants";
+import { JUDGE_CHARACTER_ID, JUDGE_VOICE, DEFAULT_WEAK_MODEL } from "./constants";
 
 const openai = new OpenAI();
 
@@ -36,7 +36,7 @@ You are Mystwright, a game master for a mystery text adventure.
 You generate vivid descriptions and guide the user through a mystery, revealing clues gradually and never giving away the solution outright
 
 Your purpose is to create structured, solvable mystery scenarios. Keep them clever and ensure the user can deduce the solution from the clues provided.
-Don't make it too easy though. There should be some locations and clues that are red herrings or not directly related to the solution. The user should have to think critically and piece together the clues to arrive at the correct conclusion.
+Do not however make it too easy. There should be some locations and clues that are red herrings or not directly related to the solution. The user should have to think critically and piece together the clues to arrive at the correct conclusion.
 The mystery should be engaging and immersive, with a well-defined setting and characters. The clues should be diverse and interesting, including physical evidence, testimonies, and documents. The characters should have distinct personalities and motives, adding depth to the story.
 We don't want it to be immediately obvious but once solved should be plausable and make sense.
 
@@ -194,7 +194,7 @@ Create a mystery with a modern mystery novel tone
         try {
             // Parse the JSON content from the response
             worldJson = await OpenRouter.generateCompletion(
-                config.model ?? 'google/gemini-2.0-flash-001',
+                config.model ?? DEFAULT_WEAK_MODEL,
                 previousMessages,
                 { schema }
             ) as APIWorldResponse;
@@ -290,6 +290,7 @@ Create a mystery with a modern mystery novel tone
 Your mystery world is good but needs some additions. Please ADD TO the existing world (don't replace it):
 
 ${missingContent}
+
 Important instructions:
 1. Keep ALL existing content (characters, locations, clues, mystery details)
 2. Maintain consistency with the existing story, title, and theme
@@ -505,9 +506,9 @@ export function constructGameState(world: World): GameState {
  * @param options.model - The model to use for generating the dialogue
  * @returns The generated dialogue response from the character
  */
-export async function getNextDialogueWithCharacter(character: Character, world: World, state: GameState, input?: string, options: { model?: string; } = {}): Promise<string> {
+export async function getNextDialogueWithCharacter(character: Character, world: World, state: GameState, input?: string, options: { model?: string; } = {}): Promise<{ response: string; state: GameState }> {
     if (character.role === 'victim') {
-        return "You cannot speak with the victim.";
+        return { response: "You cannot speak with the victim.", state };
     }
 
     // Initialize dialogue history if it doesn't exist
@@ -571,19 +572,22 @@ This is the current mystery world:
 <WORLD>
 ${JSON.stringify(world, null, 4)}
 </WORLD>
+
 The user is currently in a conversation with ${character.name}.
 The user has the following memories:
 <MEMORY>
 ${JSON.stringify(state.memories, null, 4)}
 </MEMORY>
+
+This is the current game state:
+<GAME_STATE>
+${JSON.stringify(state, null, 4)}
+</GAME_STATE>
+
 The user knows the following clues:
 <USER_KNOWN_CLUES>
 ${JSON.stringify(state.cluesFound.map(id => world.clues.get(id)), null, 4)}
 </USER_KNOWN_CLUES>
-The user has the following game state:
-<GAME_STATE>
-${JSON.stringify(state, null, 4)}
-</GAME_STATE>
 
 Your alibi is: ${character.alibi ?? 'No alibi provided'}. 
 You know about these clues: ${knownCluesDescription ?? 'No specific clues'}. 
@@ -639,7 +643,7 @@ If there is no existing conversation start by intoducing yourself to the user.`;
     //     }
     // ];
 
-    const newDialogue = await OpenRouter.generateCompletion(options.model ?? 'google/gemini-2.0-flash-001', messages);
+    const newDialogue = await OpenRouter.generateCompletion(options.model ?? DEFAULT_WEAK_MODEL, messages);
 
     if (input) {
         // Add the user input to the character's history
@@ -658,7 +662,7 @@ If there is no existing conversation start by intoducing yourself to the user.`;
     updateGameState(world, state);
 
     // Return the new dialogue
-    return newDialogue;
+    return { response: newDialogue, state };
 }
 
 /**
@@ -666,14 +670,16 @@ If there is no existing conversation start by intoducing yourself to the user.`;
  * @param world - The world object
  * @param state - The current game state
  */
-export async function updateGameState(world: World, state: GameState): Promise<void> {
+export async function updateGameState(world: World, state: GameState): Promise<GameState> {
     await Promise.all([
         updateKnownClues(world, state),
         updateMemories(world, state)
     ]);
+
+    return state;
 }
 
-export async function updateMemories(world: World, state: GameState): Promise<void> {
+export async function updateMemories(world: World, state: GameState): Promise<GameState> {
     // Here we will run the game master on the current game state
     // and check if there are any changes to the game state
     // We will look for stuff like new memories or facts that have been created
@@ -739,7 +745,7 @@ ${JSON.stringify(state, null, 4)}
 
 
                     const memories = await OpenRouter.generateCompletion(
-                        'google/gemini-2.0-flash-001',
+                        DEFAULT_WEAK_MODEL,
                         [
                             {
                                 role: 'system',
@@ -764,9 +770,11 @@ ${JSON.stringify(state, null, 4)}
             }
         }
     }
+
+    return state;
 }
 
-export async function updateKnownClues(world: World, state: GameState): Promise<void> {
+export async function updateKnownClues(world: World, state: GameState): Promise<GameState> {
     // Are we in a conversation?
     if (state.isInConversation) {
         // Check if the current character is still in the same location
@@ -817,7 +825,7 @@ ${JSON.stringify(world, null, 4)}
                     };
 
                     const clues = await OpenRouter.generateCompletion(
-                        'google/gemini-2.0-flash-001',
+                        DEFAULT_WEAK_MODEL,
                         [
                             {
                                 role: 'system',
@@ -841,6 +849,8 @@ ${JSON.stringify(world, null, 4)}
             }
         }
     }
+
+    return state;
 }
 
 /**
@@ -854,6 +864,7 @@ export function revealClue(world: World, state: GameState, clueId: ClueID): void
     const clue = world.clues.get(clueId);
 
     if (!clue) {
+        return;
         throw new Error(`Clue with ID ${clueId} not found`);
     }
 
