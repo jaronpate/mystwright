@@ -1,0 +1,36 @@
+@import './variables';
+
+:root {
+  --primary-color: #{$primary-color};
+  --secondary-color: #{$secondary-color};
+  --accent-color: #{$accent-color};
+  --text-color: #{$text-color};
+  --bg-color: #{$bg-color};
+  --card-bg: #{$card-bg};
+  --border-color: #{$border-color};
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.5;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-color: #{$primary-color-dark};
+    --secondary-color: #{$secondary-color-dark};
+    --accent-color: #{$accent-color-dark};
+    --text-color: #{$text-color-dark};
+    --bg-color: #{$bg-color-dark};
+    --card-bg: #{$card-bg-dark};
+    --border-color: #{$border-color-dark};
+  }
+}

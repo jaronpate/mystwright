@@ -6,7 +6,6 @@ import { writeRelative } from "./util";
 import { JUDGE_CHARACTER_ID, JUDGE_VOICE, DEFAULT_WEAK_MODEL } from "./constants";
 
 const openai = new OpenAI();
-
 const elevenlabs = new ElevenLabsClient({ apiKey: process.env.ELEVENLABS_API_KEY });
 
 /**
@@ -221,19 +220,24 @@ Create a mystery with a modern mystery novel tone
             
             // Write the generated world to a file
             // Intentionally not waiting for the write to finish to prevent longer load times
-            writeRelative(import.meta.url, `../gens/${world.mystery.title}/world.json`, JSON.stringify(worldJson, null, 4));
+            writeRelative(import.meta.url, `../../../gens/${world.mystery.title}/world.json`, JSON.stringify(worldJson, null, 4));
 
             console.log('Generating clue images...');
-            await Promise.all(
-                Array.from(world.clues.values()).map(async (clue) => {
+            await Promise.all([
+                ...world.clues.values().map(async (clue) => {
                     if (clue.type === 'physical') {
                         // Generate an image for the clue
-                        const image = await generateClueImage(clue);
-                        await writeRelative(import.meta.url, `../gens/imgs/${world.mystery.title}/${clue.id}-clue-image.png`, image);
+                        const image = await generateClueImage(world, clue);
+                        await writeRelative(import.meta.url, `../../../gens/${world.mystery.title}/imgs/clues/${clue.id}-clue-image.png`, image);
                         console.log(`Generated image for clue ${clue.name} (${clue.id})`);
                     }
+                }),
+                ...world.characters.values().map(async (character) => {
+                    const image = await generateCharacterImage(world, character);
+                    await writeRelative(import.meta.url, `../../../gens/${world.mystery.title}/imgs/character/${character.id}-character-image.png`, image);
+                    console.log(`Generated image for character ${character.name} (${character.id})`);
                 })
-            );
+            ]);
             console.log('All clue images generated successfully.');
 
             return world;
@@ -963,7 +967,7 @@ Reject a guess if it has insufficient evidence to support it. Request more evide
     return response;
 }
 
-export async function generateClueImage(clue: Clue): Promise<Buffer> {
+export async function generateClueImage(world: World, clue: Clue): Promise<Buffer> {
     const prompt = `\
 You are Mystwright, a game master for a mystery text adventure.
 Your job is to generate a clue image based on the clue description.
@@ -1000,4 +1004,42 @@ The image should be clear and focused on the clue itself.`;
     // const image_url = URL.createObjectURL(image_blob);
 
     // return image_url;
+}
+
+// export async function generateWorldImage(world: World): Promise<Buffer> {}
+
+export async function generateCharacterImage(world: World, character: Character): Promise<Buffer> {
+    const prompt = `\
+You are Mystwright, a game master for a mystery text adventure.
+Your job is to generate a character image based on the character description.
+Generate an image for the character: ${character.name}.
+The character description is: ${character.description}.
+The character is a ${character.role} in the mystery.
+The character's personality is ${character.personality}.
+For some context this is the current mystery world:
+<WORLD>
+${JSON.stringify(world, null, 4)}
+</WORLD>
+The image should be a realistic representation of the character, with no additional elements or distractions.
+The image should be clear and focused on the character itself.
+The image should be a portrait of the character, with a neutral background.`;
+
+    const result = await openai.images.generate({
+        model: "gpt-image-1",
+        prompt,
+    });
+
+    if (result.data?.[0] === undefined || result.data?.[0] === null) {
+        throw new Error('No image generated');
+    }
+
+    const image_base64 = result.data[0].b64_json;
+
+    if (image_base64 === undefined || image_base64 === null) {
+        throw new Error('No image data returned');
+    }
+
+    const image_bytes = Buffer.from(image_base64, "base64");
+
+    return image_bytes;
 }

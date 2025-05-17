@@ -8,6 +8,7 @@ Mystwright is an interactive text-based mystery game with voice capabilities, bu
 - Character conversations with AI-powered dialogue
 - Voice synthesis through ElevenLabs integration
 - Terminal-based UI with React/Ink
+- Web-based UI with React
 - Clue collection and mystery solving mechanics
 
 ## Requirements
@@ -38,14 +39,25 @@ export ELEVENLABS_API_KEY="your_elevenlabs_api_key"
 
 ## Running the Game
 
+### Terminal UI
 ```bash
 bun run index.ts
 ```
 
+### Web UI
+```bash
+cd frontend
+npm install  # or yarn install
+npm run dev  # or yarn dev
+```
+
 ## Game Commands
 
-- `/help` - Show available commands (WIP)
+- `/help` - Show available commands
 - `/talkto [character]` - Talk to a character
+- `/solve [solution]` - Attempt to solve the mystery
+- `/leave` - Leave the current conversation
+- `/clear` - Clear the chat history
 - Type messages to interact with characters during conversations
 
 ## Technology
@@ -53,6 +65,8 @@ bun run index.ts
 - TypeScript
 - Bun (JavaScript runtime)
 - Ink (React for terminal applications)
+- React (Web UI)
+- Vite (Build tooling for Web UI)
 - OpenRouter API for AI interactions
 - ElevenLabs for voice synthesis
 

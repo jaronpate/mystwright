@@ -1,9 +1,7 @@
+import type { CharacterID, GameState, MessageUI, World } from '@mystwright/engine';
+import { attemptSolve, getNextDialogueWithCharacter, JUDGE_CHARACTER_ID, JUDGE_VOICE, playVoiceForText } from '@mystwright/engine';
 import { Box, Newline, render, Text, useApp, useInput } from 'ink';
-import { useEffect, useState } from 'react';
-import { attemptSolve, getNextDialogueWithCharacter } from './generation';
-import { playVoiceForText } from './speech';
-import type { CharacterID, GameState, MessageUI, World } from './types';
-import { JUDGE_CHARACTER_ID, JUDGE_VOICE } from './constants';
+import { useState } from 'react';
 
 // UI Components
 const InfoPanel = ({ world, state, height, width }: { world: World, state: GameState, height?: string | number, width?: string | number }) => {

@@ -1,0 +1,24 @@
+@import './variables';
+@import './mixins';
+
+.app-container {
+  @include flex-column;
+  height: 100vh;
+  padding: 1rem;
+
+  .main-layout {
+    @include flex-row;
+    height: 100%;
+    gap: 1rem;
+    
+    @include mobile {
+      flex-direction: column;
+    }
+  }
+}
+
+.loading {
+  @include center-content;
+  height: 100vh;
+  font-size: 1.5rem;
+}

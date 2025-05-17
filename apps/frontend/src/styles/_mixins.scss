@@ -1,0 +1,75 @@
+@import './variables';
+
+// Responsive mixins
+@mixin mobile {
+  @media (max-width: $mobile-breakpoint) {
+    @content;
+  }
+}
+
+// Border mixins
+@mixin card-border {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+// Flexbox mixins
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+@mixin center-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Typography mixins
+@mixin heading-text {
+  font-size: 1.5rem;
+  color: var(--secondary-color);
+  font-weight: bold;
+}
+
+@mixin subheading-text {
+  font-size: 1.2rem;
+  color: var(--secondary-color);
+  font-weight: bold;
+}
+
+// Animation mixins
+@mixin transition($property: all, $duration: 0.2s, $timing: ease-in-out) {
+  transition: $property $duration $timing;
+}
+
+// Button mixins
+@mixin primary-button {
+  padding: 0.8rem 1.5rem;
+  background-color: var(--secondary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  @include transition(background-color);
+  
+  &:hover {
+    background-color: var(--accent-color);
+  }
+}
+
+// Input mixins
+@mixin text-input {
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
