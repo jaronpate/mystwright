@@ -405,7 +405,13 @@ Commands:
 
 // Export function to render the UI
 export function renderMystwrightTUI(world: World, state: GameState) {
+    enterAltScreen();
     clearTerm();
+
+    process.on("exit", () => {
+        clearTerm();
+        exitAltScreen();
+    });
     
     render(
         <MystwrightUI world={world} state={state} />, 
@@ -417,8 +423,30 @@ export function renderMystwrightTUI(world: World, state: GameState) {
     );
 }
 
+function hideCursor(){
+    const hideCursorCommand = "\x1b[?25l";
+    process.stdout.write(hideCursorCommand);
+}
+
+function showCursor(){
+    const showCursorCommand = "\x1b[?25h";
+    process.stdout.write(showCursorCommand);
+}
+
+function enterAltScreen(){
+    const enterAltScreenCommand = "\x1b[?1049h";
+    process.stdout.write(enterAltScreenCommand);
+    hideCursor();
+}
+
+function exitAltScreen(){
+    const exitAltScreenCommand = "\x1b[?1049l";
+    process.stdout.write(exitAltScreenCommand);
+    showCursor();
+}
+
 function clearTerm(){
     // Clear terminal
     process.stdout.write('\x1Bc');
-    process.stdout.write('\x1B[?25l');
+    // hideCursor();
 }
