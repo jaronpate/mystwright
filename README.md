@@ -44,13 +44,6 @@ export ELEVENLABS_API_KEY="your_elevenlabs_api_key"
 bun run index.ts
 ```
 
-### Web UI
-```bash
-cd frontend
-npm install  # or yarn install
-npm run dev  # or yarn dev
-```
-
 ## Game Commands
 
 - `/help` - Show available commands
