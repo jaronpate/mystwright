@@ -1,10 +1,10 @@
-import { db } from '@mystwright/db';
+import { db, sql } from '@mystwright/db';
 import { constructGameState, deserializeWorldStructure, getNextDialogueWithCharacter, type APIWorldResponse, type GameState } from '@mystwright/engine';
 import type { APIRequest, AuthenticatedRequest } from '../utils/responses';
 import { errorResponse, jsonResponse } from '../utils/responses';
 
 export const gameplayController = {
-    async generateNextCharacterDialogue(req: Request): Promise<Response> {
+    async generateNextCharacterDialogue(req: APIRequest<'/api/v1/worlds/:world_id/states/:state_id/dialogue'>): Promise<Response> {
         try {
             const authReq = req as AuthenticatedRequest;
             const { input, character_id } = await req.json() as Record<string, any>;
@@ -13,18 +13,16 @@ export const gameplayController = {
                 return errorResponse('Input is required', req, 400);
             }
 
-            const url = new URL(req.url);
-            const pathParts = url.pathname.split('/');
-            const worldId = pathParts[pathParts.length - 2];
+            const { world_id, state_id } = req.params
 
-            if (!worldId) {
+            if (!world_id) {
                 return errorResponse('World ID is required', req, 400);
             }
 
             // Get world from database
             const world = await db.selectFrom('worlds')
                 .selectAll()
-                .where('id', '=', worldId)
+                .where('id', '=', world_id)
                 .where('user_id', '=', authReq.user.id)
                 .executeTakeFirst();
 
@@ -44,7 +42,8 @@ export const gameplayController = {
             // Get the game state from the database
             const rawGameState = await db.selectFrom('game_states')
                 .selectAll()
-                .where('world_id', '=', worldId)
+                .where('id', '=', state_id)
+                .where('world_id', '=', world_id)
                 .where('user_id', '=', authReq.user.id)
                 .executeTakeFirst();
 
@@ -60,8 +59,12 @@ export const gameplayController = {
 
             // Update the game state in the database
             await db.updateTable('game_states')
-                .set({ payload: state })
-                .where('world_id', '=', worldId)
+                // .set({ payload: state })
+                .set({
+                    payload: sql`payload || CAST(${sql.val(state)} AS jsonb)`
+                })
+                .where('id', '=', state_id)
+                .where('world_id', '=', world_id)
                 .where('user_id', '=', authReq.user.id)
                 .execute();
 
@@ -72,6 +75,41 @@ export const gameplayController = {
         } catch (error) {
             console.error('Generate next character dialogue error:', error);
             return errorResponse('Error generating next character dialogue', req, 500);
+        }
+    },
+
+    async listGameStates(req: APIRequest<'/api/v1/worlds/:world_id/states'>): Promise<Response> {
+        try {
+            const authReq = req as AuthenticatedRequest;
+            const worldId = req.params.world_id;
+
+            if (!worldId) {
+                return errorResponse('World ID is required', req, 400);
+            }
+
+            // Get world from database
+            const world = await db.selectFrom('worlds')
+                .selectAll()
+                .where('id', '=', worldId)
+                .where('user_id', '=', authReq.user.id)
+                .executeTakeFirst();
+
+            if (!world) {
+                return errorResponse('World not found', req, 404);
+            }
+
+            // Get game states from database
+            const gameStates = await db.selectFrom('game_states')
+                .selectAll()
+                .where('world_id', '=', worldId)
+                .where('user_id', '=', authReq.user.id)
+                .orderBy('created_at', 'desc')
+                .execute();
+            
+            return jsonResponse({ states: gameStates }, req);
+        } catch (error) {
+            console.error('List game states error:', error);
+            return errorResponse('Error retrieving game states', req, 500);
         }
     },
 
@@ -157,27 +195,28 @@ export const gameplayController = {
     /**
      * Save the game state to the database
      */
-    async saveGameState(req: APIRequest<'/api/v1/worlds/:world_id/states/:state_id'>): Promise<Response> {
+    async updateGameState(req: APIRequest<'/api/v1/worlds/:world_id/states/:state_id'>): Promise<Response> {
         try {
             const authReq = req as AuthenticatedRequest;
-            const url = new URL(req.url);
-            const pathParts = url.pathname.split('/');
-            const worldId = pathParts[pathParts.length - 2];
+            const { world_id } = req.params;
 
-            if (!worldId) {
+            if (!world_id) {
                 return errorResponse('World ID is required', req, 400);
             }
 
-            const { state } = await req.json() as Record<string, any>;
+            const { payload } = await req.json() as Record<string, any>;
 
-            if (state === undefined || state === null) {
-                return errorResponse('State is required', req, 400);
+            if (payload === undefined || payload === null) {
+                return errorResponse('State payload is required', req, 400);
             }
 
             // Save the game state to the database
             await db.updateTable('game_states')
-                .set({ payload: state })
-                .where('world_id', '=', worldId)
+                .set({ payload })
+                .set({
+                    payload: sql`payload || CAST(${sql.val(payload)} AS jsonb)`
+                })
+                .where('world_id', '=', world_id)
                 .where('user_id', '=', authReq.user.id)
                 .execute();
 
@@ -185,6 +224,30 @@ export const gameplayController = {
         } catch (error) {
             console.error('Save game state error:', error);
             return errorResponse('Error saving game state', req, 500);
+        }
+    },
+
+    async deleteGameState(req: APIRequest<'/api/v1/worlds/:world_id/states/:state_id'>): Promise<Response> {
+        try {
+            const authReq = req as AuthenticatedRequest;
+            const worldId = req.params.world_id;
+            const stateId = req.params.state_id;
+
+            if (!worldId) {
+                return errorResponse('World ID is required', req, 400);
+            }
+
+            // Delete the game state from the database
+            await db.deleteFrom('game_states')
+                .where('world_id', '=', worldId)
+                .where('user_id', '=', authReq.user.id)
+                .where('id', '=', stateId)
+                .execute();
+
+            return jsonResponse({ message: 'Game state deleted successfully' }, req);
+        } catch (error) {
+            console.error('Delete game state error:', error);
+            return errorResponse('Error deleting game state', req, 500);
         }
     }
 }

@@ -105,12 +105,14 @@ export const routes = {
 
     // Gameplay endpoints
     '/api/v1/worlds/:world_id/states': constructRoute<'/api/v1/worlds/:world_id/states'>({
+        GET: [authMiddleware, gameplayController.listGameStates],
         POST: [authMiddleware, gameplayController.createGameState]
     }),
     
     '/api/v1/worlds/:world_id/states/:state_id': constructRoute<'/api/v1/worlds/:world_id/states/:state_id'>({
         GET: [authMiddleware, gameplayController.getGameState],
-        PATCH: [authMiddleware, gameplayController.saveGameState]
+        PATCH: [authMiddleware, gameplayController.updateGameState],
+        DELETE: [authMiddleware, gameplayController.deleteGameState]
     }),
     
     '/api/v1/worlds/:world_id/states/:state_id/dialogue': constructRoute<'/api/v1/worlds/:world_id/states/:state_id/dialogue'>({
