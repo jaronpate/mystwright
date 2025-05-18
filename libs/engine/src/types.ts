@@ -40,8 +40,8 @@ export interface Clue {
 
 export interface Solutuion {
     culpritId: CharacterID;
-    motive?: string;
-    method?: string;
+    motive: string;
+    method: string;
 }
 
 export interface World {

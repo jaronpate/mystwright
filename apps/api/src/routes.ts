@@ -1,10 +1,11 @@
 import { authController } from './controllers/authController';
 import { worldsController } from './controllers/worldsController';
+import { gameplayController } from './controllers/gameplayController';
 import { jsonResponse, optionsResponse } from './utils/responses';
 import { getCorsHeaders } from './utils/cors';
 import { authMiddleware, type APIRequest, type AuthenticatedRequest } from './middleware/auth';
 
-type Handler = (req: Request) => Promise<APIRequest | Response> | APIRequest | Response;
+type Handler = (req: Request | AuthenticatedRequest) => Promise<APIRequest | Response> | APIRequest | Response;
 
 /**
  * Constructs a route object with default OPTIONS method for CORS preflight requests
@@ -26,7 +27,7 @@ const constructRoutes = (methods?: Partial<Record<'GET' | 'POST' | 'PATCH' | 'DE
  * If no handler returns a response, a 404 Not Found response is returned.
  */
 const constructHandler = (...handlers: Array<Handler>) => {
-    return async (req: Request) => {
+    return async (req: Request | AuthenticatedRequest) => {
         let request = req;
         for (const handler of handlers) {
             const response = await handler(request);
@@ -86,6 +87,16 @@ export const routes = {
     
     "/api/v1/worlds/import": constructRoutes({
         POST: constructHandler(authMiddleware, worldsController.importWorld)
+    }),
+
+    // Gameplay endpoints
+    "/api/v1/worlds/:id/state": constructRoutes({
+        GET: constructHandler(authMiddleware, gameplayController.getGameState),
+        POST: constructHandler(authMiddleware, gameplayController.saveGameState)
+    }),
+    
+    "/api/v1/worlds/:id/dialogue": constructRoutes({
+        POST: constructHandler(authMiddleware, gameplayController.generateNextCharacterDialogue)
     }),
 
     // 404 handler for all other routes

@@ -415,7 +415,7 @@ export function validateWorldStructure(world: APIWorldResponse): void {
  * @param raw - The raw API response object
  * @returns The constructed world object
  */
-export function constructWorldStructure(raw: APIWorldResponse): World {
+export function deserializeWorldStructure(raw: APIWorldResponse): World {
     // Convert string IDs to branded types
     const locations = new Map<LocationID, Location>();
 
@@ -480,6 +480,45 @@ export function constructWorldStructure(raw: APIWorldResponse): World {
         }
     };
 }
+
+export function serializeWorldStructure(raw: World): APIWorldResponse {
+    // Convert branded types back to strings
+    const locations = Array.from(raw.locations.values()).map(location => ({
+        id: location.id as string,
+        name: location.name,
+        description: location.description,
+        connectedLocations: location.connectedLocations,
+        clues: location.clues,
+        characters: location.characters
+    }));
+
+    const characters = Array.from(raw.characters.values()).map(character => ({
+        id: character.id as string,
+        name: character.name,
+        description: character.description,
+        personality: character.personality,
+        voice: character.voice,
+        role: character.role,
+        alibi: character.alibi,
+        knownClues: character.knownClues
+    }));
+    
+    const clues = Array.from(raw.clues.values()).map(clue => ({
+        id: clue.id as string,
+        name: clue.name,
+        description: clue.description,
+        type: clue.type
+    }));
+    
+    return {
+        locations,
+        characters,
+        clues,
+        mystery: raw.mystery,
+        solution: raw.solution
+    };
+}
+
 
 /**
  * Constructs the initial game state for the mystery game.

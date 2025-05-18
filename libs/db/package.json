@@ -5,7 +5,8 @@
   "private": true,
   "dependencies": {
     "kysely": "^0.27.6",
-    "pg": "^8.14.1"
+    "pg": "^8.14.1",
+    "@mystwright/db": "workspace:*"
   },
   "devDependencies": {
     "@types/pg": "^8.11.11"

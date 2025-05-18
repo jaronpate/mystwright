@@ -1,5 +1,5 @@
-import { generateWorld } from '@mystwright/engine';
-import { db, type NewWorld } from '@mystwright/db';
+import { generateWorld, serializeWorldStructure } from '@mystwright/engine';
+import { db, type NewWorld, type WorldPayload } from '@mystwright/db';
 import { errorResponse, jsonResponse } from '../utils/responses';
 import type { AuthenticatedRequest } from '../middleware/auth';
 
@@ -23,7 +23,8 @@ export const worldsController = {
                 user_id: authReq.user.id,
                 title: world.mystery.title,
                 description: world.mystery.description || null,
-                payload: world
+                // TODO: Merge APIWorldResponse & WorldPayload
+                payload: serializeWorldStructure(world) as unknown as WorldPayload
             };
             
             const createdWorld = await db.insertInto('worlds')
