@@ -26,6 +26,7 @@
     "noPropertyAccessFromIndexSignature": false,
     "paths": {
       "@mystwright/engine": ["./libs/engine/src"],
+      "@mystwright/db": ["./libs/db/src"],
     }
   }
 }

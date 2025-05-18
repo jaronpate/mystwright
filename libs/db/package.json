@@ -1,0 +1,16 @@
+{
+  "name": "@mystwright/db",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "kysely": "^0.27.6",
+    "pg": "^8.14.1"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.11.11"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
