@@ -5,6 +5,7 @@
     "scripts": {
         "run-tui": "bun --cwd=apps/tui run --env-file=../../.env index.ts",
         "run-api": "bun --cwd=apps/api run --env-file=../../.env start",
+        "run-api:watch": "bun --cwd=apps/api run --env-file=../../.env watch",
         "run-web-ui": "bun --cwd=apps/frontend run --env-file=../../.env dev"
     },
     "workspaces": [

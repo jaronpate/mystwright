@@ -1,13 +1,13 @@
-@import './variables';
+@use './variables' as v;
 
 :root {
-  --primary-color: #{$primary-color};
-  --secondary-color: #{$secondary-color};
-  --accent-color: #{$accent-color};
-  --text-color: #{$text-color};
-  --bg-color: #{$bg-color};
-  --card-bg: #{$card-bg};
-  --border-color: #{$border-color};
+  --primary-color: #{v.$primary-color};
+  --secondary-color: #{v.$secondary-color};
+  --accent-color: #{v.$accent-color};
+  --text-color: #{v.$text-color};
+  --bg-color: #{v.$bg-color};
+  --card-bg: #{v.$card-bg};
+  --border-color: #{v.$border-color};
 }
 
 * {
@@ -25,12 +25,12 @@ body {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --primary-color: #{$primary-color-dark};
-    --secondary-color: #{$secondary-color-dark};
-    --accent-color: #{$accent-color-dark};
-    --text-color: #{$text-color-dark};
-    --bg-color: #{$bg-color-dark};
-    --card-bg: #{$card-bg-dark};
-    --border-color: #{$border-color-dark};
+    --primary-color: #{v.$primary-color-dark};
+    --secondary-color: #{v.$secondary-color-dark};
+    --accent-color: #{v.$accent-color-dark};
+    --text-color: #{v.$text-color-dark};
+    --bg-color: #{v.$bg-color-dark};
+    --card-bg: #{v.$card-bg-dark};
+    --border-color: #{v.$border-color-dark};
   }
 }

@@ -1,15 +1,14 @@
-@import './variables';
-@import './mixins';
+@use './mixins' as m;
 
 .chat-panel {
   width: 70%;
   height: 100%;
-  @include flex-column;
-  @include card-border;
+  @include m.flex-column;
+  @include m.card-border;
   background-color: var(--card-bg);
   overflow: hidden;
   
-  @include mobile {
+  @include m.mobile {
     width: 100%;
     height: 60vh;
   }
@@ -31,7 +30,7 @@
   flex: 1;
   padding: 1rem;
   overflow-y: auto;
-  @include flex-column;
+  @include m.flex-column;
   gap: 0.8rem;
 }
 
@@ -41,7 +40,7 @@
   max-width: 80%;
   word-break: break-word;
   
-  @include mobile {
+  @include m.mobile {
     max-width: 90%;
   }
   
@@ -74,16 +73,16 @@
   border-top: 1px solid var(--border-color);
   
   form {
-    @include flex-row;
+    @include m.flex-row;
     gap: 0.5rem;
     
     input {
       flex: 1;
-      @include text-input;
+      @include m.text-input;
     }
     
     button {
-      @include primary-button;
+      @include m.primary-button;
     }
   }
 }

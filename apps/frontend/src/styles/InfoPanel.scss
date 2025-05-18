@@ -1,15 +1,14 @@
-@import './variables';
-@import './mixins';
+@use './mixins' as m;
 
 .info-panel {
   width: 30%;
   height: 100%;
   padding: 1rem;
   background-color: var(--card-bg);
-  @include card-border;
+  @include m.card-border;
   overflow-y: auto;
   
-  @include mobile {
+  @include m.mobile {
     width: 100%;
     height: auto;
     max-height: 40vh;
@@ -22,7 +21,7 @@
   padding-bottom: 0.5rem;
   
   h1 {
-    @include heading-text;
+    @include m.heading-text;
   }
 }
 
@@ -35,7 +34,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
   
-  @include mobile {
+  @include m.mobile {
     grid-template-columns: 1fr;
   }
 }
@@ -44,7 +43,7 @@
   margin-bottom: 1.5rem;
   
   h2 {
-    @include subheading-text;
+    @include m.subheading-text;
     margin-bottom: 0.5rem;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 0.3rem;

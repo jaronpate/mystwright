@@ -1,24 +1,23 @@
-@import './variables';
-@import './mixins';
+@use './mixins' as m;
 
 .app-container {
-  @include flex-column;
+  @include m.flex-column;
   height: 100vh;
   padding: 1rem;
 
   .main-layout {
-    @include flex-row;
+    @include m.flex-row;
     height: 100%;
     gap: 1rem;
     
-    @include mobile {
+    @include m.mobile {
       flex-direction: column;
     }
   }
 }
 
 .loading {
-  @include center-content;
+  @include m.center-content;
   height: 100vh;
   font-size: 1.5rem;
 }
