@@ -94,18 +94,37 @@ export async function initializeDb(database = db): Promise<void> {
                 .addColumn('user_id', 'uuid', (col) => col.notNull().references('users.id').onDelete('cascade'))
                 .addColumn('refresh_token_id', 'uuid', (col) => col.references('refresh_tokens.id').onDelete('cascade'))
                 .addColumn('value', 'text', (col) => col.notNull())
-                .addColumn('created_at', 'timestamptz', (col) =>
-                    col.defaultTo(sql`NOW()`).notNull()
-                )
-                .addColumn('updated_at', 'timestamptz', (col) =>
-                    col.defaultTo(sql`NOW()`).notNull()
-                )
+                .addColumn('created_at', 'timestamptz', (col) => col.defaultTo(sql`NOW()`).notNull())
+                .addColumn('updated_at', 'timestamptz', (col) => col.defaultTo(sql`NOW()`).notNull())
                 .addColumn('expires_at', 'timestamptz')
                 .addColumn('type', sql`token_type_enum`, (col) => col.notNull())
                 .addColumn('scopes', sql`text[]`, (col) => col.notNull().defaultTo(sql`ARRAY[]::text[]`))
                 .addColumn('properties', 'jsonb', (col) => col.notNull().defaultTo(sql`'{}'::jsonb`))
                 .execute();
             
+            await database.schema
+                .createTable('worlds')
+                .ifNotExists()
+                .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(sql`uuid_generate_v4()`))
+                .addColumn('user_id', 'uuid', (col) => col.notNull().references('users.id').onDelete('cascade'))
+                .addColumn('title', 'text', (col) => col.notNull())
+                .addColumn('description', 'text', (col) => col.notNull())
+                .addColumn('created_at', 'timestamptz', (col) => col.defaultTo(sql`NOW()`).notNull())
+                .addColumn('updated_at', 'timestamptz', (col) => col.defaultTo(sql`NOW()`).notNull())
+                .addColumn('payload', 'jsonb', (col) => col.notNull().defaultTo(sql`'{}'::jsonb`))
+                .execute();
+            
+            await database.schema
+                .createTable('game_states')
+                .ifNotExists()
+                .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(sql`uuid_generate_v4()`))
+                .addColumn('user_id', 'uuid', (col) => col.notNull().references('users.id').onDelete('cascade'))
+                .addColumn('world_id', 'uuid', (col) => col.notNull().references('worlds.id').onDelete('cascade'))
+                .addColumn('created_at', 'timestamptz', (col) => col.defaultTo(sql`NOW()`).notNull())
+                .addColumn('updated_at', 'timestamptz', (col) => col.defaultTo(sql`NOW()`).notNull())
+                .addColumn('payload', 'jsonb', (col) => col.notNull().defaultTo(sql`'{}'::jsonb`))
+                .execute();
+
             console.log('Database schema initialized successfully');
             return;
         } catch (error) {

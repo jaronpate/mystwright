@@ -45,7 +45,7 @@ export const authController = {
                 message: 'User registered successfully',
                 user: { id: newUser.id, email: newUser.email, first_name: newUser.first_name, last_name: newUser.last_name },
                 id_token: accessToken.value,
-                access_token: refreshToken.value,
+                access_token: accessToken.value,
                 refresh_token: refreshToken.value,
                 expires_in: expiresIn
             }, req, 201);

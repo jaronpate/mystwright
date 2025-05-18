@@ -1,4 +1,5 @@
 import { authController } from './controllers/authController';
+import { worldsController } from './controllers/worldsController';
 import { jsonResponse, optionsResponse } from './utils/responses';
 import { getCorsHeaders } from './utils/cors';
 import { authMiddleware, type APIRequest, type AuthenticatedRequest } from './middleware/auth';
@@ -66,6 +67,25 @@ export const routes = {
     
     "/api/v1/auth/profile": constructRoutes({
         GET: constructHandler(authMiddleware, authController.getProfile)
+    }),
+
+    // World management endpoints
+    "/api/v1/worlds": constructRoutes({
+        GET: constructHandler(authMiddleware, worldsController.listWorlds),
+        POST: constructHandler(authMiddleware, worldsController.createWorld)
+    }),
+    
+    "/api/v1/worlds/:id": constructRoutes({
+        GET: constructHandler(authMiddleware, worldsController.getWorld),
+        DELETE: constructHandler(authMiddleware, worldsController.deleteWorld)
+    }),
+    
+    "/api/v1/worlds/:id/export": constructRoutes({
+        GET: constructHandler(authMiddleware, worldsController.exportWorld)
+    }),
+    
+    "/api/v1/worlds/import": constructRoutes({
+        POST: constructHandler(authMiddleware, worldsController.importWorld)
     }),
 
     // 404 handler for all other routes

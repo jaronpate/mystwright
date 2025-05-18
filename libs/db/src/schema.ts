@@ -1,10 +1,12 @@
-import type { Generated, Insertable, Selectable, Updateable } from 'kysely';
+import type { Generated, Insertable, JSONColumnType, Selectable, Updateable } from 'kysely';
 
 // Define the database schema using Kysely's type system
 export interface Database {
     users: UsersTable;
     access_tokens: AccessTokensTable;
     refresh_tokens: RefreshTokensTable;
+    worlds: WorldsTable;
+    game_states: GameStateTable;
 }
 
 export enum TokenType {
@@ -59,3 +61,71 @@ export type User = Selectable<UsersTable>;
 export type SafeUser = Selectable<Omit<UsersTable, 'password_hash'>>;
 export type NewUser = Insertable<UsersTable>;
 export type UserUpdate = Updateable<UsersTable>;
+
+export type WorldPayload = Record<string, any>;
+// export type WorldPayload = {
+//     characters: Array<{
+//         alibi: string;
+//         description: string;
+//         id: string;
+//         knownClues: Array<string>;
+//         name: string;
+//         personality: string;
+//         role: string;
+//         voice: string;
+//     }>,
+//     clues: Array<{
+//         description: string;
+//         id: string;
+//         name: string;
+//         type: string;
+//     }>,
+//     locations: Array<{
+//         characters: Array<string>;
+//         clues: Array<string>;
+//         connectedLocations: Array<string>;
+//         description: string;
+//         id: string;
+//         name: string;
+//     }>,
+//     mystery: {
+//         crime: string;
+//         description: string;
+//         title: string;
+//         victims: string;
+//     },
+//     solution: {
+//         culpritId: string;
+//         method: string;
+//         motive: string;
+//     }
+// };
+
+export interface WorldsTable {
+    id: Generated<string>;
+    created_at: Generated<Date>;
+    updated_at: Generated<Date>;
+    user_id: string;
+    title: string;
+    description: string | null;
+    payload: JSONColumnType<WorldPayload, WorldPayload, WorldPayload>;
+};
+
+export type DBWorld = Selectable<WorldsTable>;
+export type NewWorld = Insertable<WorldsTable>;
+export type WorldUpdate = Updateable<WorldsTable>;
+
+export type GameStatePayload = Record<string, any>;
+
+export interface GameStateTable {
+    id: Generated<string>;
+    created_at: Generated<Date>;
+    updated_at: Generated<Date>;
+    user_id: string;
+    world_id: string;
+    payload: JSONColumnType<GameStatePayload, GameStatePayload, GameStatePayload>;
+};
+
+export type DBGameState = Selectable<GameStateTable>;
+export type NewGameState = Insertable<GameStateTable>;
+export type GameStateUpdate = Updateable<GameStateTable>;

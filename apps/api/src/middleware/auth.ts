@@ -114,7 +114,7 @@ export const generateTokenSet = async (user: User | SafeUser, refresh_token_id?:
         properties: {}
     };
 
-    const refreshInsert = await db.insertInto('refresh_tokens').values(newRefreshToken).executeTakeFirst() as unknown as DBRefreshToken;
+    const refreshInsert = await db.insertInto('refresh_tokens').returningAll().values(newRefreshToken).executeTakeFirst() as unknown as DBRefreshToken;
     const refreshToken = Token.fromDB(refreshInsert);
     
     const access_token = generateToken({ id: user.id as string, email: user.email });
@@ -132,7 +132,7 @@ export const generateTokenSet = async (user: User | SafeUser, refresh_token_id?:
         expires_at: new Date(Date.now() + ACCESS_TOKEN_LIFETIME) // 1 year
     };
     
-    const accessInsert = await db.insertInto('access_tokens').values(newAccessToken).execute() as unknown as DBRefreshToken;
+    const accessInsert = await db.insertInto('access_tokens').returningAll().values(newAccessToken).executeTakeFirst() as unknown as DBRefreshToken;
     const accessToken = Token.fromDB(accessInsert);
 
     return {
