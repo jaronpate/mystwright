@@ -58,6 +58,13 @@ export const gameplayController = {
             // Generate the next character dialogue using the world and game state
             const { response, state } = await getNextDialogueWithCharacter(character, gameWorld, gameState, input);
 
+            // Update the game state in the database
+            await db.updateTable('game_states')
+                .set({ payload: state })
+                .where('world_id', '=', worldId)
+                .where('user_id', '=', authReq.user.id)
+                .execute();
+
             return jsonResponse({
                 response,
                 state
