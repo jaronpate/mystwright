@@ -1,7 +1,7 @@
 import { db } from '@mystwright/db';
+import { constructGameState, deserializeWorldStructure, getNextDialogueWithCharacter, type APIWorldResponse, type GameState } from '@mystwright/engine';
+import type { APIRequest, AuthenticatedRequest } from '../utils/responses';
 import { errorResponse, jsonResponse } from '../utils/responses';
-import type { AuthenticatedRequest } from '../middleware/auth';
-import { getNextDialogueWithCharacter, deserializeWorldStructure, constructGameState, type APIWorldResponse, type GameState } from '@mystwright/engine';
 
 export const gameplayController = {
     async generateNextCharacterDialogue(req: Request): Promise<Response> {
@@ -75,12 +75,11 @@ export const gameplayController = {
         }
     },
 
-    async getGameState(req: Request): Promise<Response> {
+    async getGameState(req: APIRequest<'/api/v1/worlds/:world_id/states/:state_id'>): Promise<Response> {
         try {
             const authReq = req as AuthenticatedRequest;
-            const url = new URL(req.url);
-            const pathParts = url.pathname.split('/');
-            const worldId = pathParts[pathParts.length - 2];
+            const worldId = req.params.world_id;
+            const stateId = req.params.state_id;
 
             if (!worldId) {
                 return errorResponse('World ID is required', req, 400);
@@ -96,28 +95,16 @@ export const gameplayController = {
                 return errorResponse('World not found', req, 404);
             }
 
-            // TODO: Merge APIWorldResponse & WorldPayload
-            const gameWorld = deserializeWorldStructure(world.payload as unknown as APIWorldResponse);
-
             // Get game state from database
-            let gameState = await db.selectFrom('game_states')
+            const gameState = await db.selectFrom('game_states')
                 .selectAll()
                 .where('world_id', '=', worldId)
                 .where('user_id', '=', authReq.user.id)
+                .where('id', '=', stateId)
                 .executeTakeFirst();
 
-            // If no game state is found, create a new one
             if (gameState === undefined || gameState === null) {
-                const newGameState = constructGameState(gameWorld);
-
-                gameState = await db.insertInto('game_states')
-                    .values({
-                        world_id: worldId,
-                        user_id: authReq.user.id,
-                        payload: newGameState
-                    })
-                    .returningAll()
-                    .executeTakeFirstOrThrow();
+                return errorResponse('Game state not found', req, 404);
             }
 
             return jsonResponse({ state: gameState }, req);
@@ -127,10 +114,50 @@ export const gameplayController = {
         }
     },
 
+    async createGameState(req: APIRequest<'/api/v1/worlds/:world_id/states'>): Promise<Response> {
+        try {
+            const authReq = req as AuthenticatedRequest;
+            const worldId = req.params.world_id;
+
+            if (!worldId) {
+                return errorResponse('World ID is required', req, 400);
+            }
+
+            const world = await db.selectFrom('worlds')
+                .selectAll()
+                .where('id', '=', worldId)
+                .where('user_id', '=', authReq.user.id)
+                .executeTakeFirst();
+
+            if (!world) {
+                return errorResponse('World not found', req, 404);
+            }
+
+            const gameWorld = deserializeWorldStructure(world.payload as unknown as APIWorldResponse);
+            const newGameState = constructGameState(gameWorld);
+
+            // Create a new game state in the database
+            const gameState = await db.insertInto('game_states')
+                .values({
+                    world_id: worldId,
+                    user_id: authReq.user.id,
+                    payload: newGameState
+                })
+                .returningAll()
+                .executeTakeFirstOrThrow();
+
+            return jsonResponse({ state: gameState }, req);
+        }
+        catch (error) {
+            console.error('Create game state error:', error);
+            return errorResponse('Error creating game state', req, 500);
+        }
+    },
+
     /**
      * Save the game state to the database
      */
-    async saveGameState(req: Request): Promise<Response> {
+    async saveGameState(req: APIRequest<'/api/v1/worlds/:world_id/states/:state_id'>): Promise<Response> {
         try {
             const authReq = req as AuthenticatedRequest;
             const url = new URL(req.url);

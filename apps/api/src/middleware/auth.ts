@@ -3,6 +3,7 @@ import { config } from '../config';
 import { errorResponse } from '../utils/responses';
 import { db, Token, TokenType } from '../db';
 import type { NewAccessToken, NewRefreshToken, DBRefreshToken, SafeUser, User } from '../db';
+import type { APIRequest, AuthenticatedRequest } from '../utils/responses';
 
 /**
  * Interface for JWT payload with user data
@@ -21,18 +22,9 @@ declare global {
 }
 
 /**
- * Extend Bun's Request interface to include user data
- */
-export interface AuthenticatedRequest extends Request {
-    user: JwtPayload;
-}
-
-export type APIRequest = Request | AuthenticatedRequest;
-
-/**
  * Middleware to verify JWT and attach user data to request
  */
-export async function authMiddleware(req: APIRequest): Promise<AuthenticatedRequest | Response> {
+export async function authMiddleware<T extends string = string>(req: APIRequest<T>): Promise<AuthenticatedRequest<T> | Response> {
     const authHeader = req.headers.get('Authorization');
 
     if (!authHeader?.startsWith('Bearer ')) {

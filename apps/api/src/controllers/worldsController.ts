@@ -1,7 +1,7 @@
-import { generateWorld, serializeWorldStructure } from '@mystwright/engine';
 import { db, type NewWorld, type WorldPayload } from '@mystwright/db';
+import { generateWorld, serializeWorldStructure } from '@mystwright/engine';
+import type { APIRequest, AuthenticatedRequest } from '../utils/responses';
 import { errorResponse, jsonResponse } from '../utils/responses';
-import type { AuthenticatedRequest } from '../middleware/auth';
 
 /**
  * Controller for world management operations
@@ -66,11 +66,10 @@ export const worldsController = {
     /**
      * Get a specific world by ID
      */
-    async getWorld(req: Request): Promise<Response> {
+    async getWorld(req: APIRequest<'/api/v1/worlds/:world_id'>): Promise<Response> {
         try {
             const authReq = req as AuthenticatedRequest;
-            const url = new URL(req.url);
-            const worldId = url.pathname.split('/').pop();
+            const worldId = req.params.world_id
             
             if (!worldId) {
                 return errorResponse('World ID is required', req, 400);
@@ -97,11 +96,10 @@ export const worldsController = {
     /**
      * Delete a world by ID
      */
-    async deleteWorld(req: Request): Promise<Response> {
+    async deleteWorld(req: APIRequest<'/api/v1/worlds/:world_id'>): Promise<Response> {
         try {
             const authReq = req as AuthenticatedRequest;
-            const url = new URL(req.url);
-            const worldId = url.pathname.split('/').pop();
+            const worldId = req.params.world_id
             
             if (!worldId) {
                 return errorResponse('World ID is required', req, 400);
@@ -135,11 +133,10 @@ export const worldsController = {
     /**
      * Export a world as JSON
      */
-    async exportWorld(req: Request): Promise<Response> {
+    async exportWorld(req: APIRequest<'/api/v1/worlds/:world_id/export'>): Promise<Response> {
         try {
             const authReq = req as AuthenticatedRequest;
-            const url = new URL(req.url);
-            const worldId = url.pathname.split('/').pop();
+            const worldId = req.params.world_id
             
             if (!worldId) {
                 return errorResponse('World ID is required', req, 400);

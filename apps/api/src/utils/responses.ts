@@ -1,4 +1,15 @@
 import { getCorsHeaders } from './cors';
+import type { BunRequest } from "bun";
+import type { JwtPayload } from '../middleware/auth';
+
+/**
+ * Extend Bun's Request interface to include user data
+ */
+export interface AuthenticatedRequest<T extends string = string> extends BunRequest<T> {
+    user: JwtPayload;
+}
+
+export type APIRequest<T extends string = string> = BunRequest<T> | AuthenticatedRequest<T>;
 
 /**
  * Creates a JSON response with appropriate CORS headers
@@ -106,7 +117,7 @@ export function csvResponse(
 /**
  * Creates a response for preflight OPTIONS requests
  */
-export function optionsResponse(req: Request): Response {
+export function optionsResponse<T extends string = string>(req: APIRequest<T>): Response {
     return new Response(null, {
         status: 204,
         headers: getCorsHeaders(req)
