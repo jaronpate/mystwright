@@ -376,7 +376,7 @@ Commands:
                         ...prev,
                         { role: 'assistant', content: response, sender: currentCharacter.name }
                     ]);
-                    // await playVoiceForText(currentCharacter.voice, response);
+                    await playVoiceForText(currentCharacter.voice, response);
                 } else {
                     setMessages(prev => [
                         ...prev,
@@ -407,9 +407,15 @@ export function renderMystwrightTUI(world: World, state: GameState) {
     enterAltScreen();
     clearTerm();
 
-    process.on("exit", () => {
+    const cleanup = () => {
         clearTerm();
         exitAltScreen();
+    }
+
+    process.on("exit", cleanup);
+    process.on("uncaughtException", (_) => {
+        cleanup();
+        process.exit(1);
     });
     
     render(
