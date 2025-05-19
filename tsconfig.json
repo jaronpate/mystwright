@@ -27,6 +27,7 @@
     "paths": {
       "@mystwright/engine": ["./libs/engine/src"],
       "@mystwright/db": ["./libs/db/src"],
+      "@mystwright/types": ["./libs/types/src"],
     }
   }
 }

@@ -1,4 +1,4 @@
-import type { CharacterID, GameState, MessageUI, World } from '@mystwright/engine';
+import type { CharacterID, GameState, MessageUI, World } from '@mystwright/types';
 import { attemptSolve, getNextDialogueWithCharacter, JUDGE_CHARACTER_ID, JUDGE_VOICE, playVoiceForText } from '@mystwright/engine';
 import { Box, Newline, render, Text, useApp, useInput } from 'ink';
 import { useState } from 'react';

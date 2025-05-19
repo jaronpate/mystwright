@@ -1,4 +1,4 @@
-import type { OpenRouterChatCompletionResponse, Tool } from "./types";
+import type { OpenRouterChatCompletionResponse, Tool } from "@mystwright/types";
 
 export async function generateCompletion<T extends Record<string, any> | undefined = undefined, K = T extends undefined ? string : Record<string, any> | Array<Record<string, any>>>(
     model: string,

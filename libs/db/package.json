@@ -4,9 +4,9 @@
   "type": "module",
   "private": true,
   "dependencies": {
+    "@mystwright/db": "workspace:*",
     "kysely": "^0.27.6",
-    "pg": "^8.14.1",
-    "@mystwright/db": "workspace:*"
+    "pg": "^8.14.1"
   },
   "devDependencies": {
     "@types/pg": "^8.11.11"

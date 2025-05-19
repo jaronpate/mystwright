@@ -1,5 +1,6 @@
 import { db, type NewWorld, type WorldPayload } from '@mystwright/db';
-import { generateWorld, serializeWorldStructure } from '@mystwright/engine';
+import { generateWorld } from '@mystwright/engine';
+import { serializeWorldStructure } from '@mystwright/types';
 import type { APIRequest, AuthenticatedRequest } from '../utils/responses';
 import { errorResponse, jsonResponse } from '../utils/responses';
 

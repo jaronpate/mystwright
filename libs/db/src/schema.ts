@@ -1,5 +1,5 @@
 import type { Generated, Insertable, JSONColumnType, Selectable, Updateable } from 'kysely';
-import type { World } from '@mystwright/engine';
+import type { World } from '@mystwright/types';
 
 // Define the database schema using Kysely's type system
 export interface Database {
