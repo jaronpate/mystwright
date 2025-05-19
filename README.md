@@ -1,4 +1,9 @@
-# Mystwright
+<div align="center">
+    <img src="icon.png" alt="Mystwright Logo" width="100"/>
+    <h1>Mystwright</h1>
+</div>
+
+<!-- # Mystwright -->
 
 Mystwright is an interactive text-based mystery game with voice capabilities, built using TypeScript, React (via Ink), and AI-powered interactions.
 
