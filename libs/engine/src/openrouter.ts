@@ -47,6 +47,8 @@ export async function generateCompletion<T extends Record<string, any> | undefin
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
+            // 'X-Title': 'Mystwright',
+            // 'HTTP-Referer': 'https://mystwright.com',
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${openrouterAPIKey}`
         },
