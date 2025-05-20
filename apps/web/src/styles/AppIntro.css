@@ -1,0 +1,136 @@
+.intro {
+    backdrop-filter: blur(4px);
+    border: 1px solid hsl(var(--muted-foreground) / 0.2);
+    border-radius: var(--radius);
+    background-color: hsl(var(--muted));
+    min-width: 300px;
+    max-width: 450px;
+    width: 100%;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.intro-icon {
+    /* 20% opacity bg */
+    background-color: hsl(var(--primary) / 0.2);
+    color: hsl(var(--primary));
+    border-radius: 100%;
+    padding: 1rem;
+    width: 4rem;
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.intro-dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    background-color: hsl(var(--muted-foreground) / 0.5);
+    border-radius: 100%;
+    margin: 0 0.25rem;
+}
+
+.dot.active {
+    background-color: hsl(var(--primary));
+}
+
+.intro-content {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 1.5rem; /* Add margin to maintain spacing */
+    min-height: 100px;
+    transition: height 0.2s ease-in-out;
+}
+
+.intro-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 1rem;
+    color: hsl(var(--foreground));
+}
+
+.intro-subtitle {
+    font-size: 1rem;
+    color: hsl(var(--muted-foreground));
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding: 0 0.5rem; /* Add some padding to prevent text touching edges */
+    overflow-wrap: break-word; /* Ensure long words break */
+    word-wrap: break-word;
+}
+
+.slide-content {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    padding: 0 0.5rem;
+}
+
+.animating .slide-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+.slide-enter {
+    animation: slideInFromRight 0.4s forwards;
+    will-change: transform, opacity;
+    position: relative;
+    z-index: 1;
+}
+
+.slide-exit {
+    animation: slideOutToLeft 0.4s forwards;
+    will-change: transform, opacity;
+    position: absolute;
+    z-index: 2;
+}
+
+@keyframes slideInFromRight {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutToLeft {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+}
+
+.intro-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.intro-cta button {
+    width: 100%;
+}

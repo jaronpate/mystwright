@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import MainPage from './components/Page';
+import Page from './components/Page';
 import './App.css';
 import { StrictMode, useEffect } from 'react';
 import AppIntro from './components/AppIntro';
@@ -26,7 +26,7 @@ function AppRoutes() {
             {/* <Route path="/signup" element={<Signup />} /> */}
             <Route path="/app" element={
                 <Layout sidebar>
-                    <MainPage />
+                    <Page />
                 </Layout>
             } />
             {/* Add a catch-all route */}
