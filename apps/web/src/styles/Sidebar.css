@@ -1,0 +1,103 @@
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 350px;
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    padding: 8px;
+    height: 100%;
+}
+
+.sidebar-inner {
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    height: 100%;
+}
+
+.sidebar-header {
+    padding: 16px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    height: 50px;
+}
+
+.sidebar-content {
+    height: calc(100% - 50px);
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.sidebar-collapsable {
+    margin-top: 16px;
+}
+
+.sidebar-items {
+    animation: slideDown 0.2s ease-out;
+}
+
+.sidebar-item {
+    margin-bottom: 8px;
+}
+
+.sidebar-item:last-child {
+    margin-bottom: 0;
+}
+
+.sidebar-title {
+    display: flex;
+    align-items: center;
+    color: hsl(var(--foreground));
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sidebar-title:hover {
+    opacity: 0.8;
+}
+
+.sidebar-title-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    color: hsl(var(--primary));
+}
+
+.sidebar-chevron {
+    color: hsl(var(--foreground));
+    transition: transform 0.2s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.sidebar .wordmark {
+    justify-content: flex-start;
+}
+
+.sidebar-title {
+    user-select: none;
+}
+.sidebar-title-icon {
+    user-select: none;
+}
+.sidebar-chevron {
+    user-select: none;
+}
+.sidebar-title-text {
+    user-select: none;
+}

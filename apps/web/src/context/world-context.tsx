@@ -6,6 +6,30 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 
 // Sample data
 const initialWorlds: DBWorld[] = [
+    {
+        id: "1",
+        title: "The Art of Deception",
+        description: "This is the first world.",
+        payload: {
+            characters: [
+                { id: "1", name: "Character 1", description: "This is character 1." },
+                { id: "2", name: "Character 2", description: "This is character 2." },
+            ],
+            // Add other properties as needed
+        },
+    },
+    {
+        id: "2",
+        title: "The GenTech Labs Conspiracy",
+        description: "This is the second world.",
+        payload: {
+            characters: [
+                { id: "3", name: "Character 3", description: "This is character 3." },
+                { id: "4", name: "Character 4", description: "This is character 4." },
+            ],
+            // Add other properties as needed
+        },
+    }
 ];
 
 type WorldContextType = {

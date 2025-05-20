@@ -1,17 +1,18 @@
 import { WorldProvider } from './context/world-context';
+import MystwrightSidebar from './components/Sidebar';
 import './App.css';
 
 function App() {
 
-  return (
-    <>
-      <WorldProvider>
-        <div className="App">
-          <h1>Welcome to Mystwright!</h1>
-        </div>
-      </WorldProvider>
-    </>
-  );
+    return (
+        <>
+            <WorldProvider>
+                <div className='mystwright-app dark'>
+                    <MystwrightSidebar />
+                </div>
+            </WorldProvider>
+        </>
+    );
 }
 
 export default App;
