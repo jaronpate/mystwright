@@ -3,6 +3,8 @@
     overflow: hidden;
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+    display: flex;
+    flex-direction: row;
 }
 
 .wordmark {

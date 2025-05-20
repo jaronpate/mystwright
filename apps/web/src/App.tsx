@@ -1,5 +1,6 @@
 import { WorldProvider } from './context/world-context';
 import MystwrightSidebar from './components/Sidebar';
+import MainPage from './components/MainPage';
 import './App.css';
 
 function App() {
@@ -9,6 +10,7 @@ function App() {
             <WorldProvider>
                 <div className='mystwright-app dark'>
                     <MystwrightSidebar />
+                    <MainPage />
                 </div>
             </WorldProvider>
         </>

@@ -45,6 +45,7 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 142.4 71.8% 29.2%;
+    --bg-gradient-stops: #111827 , #1f2937;
 }
 
 /* Custom scrollbar for the chat interface */
