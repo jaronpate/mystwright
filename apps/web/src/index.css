@@ -61,7 +61,8 @@
 
 ::-webkit-scrollbar-thumb {
     background: rgba(103, 58, 183, 0.5); /* Medium purple thumb */
-    border-radius: 4px;
+    /* border-radius: 4px; */
+    /* border-radius: var(--radius); */
 }
 
 ::-webkit-scrollbar-thumb:hover {
