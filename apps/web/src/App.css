@@ -136,3 +136,32 @@
     border: 1px dashed hsl(var(--muted));
     border-radius: var(--radius);
 }
+
+button {
+    cursor: pointer;
+    background: none;
+    border: none;
+    font: inherit;
+    color: inherit;
+    border-radius: var(--radius);
+    padding: 0.6rem 1rem;
+
+    /* TODO standardize button colors */
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+button:active {
+    transform: translateY(1px);
+    background: rgba(255, 255, 255, 0.2);
+}
