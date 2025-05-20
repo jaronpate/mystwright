@@ -18,7 +18,7 @@ function AppRoutes() {
     return (
         <Routes>
             <Route path="/" element={
-                <Layout sidebar>
+                <Layout>
                     <AppIntro />
                 </Layout>
             } />
