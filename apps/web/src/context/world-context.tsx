@@ -4,6 +4,7 @@ import type { Character } from "@mystwright/types";
 import type { DBWorld } from "@mystwright/db";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { useUserContext } from "./user-context";
+import { useApi } from "../utils/api";
 
 type WorldContextType = {
     worlds: DBWorld[]
@@ -18,31 +19,18 @@ const WorldContext = createContext<WorldContextType | undefined>(undefined);
 export function WorldProvider({ children }: { children: ReactNode }) {
     const [ worlds, setWorlds ] = useState<DBWorld[]>([]);
     const [ activeWorldId, setActiveWorldId ] = useState<string | null>();
-    const { tokenSet } = useUserContext();
+    const { user } = useUserContext();
+    const apiFetch = useApi();
 
     useEffect(() => {
-        if (tokenSet) {
-            // Fetch worlds from the API using the token set
-            fetchWorlds(tokenSet);
+        if (user) {
+            fetchWorlds();
         }
-    }
-    , [tokenSet]);
+    }, [user]);
 
-    const fetchWorlds = async (tokenSet: any) => {
+    const fetchWorlds = async () => {
         try {
-            const response = await fetch('/api/v1/worlds', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${tokenSet.access_token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch worlds');
-            }
-
-            const data = await response.json();
+            const data = await apiFetch<{ worlds: DBWorld[] }>('/api/v1/worlds', { method: 'GET' });
             setWorlds(data.worlds);
         } catch (error) {
             console.error("Error fetching worlds:", error);

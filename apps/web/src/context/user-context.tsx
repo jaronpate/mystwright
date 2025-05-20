@@ -2,16 +2,13 @@
 
 import type { User, TokenSet } from "@mystwright/db";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-
-const TOKEN_SET_KEY = "mystwright_token_set";
-
-type LocalTokenSet = Omit<TokenSet, 'expires_at'> & { expires_at: Date };
+import { LocalTokenSet, TOKEN_SET_KEY } from "../utils/auth";
 
 type UserContextType = {
     user: User | null
     tokenSet: LocalTokenSet | null
     setUser: (user: User) => void
-    setTokenSet: (token_set: TokenSet | null) => void,
+    setTokenSet: (token_set: TokenSet | null) => LocalTokenSet | null,
     loading: boolean,
     error: string | null
 };
