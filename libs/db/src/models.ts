@@ -3,6 +3,7 @@ import { TokenType, type DBAccessToken, type DBRefreshToken } from './schema';
 export type TokenSet = {
     access_token: string;
     refresh_token: string;
+    expires_in: number;
     access_token_expires_at: Date;
     refresh_token_expires_at: Date;
 }

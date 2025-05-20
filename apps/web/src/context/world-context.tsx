@@ -2,35 +2,8 @@
 
 import type { Character } from "@mystwright/types";
 import type { DBWorld } from "@mystwright/db";
-import { createContext, useContext, useState, type ReactNode } from "react";
-
-// Sample data
-const initialWorlds: DBWorld[] = [
-    {
-        id: "1",
-        title: "The Art of Deception",
-        description: "This is the first world.",
-        payload: {
-            characters: [
-                { id: "1", name: "Character 1", description: "This is character 1." },
-                { id: "2", name: "Character 2", description: "This is character 2." },
-            ],
-            // Add other properties as needed
-        },
-    },
-    {
-        id: "2",
-        title: "The GenTech Labs Conspiracy",
-        description: "This is the second world.",
-        payload: {
-            characters: [
-                { id: "3", name: "Character 3", description: "This is character 3." },
-                { id: "4", name: "Character 4", description: "This is character 4." },
-            ],
-            // Add other properties as needed
-        },
-    }
-];
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { useUserContext } from "./user-context";
 
 type WorldContextType = {
     worlds: DBWorld[]
@@ -43,8 +16,38 @@ type WorldContextType = {
 const WorldContext = createContext<WorldContextType | undefined>(undefined);
 
 export function WorldProvider({ children }: { children: ReactNode }) {
-    const [worlds] = useState<DBWorld[]>(initialWorlds);
-    const [activeWorldId, setActiveWorldId] = useState<string | null>();
+    const [ worlds, setWorlds ] = useState<DBWorld[]>([]);
+    const [ activeWorldId, setActiveWorldId ] = useState<string | null>();
+    const { tokenSet } = useUserContext();
+
+    useEffect(() => {
+        if (tokenSet) {
+            // Fetch worlds from the API using the token set
+            fetchWorlds(tokenSet);
+        }
+    }
+    , [tokenSet]);
+
+    const fetchWorlds = async (tokenSet: any) => {
+        try {
+            const response = await fetch('/api/v1/worlds', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${tokenSet.access_token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch worlds');
+            }
+
+            const data = await response.json();
+            setWorlds(data.worlds);
+        } catch (error) {
+            console.error("Error fetching worlds:", error);
+        }
+    }
 
     const setActiveWorld = (id: string) => {
         const world = worlds.find((m) => m.id === id)

@@ -47,7 +47,9 @@ export const authController = {
                 id_token: accessToken.value,
                 access_token: accessToken.value,
                 refresh_token: refreshToken.value,
-                expires_in: expiresIn
+                expires_in: expiresIn,
+                access_token_expires_at: accessToken.expires_at,
+                refresh_token_expires_at: refreshToken.expires_at
             }, req, 201);
         } catch (error) {
             console.error('Signup error:', error);
@@ -83,8 +85,9 @@ export const authController = {
                 id_token: accessToken.value,
                 access_token: accessToken.value,
                 refresh_token: refreshToken.value,
-                expires_in: expiresIn
-
+                expires_in: expiresIn,
+                access_token_expires_at: accessToken.expires_at,
+                refresh_token_expires_at: refreshToken.expires_at
             }, req, 200);
         } catch (error) {
             console.error('Login error:', error);
@@ -127,7 +130,9 @@ export const authController = {
                     id_token: accessToken.value,
                     access_token: accessToken.value,
                     refresh_token: refreshToken.value,
-                    expires_in: expiresIn
+                    expires_in: expiresIn,
+                    access_token_expires_at: accessToken.expires_at,
+                    refresh_token_expires_at: refreshToken.expires_at
                 }, req, 200);
             } else {
                 return errorResponse('Invalid grant type', req, 400);
