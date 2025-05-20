@@ -1,9 +1,9 @@
-import { BrowserRouter, Router, Routes, Route, Navigate, useLocation } from 'react-router';
-import { WorldProvider } from './context/world-context';
-import MystwrightSidebar from './components/Sidebar';
-import MainPage from './components/MainPage';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import MainPage from './components/Page';
 import './App.css';
-import { useEffect } from 'react';
+import { StrictMode, useEffect } from 'react';
+import AppIntro from './components/AppIntro';
+import Layout from './components/Layout';
 
 function AppRoutes() {
     // const location = useLocation();
@@ -35,28 +35,13 @@ function AppRoutes() {
     );
 }
 
-function Layout({ sidebar, children }: { sidebar?: boolean, children: React.ReactNode }) {
-    return (
-        <WorldProvider>
-            {sidebar && <MystwrightSidebar />}
-            {children}
-        </WorldProvider>
-    );
-}
-
-function AppIntro() {
-    return (
-        <MainPage />
-    );
-}
-
 function App() {
     return (
-        <BrowserRouter>
-            <div className="mystwright-app dark">
+        <StrictMode>
+            <BrowserRouter>
                 <AppRoutes />
-            </div>
-        </BrowserRouter>
+            </BrowserRouter>
+        </StrictMode>
     )
 }
 

@@ -6,6 +6,7 @@
     color: hsl(var(--card-foreground));
     padding: 8px;
     height: 100%;
+    flex-shrink: 0;
 }
 
 .sidebar-inner {
