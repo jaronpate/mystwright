@@ -2,6 +2,7 @@ import { Sparkles, BookOpen, Users, UserSquare2, ChevronDown, ChevronUp } from "
 import { useWorldContext } from "../context/world-context";
 import { useState } from "react";
 import "../styles/Sidebar.css";
+import Logo from '/icon.png';
 
 type SidebarHeaderProps = {
     title: string;
@@ -87,7 +88,10 @@ export default function MystwrightSidebar() {
             <div className="sidebar-inner">
                 <SidebarHeader
                     title="Mystwright"
-                    icon={<Sparkles width={'24px'} height={'24px'} />}
+                    icon={
+                        // <Sparkles width={'24px'} height={'24px'} />
+                        <img src={Logo} alt="Mystwright Logo" />
+                    }
                 />
                 <div className="sidebar-content">
                     {/* Worlds */}

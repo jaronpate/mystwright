@@ -34,10 +34,16 @@
     margin-bottom: 0.5rem;
 }
 
+.intro-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 /* Add stars to the icon */
 .intro-icon::before,
 .intro-icon::after {
-    content: '✧';
+    /* content: '✧'; */
     position: absolute;
     color: rgba(255, 255, 255, 0.8);
     font-size: 1rem;

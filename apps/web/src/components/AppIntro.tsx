@@ -3,6 +3,7 @@ import Page from "./Page";
 import "../styles/AppIntro.css";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
+import Logo from '/icon.png'
 
 export default function AppIntro() {
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -67,7 +68,8 @@ export default function AppIntro() {
         <Page padding={20}>
             <div className="intro">
                 <div className="intro-icon">
-                    <Sparkles height={36} width={36} />
+                    {/* <Sparkles height={36} width={36} /> */}
+                    <img src={Logo} alt="Mystwright Logo" />
                 </div>
                 <div ref={contentRef} className={`intro-content ${isAnimating ? 'animating' : ''}`}>
                     {isAnimating && (

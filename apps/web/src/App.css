@@ -22,6 +22,12 @@
     color: hsl(var(--primary));
 }
 
+.wordmark img {
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
+}
+
 .ff {
     flex: 1;
 }
