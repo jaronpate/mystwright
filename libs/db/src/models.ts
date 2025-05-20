@@ -4,8 +4,8 @@ export type TokenSet = {
     access_token: string;
     refresh_token: string;
     expires_in: number;
-    access_token_expires_at: Date;
-    refresh_token_expires_at: Date;
+    expires_at: string;
+    token_type: 'Bearer'
 }
 
 export class Token {

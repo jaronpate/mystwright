@@ -5,23 +5,27 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 
 const TOKEN_SET_KEY = "mystwright_token_set";
 
+type LocalTokenSet = Omit<TokenSet, 'expires_at'> & { expires_at: Date };
+
 type UserContextType = {
     user: User | null
-    tokenSet: TokenSet | null
+    tokenSet: LocalTokenSet | null
     setUser: (user: User) => void
-    setTokenSet: (token_set: TokenSet | null) => void
+    setTokenSet: (token_set: TokenSet | null) => void,
+    loading: boolean,
+    error: string | null
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
-    const [tokenSet, setActiveTokenSet] = useState<TokenSet | null>(null);
+    const [tokenSet, setActiveTokenSet] = useState<LocalTokenSet | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     // TODO: API Response Type
-    const setTokenSet = (tokenSet: TokenSet | null): TokenSet | null => {
+    const setTokenSet = (tokenSet: TokenSet | null): LocalTokenSet | null => {
         if (!tokenSet) {
             localStorage.removeItem(TOKEN_SET_KEY);
             setActiveTokenSet(null);
@@ -30,10 +34,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
         localStorage.setItem(TOKEN_SET_KEY, JSON.stringify(tokenSet));
 
-        const newTokenSet: TokenSet = {
+        const newTokenSet: LocalTokenSet = {
             ...tokenSet,
-            access_token_expires_at: new Date(tokenSet.access_token_expires_at),
-            refresh_token_expires_at: new Date(tokenSet.refresh_token_expires_at)
+            expires_at: new Date(tokenSet.expires_at)
         };
 
         setActiveTokenSet(newTokenSet);
@@ -60,10 +63,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
         }
     }, []);
 
-    const fetchUser = async (tokenSet: TokenSet) => {
+    const fetchUser = async (tokenSet: LocalTokenSet) => {
         try {
             if (tokenSet) {
-                if(tokenSet.access_token_expires_at.getTime() < Date.now()) {
+                if(tokenSet.expires_at.getTime() < Date.now()) {
                     const res = await fetch('/api/v1/auth/token', {
                         method: 'POST',
                         headers: {
@@ -113,7 +116,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
                 user,
                 tokenSet,
                 setUser,
-                setTokenSet
+                setTokenSet,
+                loading,
+                error
             }}
         >
             {children}

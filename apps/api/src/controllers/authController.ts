@@ -44,12 +44,12 @@ export const authController = {
             return jsonResponse({
                 message: 'User registered successfully',
                 user: { id: newUser.id, email: newUser.email, first_name: newUser.first_name, last_name: newUser.last_name },
+                expires_at: accessToken.expires_at,
                 id_token: accessToken.value,
                 access_token: accessToken.value,
                 refresh_token: refreshToken.value,
                 expires_in: expiresIn,
-                access_token_expires_at: accessToken.expires_at,
-                refresh_token_expires_at: refreshToken.expires_at
+                token_type: 'Bearer'
             }, req, 201);
         } catch (error) {
             console.error('Signup error:', error);
@@ -82,12 +82,12 @@ export const authController = {
             return jsonResponse({
                 message: 'Login successful',
                 user: { id: user.id, email: user.email, first_name: user.first_name, last_name: user.last_name },
+                expires_at: accessToken.expires_at,
                 id_token: accessToken.value,
                 access_token: accessToken.value,
                 refresh_token: refreshToken.value,
                 expires_in: expiresIn,
-                access_token_expires_at: accessToken.expires_at,
-                refresh_token_expires_at: refreshToken.expires_at
+                token_type: 'Bearer'
             }, req, 200);
         } catch (error) {
             console.error('Login error:', error);
@@ -127,12 +127,12 @@ export const authController = {
                 const { accessToken, refreshToken, expiresIn } = await generateTokenSet(user, refresh.id);
                 
                 return jsonResponse({
+                    expires_at: accessToken.expires_at,
                     id_token: accessToken.value,
                     access_token: accessToken.value,
                     refresh_token: refreshToken.value,
                     expires_in: expiresIn,
-                    access_token_expires_at: accessToken.expires_at,
-                    refresh_token_expires_at: refreshToken.expires_at
+                    token_type: 'Bearer'
                 }, req, 200);
             } else {
                 return errorResponse('Invalid grant type', req, 400);
