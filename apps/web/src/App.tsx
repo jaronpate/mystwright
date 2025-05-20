@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Page from './components/Page';
 import './App.css';
-import { StrictMode, useEffect } from 'react';
+import { StrictMode } from 'react';
 import AppIntro from './components/AppIntro';
 import Layout from './components/Layout';
 
@@ -36,6 +36,7 @@ function AppRoutes() {
 }
 
 function App() {
+
     return (
         <StrictMode>
             <BrowserRouter>
