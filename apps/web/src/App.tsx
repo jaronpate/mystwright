@@ -4,6 +4,8 @@ import './App.css';
 import { StrictMode } from 'react';
 import AppIntro from './components/AppIntro';
 import Layout from './components/Layout';
+import MystwrightSidebar from './components/Sidebar';
+import Chat from './components/Chat';
 
 function AppRoutes() {
     // const location = useLocation();
@@ -25,8 +27,8 @@ function AppRoutes() {
             {/* <Route path="/login" element={<Login />} /> */}
             {/* <Route path="/signup" element={<Signup />} /> */}
             <Route path="/app" element={
-                <Layout sidebar>
-                    <Page />
+                <Layout sidebar={<MystwrightSidebar />}>
+                    <Chat />
                 </Layout>
             } />
             {/* Add a catch-all route */}

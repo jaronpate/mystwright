@@ -69,14 +69,18 @@
     background: rgba(126, 87, 194, 0.6); /* Lighter purple on hover */
 }
 
+* {
+    box-sizing: border-box;
+}
+
+html {
+    background-color: hsl(var(--background));
+}
+
 body {
     margin: 0;
     padding: 0;
     font-size: 0.9rem;
-}
-
-* {
-    box-sizing: border-box;
 }
 
 #root {
@@ -84,4 +88,32 @@ body {
     overflow: hidden;
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+    font-size: 0.9rem;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+.flex-row {
+    flex-direction: row;
+}
+.flex-wrap {
+    flex-wrap: wrap;
+}
+.flex-nowrap {
+    flex-wrap: nowrap;
+}
+.flex-1 {
+    flex: 1;
+}
+
+.flex-align-center {
+    align-items: center;
+}
+.flex-justify-center {
+    justify-content: center;
 }
