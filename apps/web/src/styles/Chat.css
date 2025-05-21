@@ -13,9 +13,35 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    /* padding: 1rem; */
-    height: 4rem;
+    height: 5.5rem;
     background-color: hsl(var(--background));
+    border-bottom: 1px solid hsl(var(--border) / 0.6);
+    /* Helps with looking aligned to rounded corners */
+    padding: 0 2px;
+}
+
+.dialog-header .character-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dialog-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: hsl(var(--foreground));
+    margin: 0;
+}
+
+.dialog-header .character-title {
+    font-size: 0.9rem;
+    color: hsl(var(--muted-foreground));
+    margin: 0;
+}
+
+.dialog-actions {
+    display: flex;
+    gap: 8px;
 }
 
 .dialog-content {
@@ -30,10 +56,10 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    /* padding: 1rem; */
     height: 6rem;
     background-color: hsl(var(--background));
-    /* padding: 8px; */
+    /* Helps with looking aligned to rounded corners */
+    padding: 0 2px;
 }
 
 .dialog-footer .chat {
@@ -68,7 +94,7 @@
     align-items: flex-start;
     justify-content: flex-start;
     gap: 16px;
-    padding: 16px;
+    padding: 12px;
     background-color: hsl(var(--background) / 0.5);
     border: 1px solid hsl(var(--muted));
     border-radius: var(--radius);
@@ -110,4 +136,8 @@
 
 .chat-messages .message.user {
     align-self: flex-end;
+}
+
+audio.character-voice{
+    display: none;
 }

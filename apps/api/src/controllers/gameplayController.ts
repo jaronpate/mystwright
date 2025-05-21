@@ -1,5 +1,5 @@
 import { db, sql } from '@mystwright/db';
-import { getNextDialogueWithCharacter } from '@mystwright/engine';
+import { getNextDialogueWithCharacter, createVoiceStreamForText } from '@mystwright/engine';
 import { constructGameState, deserializeWorldStructure, type APIWorldResponse, type GameState } from '@mystwright/types';
 import type { APIRequest, AuthenticatedRequest } from '../utils/responses';
 import { errorResponse, jsonResponse } from '../utils/responses';
@@ -77,6 +77,47 @@ export const gameplayController = {
             console.error('Generate next character dialogue error:', error);
             return errorResponse('Error generating next character dialogue', req, 500);
         }
+    },
+
+    async generateCharacterSpeech(req: APIRequest<'/api/v1/worlds/:world_id/speech'>): Promise<Response> {
+        const authReq = req as AuthenticatedRequest;
+        const { text, character_id } = await req.json() as Record<string, any>;
+        
+        if (text === undefined || text === null) {
+            return errorResponse('Text is required', req, 400);
+        }
+
+        const { world_id } = req.params
+
+        if (!world_id) {
+            return errorResponse('World ID is required', req, 400);
+        }
+
+        // Get world from database
+        const world = await db.selectFrom('worlds')
+            .selectAll()
+            .where('id', '=', world_id)
+            .where('user_id', '=', authReq.user.id)
+            .executeTakeFirst();
+
+        if (!world) {
+            return errorResponse('World not found', req, 404);
+        }
+
+        const gameWorld = deserializeWorldStructure(world.payload as unknown as APIWorldResponse);
+        const character = gameWorld.characters.get(character_id);
+
+        if (character === undefined || character === null) {
+            return errorResponse('Character not found', req, 404);
+        }
+
+        console.log('Generating speech for character:', character.name, 'with text:', text, 'and voice:', character.voice);
+
+        const audio = await createVoiceStreamForText(character.voice, text);
+
+        return new Response(audio, {
+            headers: { 'Content-Type': 'audio/mpeg' }
+        });
     },
 
     async listGameStates(req: APIRequest<'/api/v1/worlds/:world_id/states'>): Promise<Response> {

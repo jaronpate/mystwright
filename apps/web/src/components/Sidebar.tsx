@@ -120,20 +120,21 @@ export default function MystwrightSidebar() {
                                 No world selected
                             </div>
                         ) : (
-                            activeWorld.payload.characters.map((character) => (
-                                <Card
-                                    key={character.id}
-                                    title={character.name}
-                                    description={character.description}
-                                    active={activeCharacter?.id === character.id}
-                                    onClick={() => setActiveCharacter(character.id)}
-                                    noBorder={true}
-                                    icon={
-                                        <div className="character-avatar">
-                                            {character.name.charAt(0)}
-                                        </div>
-                                    }
-                                />
+                            activeWorld.payload.characters.map((character) => character.role !== 'victim' && (
+                                <div className="card-character" key={character.id}>
+                                    <Card
+                                        title={character.name}
+                                        description={character.description}
+                                        active={activeCharacter?.id === character.id}
+                                        onClick={() => setActiveCharacter(character.id)}
+                                        noBorder={true}
+                                        icon={
+                                            <div className="character-avatar">
+                                                {character.name.charAt(0)}
+                                            </div>
+                                        }
+                                    />
+                                </div>
                             ))
                         )}
                     </CollapsibleSection>

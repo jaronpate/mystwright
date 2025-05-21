@@ -70,7 +70,14 @@
 .card-subtitle {
     font-size: 0.8rem;
     color: hsl(var(--muted-foreground));
-    margin-top: 4px
+    margin-top: 4px;
+}
+
+.card-character .card-subtitle {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 230px;
 }
 
 .card.active {
@@ -174,6 +181,21 @@ button:hover {
 button:active {
     transform: translateY(1px);
     background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-primary {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border: none;
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: hsl(var(--primary) / 0.9);
 }
 
 input {

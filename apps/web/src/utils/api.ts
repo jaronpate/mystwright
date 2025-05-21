@@ -3,10 +3,11 @@ import { useUserContext } from '../context/user-context';
 export function useApi() {
     const { tokenSet, setTokenSet } = useUserContext();
 
-    return async function apiFetch<T>(
+    return async function apiFetch<T, K extends boolean = false>(
         input: RequestInfo,
         init?: RequestInit,
-    ): Promise<T> {
+        raw?: K
+    ): Promise<K extends true ? Response : T> {
         if (!tokenSet) {
             throw new Error('No token set found');
         }
@@ -53,6 +54,10 @@ export function useApi() {
             throw new Error(`API error: ${response.status} ${text}`);
         }
 
-        return response.json();
+        if (raw) {
+            return response as K extends true ? Response : T;
+        } else {
+            return response.json() as K extends true ? Response : T;
+        }
     }
 }

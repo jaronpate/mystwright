@@ -94,6 +94,7 @@ export const routes = {
         GET: [authMiddleware, worldsController.getWorld],
         DELETE: [authMiddleware, worldsController.deleteWorld]
     }), 
+
     
     '/api/v1/worlds/:world_id/export': constructRoute<'/api/v1/worlds/:world_id/export'>({
         GET: [authMiddleware, worldsController.exportWorld]
@@ -107,6 +108,10 @@ export const routes = {
     '/api/v1/worlds/:world_id/states': constructRoute<'/api/v1/worlds/:world_id/states'>({
         GET: [authMiddleware, gameplayController.listGameStates],
         POST: [authMiddleware, gameplayController.createGameState]
+    }),
+    
+    '/api/v1/worlds/:world_id/speech': constructRoute<'/api/v1/worlds/:world_id/speech'>({
+        POST: [authMiddleware, gameplayController.generateCharacterSpeech]
     }),
     
     '/api/v1/worlds/:world_id/states/:state_id': constructRoute<'/api/v1/worlds/:world_id/states/:state_id'>({
