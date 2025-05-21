@@ -132,6 +132,8 @@ export default function Chat() {
             const res = await api<Response>(`/api/v1/worlds/${activeWorld.id}/speech`, {
                 method: 'POST',
                 body: JSON.stringify({ character_id, text }),
+            // TODO: Fix raw boolean type in api
+            // @ts-ignore
             }, true);
 
             if (!res.ok || !res.body) {

@@ -111,8 +111,6 @@ export const gameplayController = {
             return errorResponse('Character not found', req, 404);
         }
 
-        console.log('Generating speech for character:', character.name, 'with text:', text, 'and voice:', character.voice);
-
         const audio = await createVoiceStreamForText(character.voice, text);
 
         return new Response(audio, {
