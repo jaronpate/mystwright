@@ -63,47 +63,6 @@ export type SafeUser = Selectable<Omit<UsersTable, 'password_hash'>>;
 export type NewUser = Insertable<UsersTable>;
 export type UserUpdate = Updateable<UsersTable>;
 
-// export type WorldPayload = Record<string, any>;
-// export type WorldPayload = {
-//     characters: Array<{
-//         alibi: string;
-//         description: string;
-//         id: string;
-//         knownClues: Array<string>;
-//         name: string;
-//         personality: string;
-//         role: string;
-//         voice: string;
-//     }>,
-//     clues: Array<{
-//         description: string;
-//         id: string;
-//         name: string;
-//         type: string;
-//     }>,
-//     locations: Array<{
-//         characters: Array<string>;
-//         clues: Array<string>;
-//         connectedLocations: Array<string>;
-//         description: string;
-//         id: string;
-//         name: string;
-//     }>,
-//     mystery: {
-//         crime: string;
-//         description: string;
-//         title: string;
-//         victim: string;
-//         time: string;
-//         location: string;
-//     },
-//     solution: {
-//         culpritId: string;
-//         method: string;
-//         motive: string;
-//     }
-// };
-
 export interface WorldsTable {
     id: Generated<string>;
     created_at: Generated<Date>;

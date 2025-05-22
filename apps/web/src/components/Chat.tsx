@@ -281,7 +281,7 @@ export default function Chat() {
                         </button>
                     </div>
                     <div className="tip">
-                        e.g. Try: `/help` for a list of commands
+                        <p>Press <strong>Shift + Enter</strong> to add a new line.</p>
                     </div>
                 </div>
             </div>

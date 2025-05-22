@@ -140,7 +140,7 @@
     justify-content: center;
     padding: 16px;
     font-size: 0.8rem;
-    color: hsl(var(--muted-foreground));
+    color: hsl(var(--muted-foreground) / 0.7);
     border: 1px dashed hsl(var(--muted));
     border-radius: var(--radius);
 }
