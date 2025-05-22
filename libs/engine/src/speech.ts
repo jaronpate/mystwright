@@ -14,19 +14,6 @@ const elevenlabsV2 = new ElevenLabsClientV2({
     apiKey: ELEVENLABS_API_KEY,
 });
 
-function toWebReadableStream(nodeReadable: Readable): ReadableStream<Uint8Array> {
-    return new ReadableStream({
-        start(controller) {
-            nodeReadable.on('data', (chunk) => controller.enqueue(new Uint8Array(chunk)));
-            nodeReadable.on('end', () => controller.close());
-            nodeReadable.on('error', (err) => controller.error(err));
-        },
-        cancel() {
-            nodeReadable.destroy();
-        }
-    });
-}
-
 // export async function createVoiceStreamForText(voice: string, text: string): Promise<Readable | ReadableStream<Uint8Array>> {
 export async function createVoiceStreamForText(voice: string, text: string): Promise<ReadableStream<Uint8Array>> {
     try {
