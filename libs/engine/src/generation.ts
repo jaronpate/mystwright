@@ -1,4 +1,4 @@
-import type { APIWorldResponse, Character, Clue, ClueID, GameState, Memory, Message, World } from "@mystwright/types";
+import type { WorldPayload, Character, Clue, ClueID, GameState, Memory, Message, World } from "@mystwright/types";
 import { DEFAULT_WEAK_MODEL, deserializeWorldStructure, JUDGE_CHARACTER_ID, JUDGE_VOICE } from "@mystwright/types";
 import { ElevenLabsClient } from "elevenlabs";
 import OpenAI from "openai";
@@ -77,7 +77,7 @@ Create a mystery with a modern mystery novel tone
     // const model = config.model ?? 'openai/o4-mini-high';
     const maxAttempts = 5; // Maximum number of attempts to generate a valid world
     let attempts = 0;
-    let worldJson: APIWorldResponse | null = null;
+    let worldJson: WorldPayload | null = null;
     let previousMessages: Array<Message> = [
         {
             role: 'system',
@@ -168,9 +168,11 @@ Create a mystery with a modern mystery novel tone
                         title: { type: 'string' },
                         description: { type: 'string' },
                         victim: { type: 'string' },
-                        crime: { type: 'string' }
+                        crime: { type: 'string' },
+                        time: { type: 'string' },
+                        location: { type: 'string' }
                     },
-                    required: ['title', 'description', 'victim', 'crime'],
+                    required: ['title', 'description', 'victim', 'crime', 'time', 'location'],
                     additionalProperties: false
                 },
                 solution: {
@@ -199,7 +201,7 @@ Create a mystery with a modern mystery novel tone
                 config.model ?? DEFAULT_WEAK_MODEL,
                 previousMessages,
                 { schema }
-            ) as APIWorldResponse;
+            ) as WorldPayload;
 
             console.log(`Attempt ${attempts} - parsing complete. Validating...`);
             
@@ -325,7 +327,7 @@ Your response should be a single, complete JSON object containing the original c
  * @throws Will throw an error if the world structure is missing required elements.
  * @throws Will throw an error if the world structure contains invalid references.
  */
-export function validateWorldStructure(world: APIWorldResponse): void {
+export function validateWorldStructure(world: WorldPayload): void {
     // Check if all required arrays and objects exist
     if (!world.locations || !Array.isArray(world.locations)) {
         throw new Error('Missing or invalid locations array');
@@ -459,7 +461,7 @@ export async function getNextDialogueWithCharacter(character: Character, world: 
     // Create prompt based on character role and context
     let prompt = `\
 You are an AI roleplaying/method acting as a fictional character in a mystery-themed text adventure game. Stay fully in character—speak, think, and act like this character would. Do not refer to yourself as an AI or break the fourth wall.
-Your role is to engage with the user, who is the detective, as your character: share suspicions, ask questions, express doubts, notice details, and react naturally to clues or odd behavior.
+Your role is to engage with the user, who is the detective, as your character: share suspicions, express doubts, notice details, and react naturally to clues or odd behavior.
 It is the detective's job to ask questions and gather information in the hope of solving the mystery.
 
 There are some rules to follow:
@@ -476,7 +478,6 @@ There are some rules to follow:
 ❌ “The character notices a clue on the floor.”
 ❌ “As an AI, I think the next step is…”
 
-Be proactive—if the user stalls or seems uncertain, prompt them with ideas, pose questions, or draw attention to inconsistencies. Your goal is to help unravel the mystery through character-driven interaction.
 You do not control the world, environment, or events. That is handled by the game master. Focus only on what your character says or feels.
 
 You are ${character.name}. ${character.description}.
@@ -485,13 +486,14 @@ The mystery is: ${world.mystery.title}: ${world.mystery.description}.
 You are a ${character.role} in this mystery.
 The victim is: ${world.mystery.victim}
 The crime is: ${world.mystery.crime}
+The time of the crime is: ${world.mystery.time}
+The location of the crime is: ${world.mystery.location}
+The user is currently in a conversation with you.
 
 This is the current mystery world:
 <WORLD>
 ${JSON.stringify(world, null, 4)}
 </WORLD>
-
-The user is currently in a conversation with ${character.name}.
 The user has the following memories:
 <MEMORY>
 ${JSON.stringify(state.memories, null, 4)}

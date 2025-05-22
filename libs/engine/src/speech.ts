@@ -24,7 +24,7 @@ export async function createVoiceStreamForText(voice: string, text: string): Pro
                 stability: 0.3,
                 speed: 1.15,
                 style: 0.5,
-                similarityBoost: 0.75,
+                similarityBoost: 0.85,
             },
             modelId: 'eleven_flash_v2_5'
         });

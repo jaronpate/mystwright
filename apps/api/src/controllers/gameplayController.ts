@@ -1,6 +1,6 @@
 import { db, sql } from '@mystwright/db';
 import { getNextDialogueWithCharacter, createVoiceStreamForText } from '@mystwright/engine';
-import { constructGameState, deserializeWorldStructure, type APIWorldResponse, type GameState } from '@mystwright/types';
+import { constructGameState, deserializeWorldStructure, type WorldPayload, type GameState } from '@mystwright/types';
 import type { APIRequest, AuthenticatedRequest } from '../utils/responses';
 import { errorResponse, jsonResponse } from '../utils/responses';
 
@@ -31,8 +31,8 @@ export const gameplayController = {
                 return errorResponse('World not found', req, 404);
             }
 
-            // TODO: Merge APIWorldResponse & WorldPayload
-            const gameWorld = deserializeWorldStructure(world.payload as unknown as APIWorldResponse);
+            // TODO: Merge WorldPayload & WorldPayload
+            const gameWorld = deserializeWorldStructure(world.payload as unknown as WorldPayload);
 
             const character = gameWorld.characters.get(character_id);
 
@@ -54,6 +54,9 @@ export const gameplayController = {
 
             // TODO: Validate this?
             const gameState = rawGameState.payload as unknown as GameState;
+
+            gameState.isInConversation = true;
+            gameState.currentCharacter = character_id;
 
             // Generate the next character dialogue using the world and game state
             const { response, state } = await getNextDialogueWithCharacter(character, gameWorld, gameState, input);
@@ -104,7 +107,7 @@ export const gameplayController = {
             return errorResponse('World not found', req, 404);
         }
 
-        const gameWorld = deserializeWorldStructure(world.payload as unknown as APIWorldResponse);
+        const gameWorld = deserializeWorldStructure(world.payload as unknown as WorldPayload);
         const character = gameWorld.characters.get(character_id);
 
         if (character === undefined || character === null) {
@@ -211,7 +214,7 @@ export const gameplayController = {
                 return errorResponse('World not found', req, 404);
             }
 
-            const gameWorld = deserializeWorldStructure(world.payload as unknown as APIWorldResponse);
+            const gameWorld = deserializeWorldStructure(world.payload as unknown as WorldPayload);
             const newGameState = constructGameState(gameWorld);
 
             // Create a new game state in the database

@@ -4,7 +4,7 @@
     width: 350px;
     background-color: hsl(var(--card));
     color: hsl(var(--card-foreground));
-    padding: 8px;
+    padding: 16px;
     height: 100%;
     flex-shrink: 0;
 
@@ -106,4 +106,24 @@
 }
 .sidebar-title-text {
     user-select: none;
+}
+
+.crime-detail {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.detail-title {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: hsl(var(--foreground));
+}
+
+.detail-value {
+    font-size: 0.8rem;
+    color: hsl(var(--muted-foreground));
+    margin-top: 4px;
 }

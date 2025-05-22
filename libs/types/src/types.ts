@@ -9,6 +9,8 @@ export interface Mystery {
     description: string;
     victim: string;
     crime: string;
+    time: string;
+    location: string;
 }
 
 export interface Location {
@@ -58,42 +60,12 @@ export type Message = {
 
 export type MessageUI = Message & { sender?: string; };
 
-export type APIWorldResponse = {
-    locations: {
-        id: string;
-        name: string;
-        description: string;
-        connectedLocations: string[];
-        clues: string[];
-        characters: string[];
-    }[];
-    characters: {
-        id: string;
-        name: string;
-        description: string;
-        personality: string;
-        voice: string;
-        role: 'suspect' | 'witness' | 'victim';
-        alibi?: string;
-        knownClues?: string[];
-    }[];
-    clues: {
-        id: string;
-        name: string;
-        description: string;
-        type: 'physical' | 'testimony' | 'other';
-    }[];
-    mystery: {
-        title: string;
-        description: string;
-        victim: string;
-        crime: string;
-    };
-    solution: {
-        culpritId: string;
-        motive: string;
-        method: string;
-    };
+export type WorldPayload = {
+    locations: Location[];
+    characters: Character[];
+    clues: Clue[];
+    mystery: Mystery;
+    solution: Solutuion;
 };
 
 export type OpenRouterChatCompletionResponse = {

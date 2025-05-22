@@ -1,4 +1,4 @@
-import type { APIWorldResponse, LocationID, Location, CharacterID, Character, ClueID, Clue, World, GameState } from "./types";
+import type { WorldPayload, LocationID, Location, CharacterID, Character, ClueID, Clue, World, GameState } from "./types";
 
 export * from "./types";
 export * from "./constants";
@@ -8,7 +8,7 @@ export * from "./constants";
  * @param raw - The raw API response object
  * @returns The constructed world object
  */
-export function deserializeWorldStructure(raw: APIWorldResponse): World {
+export function deserializeWorldStructure(raw: WorldPayload): World {
     // Convert string IDs to branded types
     const locations = new Map<LocationID, Location>();
 
@@ -74,7 +74,7 @@ export function deserializeWorldStructure(raw: APIWorldResponse): World {
     };
 }
 
-export function serializeWorldStructure(raw: World): APIWorldResponse {
+export function serializeWorldStructure(raw: World): WorldPayload {
     // Convert branded types back to strings
     const locations = Array.from(raw.locations.values()).map(location => ({
         id: location.id as string,

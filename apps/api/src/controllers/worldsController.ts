@@ -1,6 +1,6 @@
-import { db, type NewWorld, type WorldPayload } from '@mystwright/db';
+import { db, type NewWorld } from '@mystwright/db';
 import { generateWorld } from '@mystwright/engine';
-import { serializeWorldStructure } from '@mystwright/types';
+import { serializeWorldStructure, type WorldPayload } from '@mystwright/types';
 import type { APIRequest, AuthenticatedRequest } from '../utils/responses';
 import { errorResponse, jsonResponse } from '../utils/responses';
 
@@ -24,7 +24,7 @@ export const worldsController = {
                 user_id: authReq.user.id,
                 title: world.mystery.title,
                 description: world.mystery.description || null,
-                // TODO: Merge APIWorldResponse & WorldPayload
+                // TODO: Merge WorldPayload & WorldPayload
                 payload: serializeWorldStructure(world) as unknown as WorldPayload
             };
             

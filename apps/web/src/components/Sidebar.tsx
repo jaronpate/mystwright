@@ -24,7 +24,7 @@ const SidebarHeader = ({ title, icon }: SidebarHeaderProps) => {
 type CollapsibleSectionProps = {
     title: string;
     icon: React.ReactNode;
-    children: React.ReactNode | ((isOpen: boolean) => React.ReactNode);
+    children: React.ReactNode | ((isOpen: boolean, setIsOpen: (value: React.SetStateAction<boolean>) => void) => React.ReactNode);
     alwaysShowWhenActive?: boolean;
     isActive?: boolean;
 };
@@ -62,7 +62,7 @@ const CollapsibleSection = ({
             </div>
             {showContent && (
                 <div className="sidebar-items">
-                    {typeof children === 'function' ? children(isOpen) : children}
+                    {typeof children === 'function' ? children(isOpen, setIsOpen) : children}
                 </div>
             )}
         </div>
@@ -108,18 +108,39 @@ const CrimeDetails = ({ world }: CrimeDetailsProps) => {
     const victim = world.payload.characters.find(c => c.id === world.payload.mystery.victim);
     
     return (
-        <div className="flex">
-            <Card
-                title="Victim"
-                description={victim ? victim.name : 'Unknown'}
-                noBorder={true}
-            />
-            <Card
-                title="Crime"
-                description={world.payload.mystery.crime}
-                noBorder={true}
-            />
-        </div>
+        <>
+            <div className="flex">
+                <div className="crime-detail">
+                    <div className="detail-title">Victim</div>
+                    <div className="detail-value">
+                        {victim ? victim.name : 'Unknown'}
+                    </div>
+                    <div className="detail-value">
+                        {victim ? victim.description : 'No description...'}
+                    </div>
+                </div>
+            </div>
+            <div className="flex">
+                <div className="crime-detail">
+                    <div className="detail-title">Crime</div>
+                    <div className="detail-value">
+                        {world.payload.mystery.crime}
+                    </div>
+                </div>
+                <div className="crime-detail">
+                    <div className="detail-title">Location</div>
+                    <div className="detail-value">
+                        {world.payload.mystery.location}
+                    </div>
+                </div>
+                <div className="crime-detail">
+                    <div className="detail-title">Time</div>
+                    <div className="detail-value">
+                        {world.payload.mystery.time}
+                    </div>
+                </div>
+            </div>
+        </>
     );
 };
 
@@ -144,7 +165,7 @@ export default function MystwrightSidebar() {
                         alwaysShowWhenActive={true}
                         isActive={activeWorld !== null}
                     >
-                        {isOpen => 
+                        {(isOpen, setIsOpen) => 
                             isOpen ? (
                                 // Show all worlds when expanded
                                 worlds.map((world) => (
@@ -153,7 +174,7 @@ export default function MystwrightSidebar() {
                                         title={world.title}
                                         description={world.description ?? 'No description...'}
                                         active={activeWorld?.id === world.id}
-                                        onClick={() => {setActiveCharacter(null); setActiveWorld(world.id)}}
+                                        onClick={() => {setActiveCharacter(null); setActiveWorld(world.id); setIsOpen(false)}}
                                     />
                                 ))
                             ) : (
@@ -182,8 +203,53 @@ export default function MystwrightSidebar() {
                     <CollapsibleSection
                         title="Characters"
                         icon={<Users width={'16px'} height={'16px'} />}
+                        alwaysShowWhenActive={true}
+                        isActive={activeCharacter !== null}
                     >
-                        {!activeWorld ? (
+                        {isOpen => 
+                            activeWorld === null ? (
+                                <div className="nothing">
+                                    No world selected
+                                </div>
+                            ) : isOpen ? (
+                                    // Show all characters when expanded
+                                    activeWorld.payload.characters.map((character) => character.role !== 'victim' && (
+                                        <div className="card-character" key={character.id}>
+                                            <Card
+                                                title={character.name}
+                                                description={character.description}
+                                                active={activeCharacter?.id === character.id}
+                                                onClick={() => setActiveCharacter(character.id)}
+                                                noBorder={true}
+                                                icon={
+                                                    <div className="character-avatar">
+                                                        {character.name.charAt(0)}
+                                                    </div>
+                                                }
+                                            />
+                                        </div>
+                                    ))
+                                ) : (
+                                    // Show only active character when collapsed
+                                    activeCharacter && (
+                                        <div className="card-character">
+                                            <Card
+                                                title={activeCharacter.name}
+                                                description={activeCharacter.description}
+                                                active={true}
+                                                onClick={() => setActiveCharacter(activeCharacter.id)}
+                                                noBorder={true}
+                                                icon={
+                                                    <div className="character-avatar">
+                                                        {activeCharacter.name.charAt(0)}
+                                                    </div>
+                                                }
+                                            />
+                                        </div>
+                                    )
+                                )
+                        }
+                        {/* {!activeWorld ? (
                             <div className="nothing">
                                 No world selected
                             </div>
@@ -204,7 +270,7 @@ export default function MystwrightSidebar() {
                                     />
                                 </div>
                             ))
-                        )}
+                        )} */}
                     </CollapsibleSection>
                 </div>
             </div>

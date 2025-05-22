@@ -13,6 +13,8 @@ export default function Chat() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
+    const inputElm = useRef<HTMLInputElement>(null);
+
     const audioElm = useRef<HTMLAudioElement>(null);
     const [audioIsPlaying, setAudioIsPlaying] = useState(false);
     const [audioIsLoading, setAudioIsLoading] = useState(false);
@@ -167,9 +169,16 @@ export default function Chat() {
     }
 
     useEffect(() => {
-        if (activeCharacter && activeGameState) {
-            const previousMessages = activeGameState.payload.dialogueHistory[activeCharacter.id] ?? [];
-            setMessages(previousMessages);
+        if (activeCharacter) {
+            setInput("");
+            if (inputElm.current) {
+                inputElm.current.focus();
+            }
+
+            if (activeGameState) {
+                const previousMessages = activeGameState.payload.dialogueHistory[activeCharacter.id] ?? [];
+                setMessages(previousMessages);
+            }
         } else {
             setMessages([]);
         }
@@ -214,6 +223,9 @@ export default function Chat() {
                 setError("Failed to send message");
             } finally {
                 setLoading(false);
+                if (inputElm.current) {
+                    inputElm.current.focus();
+                }
             }
         }
     };
@@ -250,6 +262,7 @@ export default function Chat() {
                 <div className="dialog-footer">
                     <div className="chat flex flex-align-center">
                         <input
+                            ref={inputElm}
                             type="text"
                             disabled={loading}
                             placeholder="Type something..."
