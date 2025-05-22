@@ -10,6 +10,7 @@
     "dev": "bun run --watch index.ts"
   },
   "dependencies": {
+    "@elevenlabs/elevenlabs-js": "^2.0.1",
     "@mystwright/db": "workspace:*",
     "bcrypt": "^5.1.1",
     "jsonwebtoken": "^9.0.2"

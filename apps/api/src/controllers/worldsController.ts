@@ -14,7 +14,7 @@ export const worldsController = {
     async createWorld(req: Request): Promise<Response> {
         try {
             const authReq = req as AuthenticatedRequest;
-            const { payload } = await req.json() as Record<string, any>;
+            // const { payload } = await req.json() as Record<string, any>;
             
             // Generate a new world using the engine
             const world = await generateWorld();

@@ -89,6 +89,11 @@ export function WorldProvider({ children }: { children: ReactNode }) {
             const activeGameState = data.states.find((s) => s.world_id === activeWorldId) ?? null;
             if (activeGameState) {
                 setActiveGameStateId(activeGameState.id);
+            } else {
+                // create a new game state
+                const newGameState = await apiFetch<{ state: DBGameState }>(`/api/v1/worlds/${worldId}/states`, { method: 'POST' });
+                setGameStates((prev) => [...prev, newGameState.state]);
+                setActiveGameStateId(newGameState.state.id);
             }
 
         } catch (error) {

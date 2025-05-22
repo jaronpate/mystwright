@@ -1,0 +1,347 @@
+{
+    "characters": [
+        {
+            "alibi": "Claims to have been at home, working on his computer, all evening. No witnesses.",
+            "description": "A somewhat reclusive tech entrepreneur. He's known for his innovative software and his intense work ethic. He appears nervous and distracted.",
+            "id": "eTechFounder",
+            "knownClues": [
+                "clue_securityFootage",
+                "clue_victimEmail",
+                "clue_threatNote",
+                "clue_missingFile"
+            ],
+            "name": "Elias Thorne",
+            "personality": "Intelligent, withdrawn, and highly ambitious. Used to be friends with the victim a long time ago.",
+            "role": "suspect",
+            "voice": "cjVigY5qzO86Huf0OWal"
+        },
+        {
+            "alibi": "Confirmed attendance at a literary event downtown. Several witnesses.",
+            "description": "A sharp-tongued literary agent with a reputation for discovering new talent. Dresses impeccably and carries herself with unwavering confidence.",
+            "id": "lAgent",
+            "knownClues": [
+                "clue_contractDraft",
+                "clue_agentStatement",
+                "clue_securityFootage"
+            ],
+            "name": "Vivienne Sterling",
+            "personality": "Ambitious, driven, and fiercely protective of her clients. Recently started working with Elias Thorne.",
+            "role": "witness",
+            "voice": "XrExE9yKIg1WjnnlVkGX"
+        },
+        {
+            "alibi": "Was at a concert with friends. They corroborate his story.",
+            "description": "A struggling musician, often performing at local venues. Appears laid-back, but shows flashes of anger when questioned about his music.",
+            "id": "sMusician",
+            "knownClues": [
+                "clue_guitarPick",
+                "clue_musicianStatement"
+            ],
+            "name": "Jake Riley",
+            "personality": "Passionate, anxious, and resentful of those more successful than him. He was once in a band with the victim back in school.",
+            "role": "suspect",
+            "voice": "7ktJCfz71Z44ppWOelh3"
+        },
+        {
+            "alibi": "He was the vicim",
+            "description": "A rising star in the tech world, known for his charm and ability to secure funding.",
+            "id": "vTechStar",
+            "knownClues": [
+                "clue_victimEmail"
+            ],
+            "name": "Marcus Bellweather",
+            "personality": "Ambitious, charismatic, and well-liked. However, he had a tendency to burn bridges.",
+            "role": "victim",
+            "voice": "TX3LPaxmHKxFdv7VOQHJ"
+        },
+        {
+            "alibi": "Claims to have been at a yoga retreat out of town.",
+            "description": "A social media influencer with a large following. Seems more concerned with her online image than with providing helpful information.",
+            "id": "sInfluencer",
+            "knownClues": [
+                "clue_influencerPost",
+                "clue_securityFootage"
+            ],
+            "name": "Chloe Vance",
+            "personality": "Superficial, image-conscious, and always seeking the next big trend. She had publicly endorsed Marcus's latest product.",
+            "role": "witness",
+            "voice": "WtA85syCrJwasGeHGH2p"
+        },
+        {
+            "alibi": "She works nights and was on shift",
+            "description": "A night security guard at the tech firm where Marcus worked. Observant and detail-oriented. Tends to keep to herself.",
+            "id": "nSecurity",
+            "knownClues": [
+                "clue_securityFootage",
+                "clue_securityLog"
+            ],
+            "name": "Sarah Chen",
+            "personality": "Quiet, diligent, and trustworthy. She takes her job seriously and is dedicated to it.",
+            "role": "witness",
+            "voice": "SAz9YHcvj6GT2YYXdXww"
+        },
+        {
+            "alibi": "Was at home caring for his sick mother.",
+            "description": "Marcus’s older brother, a former programmer who left the tech world to care for his family. Bitter about Marcus’s success.",
+            "id": "bBrother",
+            "knownClues": [
+                "clue_brotherStatement"
+            ],
+            "name": "David Bellweather",
+            "personality": "Resentful, burdened, and feels overlooked. He believes his brother stole his code.",
+            "role": "suspect",
+            "voice": "nPczCjzI2devNBz1zQrb"
+        },
+        {
+            "alibi": "She was out of the country.",
+            "description": "Marcus’s ex-girlfriend, a successful lawyer with a high-powered firm. She seemed nonchalant about his death.",
+            "id": "eGirlfriend",
+            "knownClues": [
+                "clue_lawyerStatement"
+            ],
+            "name": "Rachel Hayes",
+            "personality": "Driven, calculating, and always in control. She and Marcus had an acrimonious breakup.",
+            "role": "witness",
+            "voice": "Xb7hH8MSUJpSbSDYk0k2"
+        },
+        {
+            "alibi": "She works in Marcus’s house and was at home on the night in question.",
+            "description": "A longtime employee of Marcus' and is dedicated to doing the best job she can for his sake.",
+            "id": "hKeeper",
+            "knownClues": [
+                "clue_hKeeperStatement"
+            ],
+            "name": "Annie Smith",
+            "personality": "Friendly, helpful, and has a lot of personal pride in doing a good job.",
+            "role": "witness",
+            "voice": "pFZP5JQG7iQjIQuC4Bku"
+        },
+        {
+            "alibi": "Unknown.",
+            "description": "A mysterious hacker known for leaking sensitive information. Their motives are always unclear.",
+            "id": "mHacker",
+            "knownClues": [
+                "clue_leakedData",
+                "clue_missingFile"
+            ],
+            "name": "ZeroDay",
+            "personality": "Anonymous, unpredictable, and driven by their own sense of justice.",
+            "role": "suspect",
+            "voice": "1hlpeD1ydbI2ow0Tt3EW"
+        }
+    ],
+    "clues": [
+        {
+            "description": "Security camera footage shows Elias Thorne entering Marcus's office building shortly before the estimated time of death.",
+            "id": "clue_securityFootage",
+            "name": "Security Camera Footage",
+            "type": "physical"
+        },
+        {
+            "description": "A draft contract found in Vivienne Sterling's office indicates Marcus was about to leave Elias's company to start his own.",
+            "id": "clue_contractDraft",
+            "name": "Unsigned Contract Draft",
+            "type": "physical"
+        },
+        {
+            "description": "Jake Riley's guitar pick, with his initials, was found near the victim's body.",
+            "id": "clue_guitarPick",
+            "name": "Guitar Pick",
+            "type": "physical"
+        },
+        {
+            "description": "Marcus sent an email to Elias threatening to expose his unethical business practices if he didn't receive a larger share of the profits.",
+            "id": "clue_victimEmail",
+            "name": "Incriminating Email",
+            "type": "other"
+        },
+        {
+            "description": "A threatening note was found in Elias's office, presumably sent by Marcus, demanding a large sum of money.",
+            "id": "clue_threatNote",
+            "name": "Threatening Note",
+            "type": "physical"
+        },
+        {
+            "description": "Vivienne states that she believed Marcus was an asset to her client Mr Thorne.",
+            "id": "clue_agentStatement",
+            "name": "Vivienne's Statement",
+            "type": "testimony"
+        },
+        {
+            "description": "Jake claims he hadn't seen Marcus in years and was shocked to hear about his death.",
+            "id": "clue_musicianStatement",
+            "name": "Jake's Statement",
+            "type": "testimony"
+        },
+        {
+            "description": "Chloe posted a promotional video for Marcus's product the day before his death, but has since deleted it.",
+            "id": "clue_influencerPost",
+            "name": "Deleted Social Media Post",
+            "type": "other"
+        },
+        {
+            "description": "The security log shows that the alarm system was disarmed shortly before the murder and re-armed afterward.",
+            "id": "clue_securityLog",
+            "name": "Alarm System Log",
+            "type": "physical"
+        },
+        {
+            "description": "David claims he loved his brother and would never hurt him, despite their past disagreements.",
+            "id": "clue_brotherStatement",
+            "name": "David's Statement",
+            "type": "testimony"
+        },
+        {
+            "description": "Rachel states that she had moved on from her relationship with Marcus and was not involved in his business dealings.",
+            "id": "clue_lawyerStatement",
+            "name": "Rachel's Statement",
+            "type": "testimony"
+        },
+        {
+            "description": "Annie claims that Marcus was very careful about his health and never took sleeping pills.",
+            "id": "clue_hKeeperStatement",
+            "name": "Annie's Statement",
+            "type": "testimony"
+        },
+        {
+            "description": "A half-empty bottle of sleeping pills was found in Marcus’s desk drawer. Analysis shows they were a strong prescription not prescribed to him.",
+            "id": "clue_sleepingPills",
+            "name": "Sleeping Pills",
+            "type": "physical"
+        },
+        {
+            "description": "A forensic report indicates that Marcus died from an overdose of sleeping pills, possibly mixed with alcohol. There were signs of a struggle.",
+            "id": "clue_forensicReport",
+            "name": "Forensic Report",
+            "type": "physical"
+        },
+        {
+            "description": "Marcus's bank records show a series of large withdrawals in the weeks leading up to his death.",
+            "id": "clue_bankRecords",
+            "name": "Bank Records",
+            "type": "other"
+        },
+        {
+            "description": "A highly encrypted file is missing from Marcus's computer. Its contents are unknown, but it was last accessed the day of his death.",
+            "id": "clue_missingFile",
+            "name": "Missing Encrypted File",
+            "type": "other"
+        },
+        {
+            "description": "Data leaked online reveals that Marcus was involved in a scandal involving stolen intellectual property.",
+            "id": "clue_leakedData",
+            "name": "Leaked Data",
+            "type": "other"
+        }
+    ],
+    "locations": [
+        {
+            "characters": [
+                "vTechStar",
+                "nSecurity"
+            ],
+            "clues": [
+                "clue_securityFootage",
+                "clue_sleepingPills",
+                "clue_forensicReport",
+                "clue_victimEmail",
+                "clue_missingFile"
+            ],
+            "connectedLocations": [
+                "eTechOffice",
+                "sMusicianVenue",
+                "bBrotherHome"
+            ],
+            "description": "A modern office space with glass walls and sleek furniture. The victim's desk is cluttered with papers and gadgets.",
+            "id": "vTechOffice",
+            "name": "Marcus's Office"
+        },
+        {
+            "characters": [
+                "eTechFounder"
+            ],
+            "clues": [
+                "clue_threatNote",
+                "clue_contractDraft"
+            ],
+            "connectedLocations": [
+                "vTechOffice",
+                "lAgentOffice"
+            ],
+            "description": "A high-tech office filled with computer screens and coding books. The atmosphere is tense and sterile.",
+            "id": "eTechOffice",
+            "name": "Elias's Office"
+        },
+        {
+            "characters": [
+                "lAgent"
+            ],
+            "clues": [
+                "clue_agentStatement"
+            ],
+            "connectedLocations": [
+                "eTechOffice",
+                "sMusicianVenue"
+            ],
+            "description": "An upscale office decorated with book covers and literary awards. Organized and professional.",
+            "id": "lAgentOffice",
+            "name": "Vivienne's Office"
+        },
+        {
+            "characters": [
+                "sMusician"
+            ],
+            "clues": [
+                "clue_guitarPick",
+                "clue_musicianStatement"
+            ],
+            "connectedLocations": [
+                "lAgentOffice",
+                "vTechOffice"
+            ],
+            "description": "A dimly lit, cramped venue with a small stage and worn-out furniture. The air smells of stale beer and cigarettes.",
+            "id": "sMusicianVenue",
+            "name": "Jake's Venue"
+        },
+        {
+            "characters": [
+                "bBrother"
+            ],
+            "clues": [
+                "clue_brotherStatement"
+            ],
+            "connectedLocations": [
+                "vTechOffice"
+            ],
+            "description": "A modest, cluttered home filled with medical equipment and family photos. The atmosphere is heavy with resentment.",
+            "id": "bBrotherHome",
+            "name": "David's Home"
+        },
+        {
+            "characters": [
+                "mHacker"
+            ],
+            "clues": [
+                "clue_leakedData"
+            ],
+            "connectedLocations": [
+                "vTechOffice",
+                "eTechOffice"
+            ],
+            "description": "A hidden online forum where ZeroDay posts their leaks. Access is restricted to a select few.",
+            "id": "hackerForum",
+            "name": "ZeroDay's Online Forum"
+        }
+    ],
+    "mystery": {
+        "crime": "Murder",
+        "description": "Marcus Bellweather, a rising star in the tech world, is found dead in his office from an apparent overdose. Was it suicide, or something more sinister?",
+        "title": "Silicon Betrayal",
+        "victim": "vTechStar"
+    },
+    "solution": {
+        "culpritId": "eTechFounder",
+        "method": "Elias, fearing Marcus would expose his unethical dealings and take the stolen IPO code with him, visited Marcus's office and used a fake security code he had previously obtained. He then mixed a large dose of sleeping pills into Marcus' drink, staging the scene to look like a suicide or accidental overdose. He then used access to leak data online, and tried to cover his tracks.",
+        "motive": "Elias wanted to prevent Marcus from starting his own company, exposing Elias's unethical business practices, and revealing Elias has stolen code."
+    }
+}

@@ -1,0 +1,412 @@
+{
+    "characters": [
+        {
+            "alibi": "Was at home all night, working on his next article. His upstairs neighbor, Sarah, confirms hearing him typing until late.",
+            "description": "A seasoned investigative journalist known for his bold exposés.",
+            "id": "miles_corbin",
+            "knownClues": [
+                "interview_miles",
+                "threat_letter",
+                "late_night_typing"
+            ],
+            "name": "Miles Corbin",
+            "personality": "Driven, cynical, and sometimes abrasive.",
+            "role": "suspect",
+            "voice": "Brian"
+        },
+        {
+            "alibi": "Claims to have been at a gallery opening downtown.",
+            "description": "A successful art dealer with a sophisticated air.",
+            "id": "vivienne_laroux",
+            "knownClues": [
+                "interview_vivienne",
+                "gallery_opening_alibi",
+                "viviennes_receipt"
+            ],
+            "name": "Vivienne Laroux",
+            "personality": "Elegant, sharp-tongued, and ambitious.",
+            "role": "suspect",
+            "voice": "Oracle X"
+        },
+        {
+            "alibi": "He does not have one, and refuses to say other than he was out.",
+            "description": "An avid gambler known to have large debts.",
+            "id": "frank_decker",
+            "knownClues": [
+                "interview_frank",
+                "gambling_debts",
+                "witness_account_tony"
+            ],
+            "name": "Frank Decker",
+            "personality": "Nervous, shifty, and desperate.",
+            "role": "suspect",
+            "voice": "Chris"
+        },
+        {
+            "alibi": "Confirmed at a business dinner with clients.",
+            "description": "A renowned technology entrepreneur with a reputation for innovation.",
+            "id": "evelyn_reed",
+            "knownClues": [
+                "interview_evelyn",
+                "business_dinner_receipt",
+                "expensive_watch_receipt"
+            ],
+            "name": "Evelyn Reed",
+            "personality": "Intelligent, focused, and somewhat detached.",
+            "role": "suspect",
+            "voice": "Aria"
+        },
+        {
+            "alibi": "She was home sick. Her husband was out with work colleagues.",
+            "description": "The victim's grieving widow, a former librarian.",
+            "id": "olivia_clark",
+            "knownClues": [
+                "interview_olivia",
+                "olivia_prescription",
+                "family_photo"
+            ],
+            "name": "Olivia Clark",
+            "personality": "Quiet, reserved, and heartbroken.",
+            "role": "witness",
+            "voice": "Alice"
+        },
+        {
+            "alibi": null,
+            "description": "A retired accountant and close friend of the victim.",
+            "id": "arthur_jenkins",
+            "knownClues": [
+                "interview_arthur",
+                "financial_records",
+                "arthur_visit_log"
+            ],
+            "name": "Arthur Jenkins",
+            "personality": "Kind, observant, and meticulous.",
+            "role": "witness",
+            "voice": "Bill"
+        },
+        {
+            "alibi": "Confirmed by multiple colleagues as being at an out-of-state conference.",
+            "description": "The victim, a respected economics professor.",
+            "id": "victor_clark",
+            "knownClues": [],
+            "name": "Victor Clark",
+            "personality": "Intelligent, esteemed, and well-liked.",
+            "role": "victim",
+            "voice": "George"
+        },
+        {
+            "alibi": "He was working at the bar all night and can be vouched for; a few customers state he seemed distracted.",
+            "description": "A young barman at 'The Rusty Mug'.",
+            "id": "tony_moretti",
+            "knownClues": [
+                "interview_tony",
+                "witness_account_tony",
+                "description_frank"
+            ],
+            "name": "Tony Moretti",
+            "personality": "Friendly, observant, and eager to please.",
+            "role": "witness",
+            "voice": "Will"
+        },
+        {
+            "alibi": "Confirmed at dance practice",
+            "description": "A dance instructor who teaches evening dance classes.",
+            "id": "catherine_debois",
+            "knownClues": [
+                "interview_catherine",
+                "dance_class_roster",
+                "dance_shoes"
+            ],
+            "name": "Catherine Debois",
+            "personality": "Passionate, artistic and expressive.",
+            "role": "witness",
+            "voice": "Ember - Energetic Confident Protagonist"
+        }
+    ],
+    "clues": [
+        {
+            "description": "A threatening letter found in Victor's study, warning him to drop a certain 'investigation'.",
+            "id": "threat_letter",
+            "name": "Threatening Letter",
+            "type": "physical"
+        },
+        {
+            "description": "An interview with Miles Corbin reveals his recent series of articles targeted the exact people Victor Clark was investigating, implying more sinister behaviour.",
+            "id": "interview_miles",
+            "name": "Interview with Miles Corbin",
+            "type": "testimony"
+        },
+        {
+            "description": "A receipt from Vivienne Laroux's gallery opening, though it is stamped with the gallery name it can be faked and does not prove her presence.",
+            "id": "gallery_opening_alibi",
+            "name": "Gallery Opening Alibi",
+            "type": "other"
+        },
+        {
+            "description": "Frank Decker owes a significant amount of money to various underground bookies.",
+            "id": "gambling_debts",
+            "name": "Gambling Debts",
+            "type": "other"
+        },
+        {
+            "description": "Evelyn Reed has a signed receipt proving a business dinner with clients. The receipts are all in order.",
+            "id": "business_dinner_receipt",
+            "name": "Business Dinner Receipt",
+            "type": "physical"
+        },
+        {
+            "description": "Olivia Clark has a prescription for sleeping pills, indicating she may have been asleep and unaware of events when Victor was killed.",
+            "id": "olivia_prescription",
+            "name": "Olivia's Prescription",
+            "type": "physical"
+        },
+        {
+            "description": "Arthur Jenkins shows his visit logs to have been a regular occurance, every Tuesday, at 2PM.",
+            "id": "arthur_visit_log",
+            "name": "Arthur's Visit Log",
+            "type": "other"
+        },
+        {
+            "description": "Tony Moretti claims to have served drinks to Frank Decker on the night of the murder. Claims he was jittery and acting suspicious.",
+            "id": "witness_account_tony",
+            "name": "Witness Account - Tony",
+            "type": "testimony"
+        },
+        {
+            "description": "The victim was found dead at home in the study. It was made to look like a heart attack.",
+            "id": "crime_scene_description",
+            "name": "Crime Scene Description",
+            "type": "physical"
+        },
+        {
+            "description": "A family photo shows Victor and Olivia Clark looking happy, but it's an old photo and there are signs the relationship had become strained. Shown by neighbour.",
+            "id": "family_photo",
+            "name": "Family Photo",
+            "type": "physical"
+        },
+        {
+            "description": "Financial records discovered show Victor Clark was investigating some suspicious activity with Miles Corbin’s previous series of articles.",
+            "id": "financial_records",
+            "name": "Financial Records",
+            "type": "physical"
+        },
+        {
+            "description": "The witness, Tony, offers very little detail other than Frank being a rather unremarkable middled aged man.",
+            "id": "description_frank",
+            "name": "Description from witness",
+            "type": "testimony"
+        },
+        {
+            "description": "The expensive watch found in the house shows reciepts belonging to Evelyn Reed, and was a gift for Victor Clark.",
+            "id": "expensive_watch_receipt",
+            "name": "Expensive watch receipt",
+            "type": "physical"
+        },
+        {
+            "description": "Interview with Evelyn reveals she was working for Victor Clark with his Financial Investigation, and they had become close.",
+            "id": "interview_evelyn",
+            "name": "Interview Evelyn",
+            "type": "testimony"
+        },
+        {
+            "description": "Arthur has a strong alibi, and the police confirm he visits every Tuesday at 2PM.",
+            "id": "interview_arthur",
+            "name": "Interview Arthur",
+            "type": "testimony"
+        },
+        {
+            "description": "Receipt of Vivienne buying sleeping pills from a local pharmacy.",
+            "id": "viviennes_receipt",
+            "name": "Viviennes receipt",
+            "type": "physical"
+        },
+        {
+            "description": "Tony claims he saw Frank Decker outside the clark residence on the night of the murder.",
+            "id": "late_night_typing",
+            "name": "late night typing",
+            "type": "other"
+        },
+        {
+            "description": "Catherine states that Frank had been coming for beginner dance lessons, but dropped out 2 weeks ago and never offered a reason why.",
+            "id": "interview_catherine",
+            "name": "Interview Catherine",
+            "type": "testimony"
+        },
+        {
+            "description": "The dance roster shows that Frank has been attending dance classes, and there has been no reason for dismissal.",
+            "id": "dance_class_roster",
+            "name": "Dance Class roster",
+            "type": "other"
+        },
+        {
+            "description": "The dance shoes are brand new and show no signs of use, but do have a speck of mud on them.",
+            "id": "dance_shoes",
+            "name": "Dance Shoes",
+            "type": "physical"
+        },
+        {
+            "description": "Interview with Frank Decker shows that he met Vivienne on a dating app 2 weeks ago, and they have been getting private lessons together.",
+            "id": "interview_frank",
+            "name": "Interview Frank",
+            "type": "testimony"
+        },
+        {
+            "description": "Vivienne Laroux's testimony reveals that she had been feeling pressured by Victor Clark regarding the sale of a potentially fraudulent painting.",
+            "id": "interview_vivienne",
+            "name": "Interview with Vivienne Laroux",
+            "type": "testimony"
+        },
+        {
+            "description": "Olivia Clark expresses deep shock and disbelief regarding her husband's death, and mentions he had been stressed lately.",
+            "id": "interview_olivia",
+            "name": "Interview with Olivia Clark",
+            "type": "testimony"
+        },
+        {
+            "description": "Tony Moretti mentions Frank Decker seemed more interested in his phone than his drink, constantly checking it and looking anxious.",
+            "id": "interview_tony",
+            "name": "Interview with Tony Moretti",
+            "type": "testimony"
+        }
+    ],
+    "locations": [
+        {
+            "characters": [
+                "miles_corbin",
+                "victor_clark",
+                "olivia_clark"
+            ],
+            "clues": [
+                "crime_scene_description",
+                "threat_letter",
+                "family_photo",
+                "financial_records"
+            ],
+            "connectedLocations": [
+                "art_gallery",
+                "the_rusty_mug",
+                "miles_apartment"
+            ],
+            "description": "A cozy house with a study filled with books and research papers.",
+            "id": "clark_residence",
+            "name": "Clark Residence"
+        },
+        {
+            "characters": [
+                "vivienne_laroux",
+                "frank_decker"
+            ],
+            "clues": [
+                "gallery_opening_alibi",
+                "viviennes_receipt"
+            ],
+            "connectedLocations": [
+                "clark_residence",
+                "the_rusty_mug",
+                "dance_studio"
+            ],
+            "description": "A modern art gallery showcasing various contemporary pieces.",
+            "id": "art_gallery",
+            "name": "Art Gallery"
+        },
+        {
+            "characters": [
+                "frank_decker",
+                "tony_moretti"
+            ],
+            "clues": [
+                "witness_account_tony",
+                "description_frank"
+            ],
+            "connectedLocations": [
+                "clark_residence",
+                "art_gallery",
+                "evelyn_office"
+            ],
+            "description": "A dimly lit, neighborhood bar with a loyal clientele.",
+            "id": "the_rusty_mug",
+            "name": "The Rusty Mug"
+        },
+        {
+            "characters": [
+                "evelyn_reed"
+            ],
+            "clues": [
+                "business_dinner_receipt",
+                "expensive_watch_receipt"
+            ],
+            "connectedLocations": [
+                "the_rusty_mug",
+                "clark_residence",
+                "arthur_house"
+            ],
+            "description": "A sleek, modern office space reflecting a high-tech company.",
+            "id": "evelyn_office",
+            "name": "Evelyn's Office"
+        },
+        {
+            "characters": [
+                "arthur_jenkins"
+            ],
+            "clues": [
+                "arthur_visit_log"
+            ],
+            "connectedLocations": [
+                "evelyn_office",
+                "miles_apartment",
+                "dance_studio"
+            ],
+            "description": "A modest, well-kept home filled with antique furniture.",
+            "id": "arthur_house",
+            "name": "Arthur's House"
+        },
+        {
+            "characters": [
+                "miles_corbin"
+            ],
+            "clues": [
+                "interview_miles",
+                "late_night_typing"
+            ],
+            "connectedLocations": [
+                "arthur_house",
+                "clark_residence",
+                "dance_studio"
+            ],
+            "description": "A cramped apartment filled with stacks of books and papers.",
+            "id": "miles_apartment",
+            "name": "Miles' Apartment"
+        },
+        {
+            "characters": [
+                "catherine_debois",
+                "frank_decker",
+                "vivienne_laroux"
+            ],
+            "clues": [
+                "interview_catherine",
+                "dance_class_roster",
+                "dance_shoes"
+            ],
+            "connectedLocations": [
+                "arthur_house",
+                "miles_apartment",
+                "art_gallery"
+            ],
+            "description": "A lively space for dance and musical practice.",
+            "id": "dance_studio",
+            "name": "Dance Studio"
+        }
+    ],
+    "mystery": {
+        "crime": "Murder",
+        "description": "A seemingly natural death of a respected economics professor turns out to be a well-concealed murder.",
+        "title": "The Clark Case",
+        "victim": "victor_clark"
+    },
+    "solution": {
+        "culpritId": "vivienne_laroux",
+        "method": "Poisoning with sleeping pills. Vivienne added a lethal dose of sleeping pills mixed with cyanide, purchased using her name. Giving him a heart attack.",
+        "motive": "Victor Clark was investigating Miles Corbin’s past series of articles, which implicated Vivienne in an art fraud scheme. To silence him, Vivienne used her recent interest in Frank Decker to meet Victor late one night, using beginners dancing classes to trick him into being alone at the clinic residence. She then injected him with drugs obtained from a back alley dealer, who’s address she found on one of Frank’s gambling debts."
+    }
+}

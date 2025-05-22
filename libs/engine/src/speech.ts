@@ -1,4 +1,5 @@
 import { ElevenLabsClient } from "elevenlabs";
+import { ElevenLabsClient as ElevenLabsClientV2, play } from "@elevenlabs/elevenlabs-js";
 import { which } from "./util";
 import type { Readable } from "stream";
 
@@ -6,6 +7,10 @@ const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 
 const elevenlabs = new ElevenLabsClient({
+    apiKey: ELEVENLABS_API_KEY,
+});
+
+const elevenlabsV2 = new ElevenLabsClientV2({
     apiKey: ELEVENLABS_API_KEY,
 });
 
@@ -26,30 +31,15 @@ function toWebReadableStream(nodeReadable: Readable): ReadableStream<Uint8Array>
 export async function createVoiceStreamForText(voice: string, text: string): Promise<ReadableStream<Uint8Array>> {
     try {
         // TODO: This returns a 400? No error message though
-        // const audio = await elevenlabs.textToSpeech.convertAsStream(voice, {
-        //     text,
-        //     voice_settings: {
-        //         speed: 1.15,
-        //         stability: 0.3
-        //     },
-        //     apply_text_normalization: 'on',
-        //     // TODO: Idk what is best here and if this is needed?
-        //     // output_format: 'mp3_44100_128',
-        //     model_id: 'eleven_multilingual_v2'
-        //     // model_id: 'eleven_flash_v2_5'
-        // });
-
-        const audio = await elevenlabs.generate({
-            stream: true,
-            voice: voice,
-            voice_settings: {
-                speed: 1.15,
-                stability: 0.3
-            },
+        const audio = await elevenlabsV2.textToSpeech.stream(voice, {
             text,
-            apply_text_normalization: 'on',
-            model_id: 'eleven_multilingual_v2'
-            // model_id: 'eleven_flash_v2_5'
+            voiceSettings: {
+                stability: 0.3,
+                speed: 1.15,
+                style: 0.5,
+                similarityBoost: 0.75,
+            },
+            modelId: 'eleven_flash_v2_5'
         });
 
         return audio as unknown as ReadableStream<Uint8Array>;

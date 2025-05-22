@@ -24,8 +24,11 @@ export async function generateWorld(config: { model?: string; } = {}): Promise<W
             continue; // Skip the voice used for the judge
         }
 
-        if (voice.labels && voice.high_quality_base_model_ids?.includes('eleven_multilingual_v2')) {
-            availableVoices += `Name: ${voice.name}\nLabels: ${voice.labels.gender}, ${voice.labels.accent}, ${voice.labels.description}, ${voice.labels.age}\n\n`;
+        const supportsMultilingualV2 = voice.high_quality_base_model_ids?.includes('eleven_multilingual_v2');
+        const supportsFlashV2 = voice.high_quality_base_model_ids?.includes('eleven_flash_v2_5');
+
+        if (voice.labels && supportsMultilingualV2 && supportsFlashV2) {
+            availableVoices += `Voice ID: ${voice.voice_id}\nVoice Name: ${voice.name}\nVoice Labels: ${voice.labels.gender}, ${voice.labels.accent}, ${voice.labels.description}, ${voice.labels.age}\n\n`;
         }
     }
 
@@ -59,7 +62,7 @@ Rules:
 - Clues must link back to characters, locations, or events in the story.
 - All IDs must be valid and cross-referenced correctly.
 - You must only output a valid JSON object matching the schema provided. No explanations or prose outside the JSON.
-- For each character select an appropriate voice based on the info provided about the voice and the personality and description given to the character. Provice the 'Name' for the selected voice in the JSON output.
+- For each character select an appropriate voice based on the info provided about the voice and the personality and description given to the character. Provide the 'Voice ID' for the selected voice in the JSON output.
 - There should be multiple ways to solve the mystery, but only one correct solution.
 - The character id ${JUDGE_CHARACTER_ID} is reserved. Do not use it for any of characters you create.
 
@@ -224,14 +227,15 @@ Create a mystery with a modern mystery novel tone
 
             console.log('Generating clue images...');
             await Promise.all([
-                ...world.clues.values().map(async (clue) => {
-                    if (clue.type === 'physical') {
-                        // Generate an image for the clue
-                        const image = await generateClueImage(world, clue);
-                        await writeRelative(import.meta.url, `../../../gens/${world.mystery.title}/imgs/clues/${clue.id}-clue-image.png`, image);
-                        console.log(`Generated image for clue ${clue.name} (${clue.id})`);
-                    }
-                }),
+                // TODO: Was rate limited
+                // ...world.clues.values().map(async (clue) => {
+                //     if (clue.type === 'physical') {
+                //         // Generate an image for the clue
+                //         const image = await generateClueImage(world, clue);
+                //         await writeRelative(import.meta.url, `../../../gens/${world.mystery.title}/imgs/clues/${clue.id}-clue-image.png`, image);
+                //         console.log(`Generated image for clue ${clue.name} (${clue.id})`);
+                //     }
+                // }),
                 ...world.characters.values().map(async (character) => {
                     const image = await generateCharacterImage(world, character);
                     await writeRelative(import.meta.url, `../../../gens/${world.mystery.title}/imgs/character/${character.id}-character-image.png`, image);
