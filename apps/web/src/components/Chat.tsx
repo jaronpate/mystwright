@@ -1,6 +1,7 @@
 import { DBGameState } from "@mystwright/db";
 import { Bot, Send } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
+import { useUserContext } from "../context/user-context";
 import { useWorldContext } from "../context/world-context";
 import "../styles/Chat.css";
 import { useApi } from "../utils/api";
@@ -16,6 +17,7 @@ export default function Chat() {
     const [audioIsPlaying, setAudioIsPlaying] = useState(false);
     const [audioIsLoading, setAudioIsLoading] = useState(false);
 
+    const { user } = useUserContext();
     const { activeWorld, activeGameState, activeCharacter, updateActiveGameState } = useWorldContext();
     const api = useApi();
 
@@ -222,7 +224,7 @@ export default function Chat() {
             <div className="dialog">
                 <div className="dialog-header">
                     <div className="character-info">
-                        <h2>{activeCharacter ? activeCharacter.name : 'Chat'}</h2>
+                        <h2>{activeCharacter ? activeCharacter.name : `Welcome, ${user?.first_name ? user?.first_name : 'Investigator'}`}</h2>
                         <div className="character-title">{activeCharacter?.description || ''}</div>
                     </div>
                     <div className="dialog-actions">
