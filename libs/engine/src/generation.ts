@@ -577,10 +577,10 @@ If there is no existing conversation start by intoducing yourself to the user.`;
         content: newDialogue
     });
 
-    updateGameState(world, state);
+    const newState = await updateGameState(world, state);
 
     // Return the new dialogue
-    return { response: newDialogue, state };
+    return { response: newDialogue, state: newState };
 }
 
 /**
