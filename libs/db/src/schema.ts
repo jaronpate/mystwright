@@ -93,7 +93,7 @@ export type WorldPayload = {
         crime: string;
         description: string;
         title: string;
-        victims: string;
+        victim: string;
     },
     solution: {
         culpritId: string;

@@ -1,8 +1,9 @@
-import { Sparkles, BookOpen, Users, UserSquare2, ChevronDown, ChevronUp } from "lucide-react";
+import { Sparkles, BookOpen, Users, UserSquare2, ChevronDown, ChevronUp, AlertTriangle } from "lucide-react";
 import { useWorldContext } from "../context/world-context";
 import { useState } from "react";
 import "../styles/Sidebar.css";
 import Logo from '/icon.png';
+import type { DBWorld } from "@mystwright/db";
 
 type SidebarHeaderProps = {
     title: string;
@@ -23,15 +24,26 @@ const SidebarHeader = ({ title, icon }: SidebarHeaderProps) => {
 type CollapsibleSectionProps = {
     title: string;
     icon: React.ReactNode;
-    children: React.ReactNode;
+    children: React.ReactNode | ((isOpen: boolean) => React.ReactNode);
+    alwaysShowWhenActive?: boolean;
+    isActive?: boolean;
 };
 
-const CollapsibleSection = ({ title, icon, children }: CollapsibleSectionProps) => {
+const CollapsibleSection = ({ 
+    title, 
+    icon, 
+    children, 
+    alwaysShowWhenActive = false, 
+    isActive = false 
+}: CollapsibleSectionProps) => {
     const [isOpen, setIsOpen] = useState(true);
 
     const toggleSection = () => {
         setIsOpen(!isOpen);
     };
+    
+    // Determine if content should be shown
+    const showContent = isOpen || (alwaysShowWhenActive && isActive);
 
     return (
         <div className="sidebar-collapsable">
@@ -48,9 +60,9 @@ const CollapsibleSection = ({ title, icon, children }: CollapsibleSectionProps) 
                     }
                 </div>
             </div>
-            {isOpen && (
+            {showContent && (
                 <div className="sidebar-items">
-                    {children}
+                    {typeof children === 'function' ? children(isOpen) : children}
                 </div>
             )}
         </div>
@@ -80,6 +92,37 @@ const Card = ({ title, description, active, noBorder, onClick, icon }: CardProps
     );
 };
 
+interface CrimeDetailsProps {
+    world: DBWorld | null;
+}
+
+const CrimeDetails = ({ world }: CrimeDetailsProps) => {
+    if (!world) {
+        return (
+            <div className="nothing">
+                No world selected
+            </div>
+        );
+    }
+
+    const victim = world.payload.characters.find(c => c.id === world.payload.mystery.victim);
+    
+    return (
+        <div className="flex">
+            <Card
+                title="Victim"
+                description={victim ? victim.name : 'Unknown'}
+                noBorder={true}
+            />
+            <Card
+                title="Crime"
+                description={world.payload.mystery.crime}
+                noBorder={true}
+            />
+        </div>
+    );
+};
+
 export default function MystwrightSidebar() {
     const { worlds, setActiveWorld, setActiveCharacter, activeWorld, activeCharacter } = useWorldContext();
 
@@ -98,19 +141,44 @@ export default function MystwrightSidebar() {
                     <CollapsibleSection
                         title="Worlds"
                         icon={<BookOpen width={'16px'} height={'16px'} />}
+                        alwaysShowWhenActive={true}
+                        isActive={activeWorld !== null}
                     >
-                        {worlds.map((world) => (
-                            <Card
-                                key={world.id}
-                                title={world.title}
-                                description={world.description ?? 'No description...'}
-                                active={activeWorld?.id === world.id}
-                                onClick={() => {setActiveCharacter(null); setActiveWorld(world.id)}}
-                            />
-                        ))}
+                        {isOpen => 
+                            isOpen ? (
+                                // Show all worlds when expanded
+                                worlds.map((world) => (
+                                    <Card
+                                        key={world.id}
+                                        title={world.title}
+                                        description={world.description ?? 'No description...'}
+                                        active={activeWorld?.id === world.id}
+                                        onClick={() => {setActiveCharacter(null); setActiveWorld(world.id)}}
+                                    />
+                                ))
+                            ) : (
+                                // Show only active world when collapsed
+                                activeWorld && (
+                                    <Card
+                                        key={activeWorld.id}
+                                        title={activeWorld.title}
+                                        description={activeWorld.description ?? 'No description...'}
+                                        active={true}
+                                        onClick={() => {setActiveCharacter(null); setActiveWorld(activeWorld.id)}}
+                                    />
+                                )
+                            )
+                        }
                     </CollapsibleSection>
+                    {/* Crime Details */}
+                    <CollapsibleSection
+                        title="Crime Details"
+                        icon={<AlertTriangle width={'16px'} height={'16px'} />}
+                    >
+                        <CrimeDetails world={activeWorld} />
+                    </CollapsibleSection>
+
                     {/* Characters */}
-                    {/* if a world is selected */}
                     <CollapsibleSection
                         title="Characters"
                         icon={<Users width={'16px'} height={'16px'} />}
