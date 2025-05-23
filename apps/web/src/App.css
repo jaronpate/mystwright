@@ -165,10 +165,14 @@ button {
     transition: all 0.2s ease;
 }
 
-button.has-icon-right {
+button.has-icon-left, button.has-icon-right {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+button.has-icon-left svg {
+    margin-right: 8px;
 }
 
 button.has-icon-right svg {

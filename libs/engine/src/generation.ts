@@ -793,7 +793,7 @@ export function revealClue(world: World, state: GameState, clueId: ClueID): void
     }
 }
 
-export async function attemptSolve(world: World, state: GameState, input: string): Promise<{ solved: boolean; response: string }> {
+export async function attemptSolve(world: World, state: GameState, input: string): Promise<{ solved: boolean; response: string; state: GameState }> {
     const SYSTEM_PROMPT = `\
 You are Mystwright, a game master for a mystery text adventure.
 The user is making a guess for the solution to the mystery.
@@ -880,7 +880,13 @@ Reject a guess if it has insufficient evidence to support it. Request more evide
         }
     );
 
-    return response;
+    state.solved = response.solved;
+
+    return {
+        solved: response.solved,
+        response: response.response,
+        state
+    };
 }
 
 export async function generateClueImage(world: World, clue: Clue): Promise<Buffer> {

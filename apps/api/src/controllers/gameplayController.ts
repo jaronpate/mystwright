@@ -1,6 +1,6 @@
 import { db, sql } from '@mystwright/db';
-import { getNextDialogueWithCharacter, createVoiceStreamForText } from '@mystwright/engine';
-import { constructGameState, deserializeWorldStructure, type WorldPayload, type GameState } from '@mystwright/types';
+import { getNextDialogueWithCharacter, createVoiceStreamForText, attemptSolve } from '@mystwright/engine';
+import { constructGameState, deserializeWorldStructure, type WorldPayload, type GameState, JUDGE_CHARACTER_ID, JUDGE_VOICE_ID } from '@mystwright/types';
 import type { APIRequest, AuthenticatedRequest } from '../utils/responses';
 import { errorResponse, jsonResponse } from '../utils/responses';
 
@@ -34,12 +34,6 @@ export const gameplayController = {
             // TODO: Merge WorldPayload & WorldPayload
             const gameWorld = deserializeWorldStructure(world.payload as unknown as WorldPayload);
 
-            const character = gameWorld.characters.get(character_id);
-
-            if (character === undefined || character === null) {
-                return errorResponse('Character not found', req, 404);
-            }
-
             // Get the game state from the database
             const rawGameState = await db.selectFrom('game_states')
                 .selectAll()
@@ -54,18 +48,39 @@ export const gameplayController = {
 
             // TODO: Validate this?
             const gameState = rawGameState.payload as unknown as GameState;
+            let newGameState = gameState;
+            let text: string | null = null;
 
-            gameState.isInConversation = true;
-            gameState.currentCharacter = character_id;
+            if (character_id === JUDGE_CHARACTER_ID) {
+                gameState.isInConversation = false;
+                gameState.currentCharacter = null;
+                
+                // Attempt to solve the case
+                const { response, state } = await attemptSolve(gameWorld, gameState, input);
 
-            // Generate the next character dialogue using the world and game state
-            const { response, state } = await getNextDialogueWithCharacter(character, gameWorld, gameState, input);
+                text = response;
+                newGameState = state;
+            } else {
+                const character = gameWorld.characters.get(character_id);
+
+                if (character === undefined || character === null) {
+                    return errorResponse('Character not found', req, 404);
+                }
+                
+                gameState.isInConversation = true;
+                gameState.currentCharacter = character_id;
+
+                // Generate the next character dialogue using the world and game state
+                const { response, state } = await getNextDialogueWithCharacter(character, gameWorld, gameState, input);
+                text = response;
+                newGameState = state;
+            }
 
             // Update the game state in the database
             await db.updateTable('game_states')
                 // .set({ payload: state })
                 .set({
-                    payload: sql`payload || CAST(${sql.val(state)} AS jsonb)`
+                    payload: sql`payload || CAST(${sql.val(newGameState)} AS jsonb)`
                 })
                 .where('id', '=', state_id)
                 .where('world_id', '=', world_id)
@@ -73,8 +88,8 @@ export const gameplayController = {
                 .execute();
 
             return jsonResponse({
-                response,
-                state
+                response: text,
+                state: newGameState,
             }, req);
         } catch (error) {
             console.error('Generate next character dialogue error:', error);
@@ -108,13 +123,21 @@ export const gameplayController = {
         }
 
         const gameWorld = deserializeWorldStructure(world.payload as unknown as WorldPayload);
-        const character = gameWorld.characters.get(character_id);
+        let voice: string | null = null;
 
-        if (character === undefined || character === null) {
-            return errorResponse('Character not found', req, 404);
+        if (character_id === JUDGE_CHARACTER_ID) {
+            voice = JUDGE_VOICE_ID;
+        } else {
+            const character = gameWorld.characters.get(character_id);
+
+            if (character === undefined || character === null) {
+                return errorResponse('Character not found', req, 404);
+            }
+
+            voice = character.voice;
         }
 
-        const audio = await createVoiceStreamForText(character.voice, text);
+        const audio = await createVoiceStreamForText(voice, text);
 
         return new Response(audio, {
             headers: { 'Content-Type': 'audio/mpeg' }

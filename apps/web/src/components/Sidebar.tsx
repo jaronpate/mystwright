@@ -1,4 +1,4 @@
-import { Sparkles, BookOpen, Users, UserSquare2, ChevronDown, ChevronUp, AlertTriangle } from "lucide-react";
+import { Sparkles, BookOpen, Users, UserSquare2, ChevronDown, ChevronUp, AlertTriangle, Gavel } from "lucide-react";
 import { useWorldContext } from "../context/world-context";
 import { useState } from "react";
 import "../styles/Sidebar.css";
@@ -145,7 +145,7 @@ const CrimeDetails = ({ world }: CrimeDetailsProps) => {
 };
 
 export default function MystwrightSidebar() {
-    const { worlds, setActiveWorld, setActiveCharacter, activeWorld, activeCharacter } = useWorldContext();
+    const { worlds, setActiveWorld, setActiveCharacter, activeWorld, activeCharacter, isSolving, setIsSolving } = useWorldContext();
 
     return (
         <div className="sidebar">
@@ -199,6 +199,21 @@ export default function MystwrightSidebar() {
                         <CrimeDetails world={activeWorld} />
                     </CollapsibleSection>
 
+                    {/* Judge */}
+                    {activeWorld &&
+                        <Card
+                            title="The Judge"
+                            description="Make your case!"
+                            active={isSolving}
+                            onClick={() => setIsSolving(!isSolving)}
+                            noBorder={true}
+                            icon={
+                                <div className="character-avatar">
+                                    <Gavel width={'16px'} height={'16px'} />
+                                </div>
+                            }
+                        />
+                    }
                     {/* Characters */}
                     <CollapsibleSection
                         title="Characters"

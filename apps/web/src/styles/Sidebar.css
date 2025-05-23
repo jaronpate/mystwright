@@ -38,6 +38,11 @@
 
 .sidebar-collapsable {
     margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.sidebar-collapsable + .sidebar-collapsable {
+    margin-top: 0;
 }
 
 .sidebar-items {

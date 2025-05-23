@@ -16,6 +16,8 @@ type WorldContextType = {
     updateActiveGameState: (payload: DBGameState['payload']) => void
     activeCharacter: Character | null
     setActiveCharacter: (id: string | null) => void
+    isSolving: boolean
+    setIsSolving: (isSolving: boolean) => void
 };
 
 const WorldContext = createContext<WorldContextType | undefined>(undefined);
@@ -25,6 +27,7 @@ export function WorldProvider({ children }: { children: ReactNode }) {
     const [ gameStates, setGameStates ] = useState<DBGameState[]>([]);
     const [ activeGameStateId, setActiveGameStateId ] = useState<string| null>(null);
     const [ activeWorldId, setActiveWorldId ] = useState<string | null>();
+    const [ isSolving, setIsSolving ] = useState<boolean>(false);
     const { user } = useUserContext();
     const apiFetch = useApi();
 
@@ -143,7 +146,9 @@ export function WorldProvider({ children }: { children: ReactNode }) {
                 setActiveGameState,
                 updateActiveGameState,
                 activeCharacter,
-                setActiveCharacter
+                setActiveCharacter,
+                isSolving,
+                setIsSolving,
             }}
         >
             {children}
