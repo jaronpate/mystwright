@@ -293,13 +293,13 @@ export default function Chat() {
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={(e) => {
-                                if (e.key === "Enter" && !e.shiftKey) {
+                                if (e.key === "Enter" && !e.shiftKey && !loading) {
                                     e.preventDefault();
                                     handleSendMessage();
                                 }
                             }}
                         />
-                        <button className="has-icon-right">
+                        <button className="has-icon-right" disabled={loading} onClick={handleSendMessage}>
                             Send
                             <Send width={16} height={16} />
                         </button>

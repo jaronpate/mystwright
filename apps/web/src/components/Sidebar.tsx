@@ -37,13 +37,22 @@ const CollapsibleSection = ({
     isActive = false 
 }: CollapsibleSectionProps) => {
     const [isOpen, setIsOpen] = useState(true);
+    const [isAnimating, setIsAnimating] = useState(false);
 
     const toggleSection = () => {
-        setIsOpen(!isOpen);
+        if (isOpen) {
+            setIsAnimating(true);
+            setTimeout(() => {
+                setIsOpen(false);
+                setIsAnimating(false);
+            }, 200);
+        } else {
+            setIsOpen(true);
+        }
     };
     
     // Determine if content should be shown
-    const showContent = isOpen || (alwaysShowWhenActive && isActive);
+    const showContent = isOpen || (alwaysShowWhenActive && isActive) || isAnimating;
 
     return (
         <div className="sidebar-collapsable">
@@ -61,7 +70,7 @@ const CollapsibleSection = ({
                 </div>
             </div>
             {showContent && (
-                <div className="sidebar-items">
+                <div className={`sidebar-items ${isAnimating ? 'closing' : ''}`}>
                     {typeof children === 'function' ? children(isOpen, setIsOpen) : children}
                 </div>
             )}
