@@ -156,6 +156,20 @@ const CrimeDetails = ({ world }: CrimeDetailsProps) => {
 export default function MystwrightSidebar() {
     const { worlds, setActiveWorld, setActiveCharacter, activeWorld, activeCharacter, isSolving, setIsSolving } = useWorldContext();
 
+    const talkToJudge = () => {
+        if (activeWorld) {
+            setActiveCharacter(null); // Reset active character when starting to solve
+            setIsSolving(!isSolving); // Toggle solving state
+        }
+    }
+
+    const talkToCharacter = (characterId: string) => {
+        if (activeWorld) {
+            setActiveCharacter(characterId); // Set active character when talking to them
+            setIsSolving(false); // Stop solving when talking to a character
+        }
+    };
+
     return (
         <div className="sidebar">
             <div className="sidebar-inner">
@@ -214,7 +228,7 @@ export default function MystwrightSidebar() {
                             title="The Judge"
                             description="Make your case!"
                             active={isSolving}
-                            onClick={() => setIsSolving(!isSolving)}
+                            onClick={() => talkToJudge()}
                             noBorder={true}
                             icon={
                                 <div className="character-avatar">
@@ -243,7 +257,7 @@ export default function MystwrightSidebar() {
                                                 title={character.name}
                                                 description={character.description}
                                                 active={activeCharacter?.id === character.id}
-                                                onClick={() => setActiveCharacter(character.id)}
+                                                onClick={() => talkToCharacter(character.id)}
                                                 noBorder={true}
                                                 icon={
                                                     <div className="character-avatar">
@@ -261,7 +275,7 @@ export default function MystwrightSidebar() {
                                                 title={activeCharacter.name}
                                                 description={activeCharacter.description}
                                                 active={true}
-                                                onClick={() => setActiveCharacter(activeCharacter.id)}
+                                                onClick={() => talkToCharacter(activeCharacter.id)}
                                                 noBorder={true}
                                                 icon={
                                                     <div className="character-avatar">
