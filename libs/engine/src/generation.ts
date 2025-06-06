@@ -4,6 +4,7 @@ import { ElevenLabsClient } from "elevenlabs";
 import OpenAI from "openai";
 import { OpenRouter } from "./openrouter";
 import { writeRelative } from "./util";
+import { generateImageFromPrompt } from "./replicate";
 
 const openai = new OpenAI();
 const elevenlabs = new ElevenLabsClient({ apiKey: process.env.ELEVENLABS_API_KEY });
@@ -889,7 +890,7 @@ Reject a guess if it has insufficient evidence to support it. Request more evide
     };
 }
 
-export async function generateClueImage(world: World, clue: Clue): Promise<Buffer> {
+export async function generateClueImage(world: World, clue: Clue): Promise<{ buffer: Buffer, url?: string }> {
     const prompt = `\
 You are Mystwright, a game master for a mystery text adventure.
 Your job is to generate a clue image based on the clue description.
@@ -898,34 +899,33 @@ Generate an image for the clue: ${clue.name}.
 The clue description is: ${clue.description}.
 Do not add any additional elements to the image.
 Do not quote the clue description in the image. Use it as a reference for the image.
-Do not make up any text in the image. The image should in the style of a photograph of evidence taken at a crime scene.
+The image should in the style of a photograph of evidence taken at a crime scene.
 Add a border to the image so it looks like a photograph.
 The image should be a realistic representation of the clue, with no additional elements or distractions.
 The image should be clear and focused on the clue itself.`;
 
-    const result = await openai.images.generate({
-        model: "gpt-image-1",
-        prompt,
-    });
+    const result = await generateImageFromPrompt('black-forest-labs/flux-schnell', prompt);
 
-    if (result.data?.[0] === undefined || result.data?.[0] === null) {
-        throw new Error('No image generated');
-    }
+    return { buffer: result.buffer, url: result.url };
 
-    const image_base64 = result.data[0].b64_json;
+    // const result = await openai.images.generate({
+    //     model: "gpt-image-1",
+    //     prompt,
+    // });
 
-    if (image_base64 === undefined || image_base64 === null) {
-        throw new Error('No image data returned');
-    }
+    // if (result.data?.[0] === undefined || result.data?.[0] === null) {
+    //     throw new Error('No image generated');
+    // }
 
-    const image_bytes = Buffer.from(image_base64, "base64");
+    // const image_base64 = result.data[0].b64_json;
 
-    return image_bytes;
+    // if (image_base64 === undefined || image_base64 === null) {
+    //     throw new Error('No image data returned');
+    // }
 
-    // const image_blob = new Blob([image_bytes], { type: "image/png" });
-    // const image_url = URL.createObjectURL(image_blob);
+    // const image_bytes = Buffer.from(image_base64, "base64");
 
-    // return image_url;
+    // return image_bytes;
 }
 
 // export async function generateWorldImage(world: World): Promise<Buffer> {}
