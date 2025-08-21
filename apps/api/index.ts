@@ -2,4 +2,5 @@
 import { startServer } from './src/server';
 
 // Run the server
-startServer();
+startServer('0.0.0.0');
+startServer('::'); // For IPv6 support
