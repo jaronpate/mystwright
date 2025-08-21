@@ -1,5 +1,6 @@
-import { Sparkles, BookOpen, Users, UserSquare2, ChevronDown, ChevronUp, AlertTriangle, Gavel } from "lucide-react";
+import { Sparkles, BookOpen, Users, UserSquare2, ChevronDown, ChevronUp, AlertTriangle, Gavel, LogOut } from "lucide-react";
 import { useWorldContext } from "../context/world-context";
+import { useUserContext } from "../context/user-context";
 import { useState } from "react";
 import "../styles/Sidebar.css";
 import Logo from '/icon.png';
@@ -155,6 +156,7 @@ const CrimeDetails = ({ world }: CrimeDetailsProps) => {
 
 export default function MystwrightSidebar() {
     const { worlds, setActiveWorld, setActiveCharacter, activeWorld, activeCharacter, isSolving, setIsSolving } = useWorldContext();
+    const { user, logout } = useUserContext();
 
     const talkToJudge = () => {
         if (activeWorld) {
@@ -168,6 +170,11 @@ export default function MystwrightSidebar() {
             setActiveCharacter(characterId); // Set active character when talking to them
             setIsSolving(false); // Stop solving when talking to a character
         }
+    };
+
+    const handleLogout = () => {
+        logout();
+        window.location.href = '/';
     };
 
     return (
@@ -310,6 +317,18 @@ export default function MystwrightSidebar() {
                             ))
                         )} */}
                     </CollapsibleSection>
+                </div>
+                
+                {/* Logout Button */}
+                <div className="sidebar-footer">
+                    <div className="user-info">
+                        <div className="user-name">
+                            {user ? (user.first_name || user.email) : "Guest"}
+                        </div>
+                        <button className="logout-button" onClick={handleLogout} title="Logout">
+                            <LogOut width={'16px'} height={'16px'} />
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,29 +1,38 @@
-import { Kysely, PostgresDialect, sql } from 'kysely';
+import { Kysely, PostgresDialect } from 'kysely';
 import pg from 'pg';
 import { config, type DBConfig } from './config';
+import { migrateToLatest } from './migrate';
 import { type Database } from './schema';
-
 // Re-export schema and types
 export { sql } from 'kysely';
 export * from './config';
-export * from './schema';
 export * from './models';
+export * from './schema';
 
 /**
  * Creates a new Kysely database instance
  */
 export function createDb(config: DBConfig): Kysely<Database> {
+    const connectionConfig = {
+        connectionTimeoutMillis: 10000, // 10 seconds
+        max: config.MAX_CONNECTIONS || 10, // Default to 10 connections
+    } as pg.PoolConfig;
+    
+    if (process.env.DATABASE_URL) {
+        // Use DATABASE_URL if available
+        connectionConfig.connectionString = process.env.DATABASE_URL;
+    } else {
+        // Otherwise, use individual config options
+        connectionConfig.password = config.DB_PASS;
+        connectionConfig.user = config.DB_USER;
+        connectionConfig.host = config.DB_HOST;
+        connectionConfig.port = config.DB_PORT;
+        connectionConfig.database = config.DB_NAME;
+    }
+
     return new Kysely<Database>({
         dialect: new PostgresDialect({
-            pool: new pg.Pool({
-                password: config.DB_PASS,
-                user: config.DB_USER,
-                host: config.DB_HOST,
-                port: config.DB_PORT,
-                database: config.DB_NAME,
-                connectionTimeoutMillis: 10000,
-                max: config.MAX_CONNECTIONS || 10,
-            }),
+            pool: new pg.Pool(connectionConfig),
         }),
     });
 }
@@ -31,113 +40,64 @@ export function createDb(config: DBConfig): Kysely<Database> {
 // Default db instance using default config
 export const db = createDb(config);
 
+export const cleanup = async () => {
+    console.log('Shutting down database connection pool...');
+    await db.destroy();
+    console.log('Database connection pool shut down complete.');
+};
+
 /**
- * Function to initialize the database schema
+ * Function to initialize the database schema with exponential backoff
  */
-export async function initializeDb(database = db): Promise<void> {
-    // Number of retries and delay between retries
-    const maxRetries = 5;
-    const retryDelayMs = 3000;
-    
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+export async function initializeDb(
+    database = db,
+    options: {
+        maxRetries?: number; // undefined means infinite retries
+        initialDelayMs?: number;
+        maxDelayMs?: number;
+        backoffMultiplier?: number;
+    } = {}
+): Promise<typeof cleanup> {
+    const {
+        maxRetries, // undefined by default for infinite retries
+        initialDelayMs = 1000,
+        maxDelayMs = 30000,
+        backoffMultiplier = 2
+    } = options;
+
+    let attempt = 1;
+    let currentDelayMs = initialDelayMs;
+
+    while (true) {
         try {
-            console.log(`Database initialization attempt ${attempt}/${maxRetries}`);
-            await database.executeQuery(sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`.compile(database));
+            if (maxRetries !== undefined) {
+                console.log(`Database initialization attempt ${attempt}/${maxRetries}`);
+            } else {
+                console.log(`Database initialization attempt ${attempt}`);
+            }
 
-            await database.schema
-                .createTable('users')
-                .ifNotExists()
-                .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(sql`uuid_generate_v4()`))
-                .addColumn('email', 'text', (col) => col.notNull().unique())
-                .addColumn('password_hash', 'text', (col) => col.notNull())
-                .addColumn('first_name', 'text', (col) => col.notNull())
-                .addColumn('last_name', 'text')
-                .addColumn('created_at', 'timestamptz', (col) =>
-                    col.defaultTo(sql`NOW()`).notNull()
-                )
-                .addColumn('updated_at', 'timestamptz', (col) =>
-                    col.defaultTo(sql`NOW()`).notNull()
-                )
-                .execute();
-
-            await database.executeQuery(sql`\
-                DO $$ 
-                BEGIN
-                    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'token_type_enum') THEN
-                        CREATE TYPE token_type_enum AS ENUM ('user', 'service');
-                    END IF;
-                END $$;\
-            `.compile(database));
-
-            await database.schema
-                .createTable('refresh_tokens')
-                .ifNotExists()
-                .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(sql`uuid_generate_v4()`))
-                .addColumn('user_id', 'uuid', (col) => col.notNull().references('users.id').onDelete('cascade'))
-                .addColumn('value', 'text', (col) => col.notNull())
-                .addColumn('created_at', 'timestamptz', (col) =>
-                    col.defaultTo(sql`NOW()`).notNull()
-                )
-                .addColumn('updated_at', 'timestamptz', (col) =>
-                    col.defaultTo(sql`NOW()`).notNull()
-                )
-                .addColumn('expires_at', 'timestamptz')
-                .addColumn('type', sql`token_type_enum`, (col) => col.notNull())
-                .addColumn('scopes', sql`text[]`, (col) => col.notNull().defaultTo(sql`ARRAY[]::text[]`))
-                .addColumn('properties', 'jsonb', (col) => col.notNull().defaultTo(sql`'{}'::jsonb`))
-                .execute();
-
-            await database.schema
-                .createTable('access_tokens')
-                .ifNotExists()
-                .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(sql`uuid_generate_v4()`))
-                .addColumn('user_id', 'uuid', (col) => col.notNull().references('users.id').onDelete('cascade'))
-                .addColumn('refresh_token_id', 'uuid', (col) => col.references('refresh_tokens.id').onDelete('cascade'))
-                .addColumn('value', 'text', (col) => col.notNull())
-                .addColumn('created_at', 'timestamptz', (col) => col.defaultTo(sql`NOW()`).notNull())
-                .addColumn('updated_at', 'timestamptz', (col) => col.defaultTo(sql`NOW()`).notNull())
-                .addColumn('expires_at', 'timestamptz')
-                .addColumn('type', sql`token_type_enum`, (col) => col.notNull())
-                .addColumn('scopes', sql`text[]`, (col) => col.notNull().defaultTo(sql`ARRAY[]::text[]`))
-                .addColumn('properties', 'jsonb', (col) => col.notNull().defaultTo(sql`'{}'::jsonb`))
-                .execute();
-            
-            await database.schema
-                .createTable('worlds')
-                .ifNotExists()
-                .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(sql`uuid_generate_v4()`))
-                .addColumn('user_id', 'uuid', (col) => col.notNull().references('users.id').onDelete('cascade'))
-                .addColumn('title', 'text', (col) => col.notNull())
-                .addColumn('description', 'text', (col) => col.notNull())
-                .addColumn('created_at', 'timestamptz', (col) => col.defaultTo(sql`NOW()`).notNull())
-                .addColumn('updated_at', 'timestamptz', (col) => col.defaultTo(sql`NOW()`).notNull())
-                .addColumn('payload', 'jsonb', (col) => col.notNull().defaultTo(sql`'{}'::jsonb`))
-                .execute();
-            
-            await database.schema
-                .createTable('game_states')
-                .ifNotExists()
-                .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(sql`uuid_generate_v4()`))
-                .addColumn('user_id', 'uuid', (col) => col.notNull().references('users.id').onDelete('cascade'))
-                .addColumn('world_id', 'uuid', (col) => col.notNull().references('worlds.id').onDelete('cascade'))
-                .addColumn('created_at', 'timestamptz', (col) => col.defaultTo(sql`NOW()`).notNull())
-                .addColumn('updated_at', 'timestamptz', (col) => col.defaultTo(sql`NOW()`).notNull())
-                .addColumn('payload', 'jsonb', (col) => col.notNull().defaultTo(sql`'{}'::jsonb`))
-                .execute();
+            migrateToLatest(database);
 
             console.log('Database schema initialized successfully');
-            return;
+            return cleanup;
         } catch (error) {
-            console.error(`Database initialization attempt ${attempt} failed:`, error);
-            
-            if (attempt < maxRetries) {
-                console.log(`Retrying in ${retryDelayMs/1000} seconds...`);
-                await new Promise(resolve => setTimeout(resolve, retryDelayMs));
-            } else {
+            // @ts-ignore - bad error type
+            console.log(`Database initialization attempt ${attempt} failed: ${error?.message ?? error}`);
+
+            // Check if we've exceeded max retries (if specified)
+            if (maxRetries !== undefined && attempt >= maxRetries) {
                 console.error(`All ${maxRetries} initialization attempts failed`);
-                // @ts-ignore - annoying
-                throw new Error(`Failed to initialize database after ${maxRetries} attempts: ${error?.message}`);
+                console.log(`Failed to initialize database after ${maxRetries} attempts`);
+                // @ts-ignore - bad error type
+                throw new Error(`Failed to initialize database after ${maxRetries} attempts: ${error?.message ?? error}`);
             }
+
+            console.log(`Retrying database initialization in ${currentDelayMs / 1000} seconds...`);
+            await new Promise(resolve => setTimeout(resolve, currentDelayMs));
+
+            // Exponential backoff with max delay cap
+            currentDelayMs = Math.min(currentDelayMs * backoffMultiplier, maxDelayMs);
+            attempt++;
         }
     }
 }
