@@ -42,7 +42,7 @@ jobs:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |
           flyctl deploy \
-            --config services/$SERVICE/fly.toml \
+            --config apps/$SERVICE/fly.toml \
             --app "${{ inputs.app_name }}" \
             --remote-only \
             --build-arg MODE="${{ inputs.mode }}" \
