@@ -1,0 +1,22 @@
+name: Deploy API to Production
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - production
+
+jobs:
+  deploy:
+    name: Deploy API to Production
+    uses: ./.github/workflows/deploy-to-gke.yaml
+    with:
+      gke_cluster: mystwright-production
+      gke_zone: us-central1
+      deployment_name: mystwright-api-production
+      image: mystwright-api-production
+      service: api
+      mode: production
+    secrets:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}

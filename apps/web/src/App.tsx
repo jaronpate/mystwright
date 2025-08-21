@@ -6,6 +6,10 @@ import AppIntro from './components/AppIntro';
 import Layout from './components/Layout';
 import MystwrightSidebar from './components/Sidebar';
 import Chat from './components/Chat';
+import Login from './components/Login';
+import Signup from './components/Signup';
+import { UserProvider, useUserContext } from './context/user-context';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 function AppRoutes() {
     // const location = useLocation();
@@ -24,12 +28,22 @@ function AppRoutes() {
                     <AppIntro />
                 </Layout>
             } />
-            {/* <Route path="/login" element={<Login />} /> */}
-            {/* <Route path="/signup" element={<Signup />} /> */}
-            <Route path="/app" element={
-                <Layout sidebar={<MystwrightSidebar />}>
-                    <Chat />
+            <Route path="/login" element={
+                <Layout>
+                    <Login />
                 </Layout>
+            } />
+            <Route path="/signup" element={
+                <Layout>
+                    <Signup />
+                </Layout>
+            } />
+            <Route path="/app" element={
+                <ProtectedRoute>
+                    <Layout sidebar={<MystwrightSidebar />}>
+                        <Chat />
+                    </Layout>
+                </ProtectedRoute>
             } />
             {/* Add a catch-all route */}
             <Route path="*" element={<Navigate to="/" replace />} />
@@ -38,12 +52,13 @@ function AppRoutes() {
 }
 
 function App() {
-
     return (
         <StrictMode>
-            <BrowserRouter>
-                <AppRoutes />
-            </BrowserRouter>
+            <UserProvider>
+                <BrowserRouter>
+                    <AppRoutes />
+                </BrowserRouter>
+            </UserProvider>
         </StrictMode>
     )
 }

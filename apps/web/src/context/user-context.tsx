@@ -9,6 +9,7 @@ type UserContextType = {
     tokenSet: LocalTokenSet | null
     setUser: (user: User) => void
     setTokenSet: (token_set: TokenSet | null) => LocalTokenSet | null,
+    logout: () => void,
     loading: boolean,
     error: string | null
 };
@@ -59,6 +60,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
             setLoading(false);
         }
     }, []);
+
+    const logout = () => {
+        localStorage.removeItem(TOKEN_SET_KEY);
+        setUser(null);
+        setActiveTokenSet(null);
+        setError(null);
+    }
 
     const fetchUser = async (tokenSet: LocalTokenSet) => {
         try {
@@ -114,6 +122,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
                 tokenSet,
                 setUser,
                 setTokenSet,
+                logout,
                 loading,
                 error
             }}
