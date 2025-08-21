@@ -1,7 +1,7 @@
 app = "mystwright-api"
 
 [build]
-  dockerfile = "./dockerfile"
+  dockerfile = "apps/api/Dockerfile"
 
 [env]
   MODE = "production"
