@@ -3,7 +3,7 @@
  */
 export const config = {
     // Server settings
-    PORT: Number(process.env.PORT ?? 3000), // Default to 3000 if PORT is not set
+    PORT: Number(process.env.PORT ?? 3030), // Default to 3030 if PORT is not set
     
     // Environment
     NODE_ENV: process.env.NODE_ENV ?? 'development',

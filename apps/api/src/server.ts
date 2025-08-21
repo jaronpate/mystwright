@@ -6,7 +6,7 @@ import { initializeDb } from './db';
 /**
  * Start the server
  */
-async function startServer(hostname: string = '0.0.0.0') {
+async function startServer() {
     try {
         // Initialize the database with required tables
         await initializeDb();
@@ -15,7 +15,7 @@ async function startServer(hostname: string = '0.0.0.0') {
         // Start the server
         const server = serve({
             port: config.PORT,
-            hostname,
+            hostname: '0.0.0.0',
             idleTimeout: 0,
             routes,
         });
