@@ -11,10 +11,7 @@ jobs:
     name: Deploy API to Production
     uses: ./.github/workflows/deploy-to-gke.yaml
     with:
-      gke_cluster: mystwright-production
-      gke_zone: us-central1
-      deployment_name: mystwright-api-production
-      image: mystwright-api-production
+      app_name: mystwright-api-production
       service: api
       mode: production
     secrets:
