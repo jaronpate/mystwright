@@ -13,14 +13,14 @@ async function startServer() {
         console.log('Database initialized successfully');
         
         // Start the server
-        serve({
-            port: config.PORT,
+        const server = serve({
+            port: config.PORT ?? 3030,
             hostname: '0.0.0.0',
             idleTimeout: 0,
             routes,
         });
 
-        console.log(`Server running on http://localhost:${config.PORT}`);
+        console.log(`Server running on http://${server.hostname}:${server.port}`);
     } catch (error) {
         console.error('Failed to start server:', error);
         process.exit(1);
