@@ -27,10 +27,5 @@ async function startServer() {
     }
 }
 
-// Start the server if this file is run directly
-if (import.meta.path === Bun.main) {
-    startServer();
-}
-
 // Export for testing or programmatic usage
 export { startServer };
