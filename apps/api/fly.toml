@@ -9,19 +9,19 @@ app = "mystwright-api-production"
 [[services]]
   protocol = "tcp"
 
-[[services.ports]]
-  handlers = ["http"]
-  port = 80
-  force_https = true # ⬅️ redirect HTTP to HTTPS
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+    force_https = true # ⬅️ redirect HTTP to HTTPS
 
-[[services.ports]]
-  handlers = ["tls", "http"]
-  port = 443
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
 
-[[services.checks]]
-  type = "http"
-  interval = "5s"
-  timeout = "5s"
-  grace_period = "30s" # ⬅️ delay health checks until startup completes
-  method = "GET"
-  path = "/api/status" # ⬅️ make sure your app exposes this
+  [[services.checks]]
+    type = "http"
+    interval = "5s"
+    timeout = "5s"
+    grace_period = "30s" # ⬅️ delay health checks until startup completes
+    method = "GET"
+    path = "/api/status" # ⬅️ make sure your app exposes this
