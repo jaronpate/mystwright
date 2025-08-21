@@ -18,4 +18,5 @@ RUN bun install
 
 EXPOSE 3030 
 
-CMD ["sh", "-c", "until bash -c '</dev/tcp/127.0.0.1/5432' 2>/dev/null; do echo waiting for db...; sleep 1; done && bun run start"]
+# Start the application
+CMD ["bun", "run", "start"]
