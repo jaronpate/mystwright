@@ -44,7 +44,4 @@ jobs:
           flyctl deploy \
             --config apps/$SERVICE/fly.toml \
             --app "${{ inputs.app_name }}" \
-            --remote-only \
-            --build-arg MODE="${{ inputs.mode }}" \
-            --build-arg GITHUB_SHA="$GITHUB_SHA" \
-            --build-arg GITHUB_REF="$GITHUB_REF"
+            --remote-only
