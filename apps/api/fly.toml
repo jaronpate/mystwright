@@ -7,7 +7,7 @@ app = "mystwright-api-production"
   MODE = "production"
 
 [[services]]
-  internal_port = 3030
+  internal_port = 3000
   protocol = "tcp"
 
 [[services.ports]]
