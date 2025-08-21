@@ -1,0 +1,19 @@
+name: Deploy Web to Production
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - production
+
+jobs:
+  deploy:
+    name: Deploy Web to Production
+    uses: ./.github/workflows/deploy-to-fly-io.yaml
+    with:
+      app_name: mystwright-web-production
+      service: web
+      mode: production
+    secrets:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}

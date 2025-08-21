@@ -1,0 +1,20 @@
+app = "mystwright-web-production"
+
+[build]
+  dockerfile = "./Dockerfile"
+
+[env]
+  MODE = "production"
+
+[[services]]
+  internal_port = 80
+  protocol = "tcp"
+
+[[services.ports]]
+  handlers = ["http"]
+  port = 80
+  force_https = true # ⬅️ redirect HTTP to HTTPS
+
+[[services.ports]]
+  handlers = ["tls", "http"]
+  port = 443
