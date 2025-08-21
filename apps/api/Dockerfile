@@ -10,13 +10,12 @@ COPY . .
 # Set environment variables
 ENV NODE_ENV=production
 
-# Move into the api directory
-WORKDIR /usr/mystwright/services/api
-
 # Install dependencies using Bun
 RUN bun install
+
+RUN bun build apps/api/index.ts --outdir=apps/api/dist --target=bun --external=aws-sdk --external=mock-aws-s3 --external=nock
 
 EXPOSE 3030 
 
 # Start the application
-CMD ["bun", "run", "start"]
+CMD ["bun", "run", "apps/api/dist/index.js"]
