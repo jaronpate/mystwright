@@ -9,7 +9,7 @@ on:
 jobs:
   deploy:
     name: Deploy API to Production
-    uses: ./.github/workflows/deploy-to-gke.yaml
+    uses: ./.github/workflows/deploy-to-fly-io.yaml
     with:
       app_name: mystwright-api-production
       service: api
