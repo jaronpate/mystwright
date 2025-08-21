@@ -76,7 +76,7 @@ export async function initializeDb(
                 console.log(`Database initialization attempt ${attempt}`);
             }
 
-            migrateToLatest(database);
+            await migrateToLatest(database);
 
             console.log('Database schema initialized successfully');
             return cleanup;
