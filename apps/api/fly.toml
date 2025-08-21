@@ -1,4 +1,4 @@
-app = "mystwright-api"
+app = "mystwright-api-production"
 
 [build]
   dockerfile = "./Dockerfile"
