@@ -1,7 +1,6 @@
 import { FileMigrationProvider, Kysely, Migrator } from 'kysely';
 import { promises as fs } from 'node:fs';
 import path from 'path';
-import { config, createDb } from './index';
 
 export async function migrateToLatest(db: Kysely<any>) {
     const migrator = new Migrator({
@@ -34,22 +33,5 @@ export async function migrateToLatest(db: Kysely<any>) {
     if (error) {
         console.log(`Migration failed`, error);
         throw error;
-    }
-}
-
-if (import.meta.main) {
-    const db = createDb(config);
-    
-    console.log('Starting database migration...');
-    
-    try {
-        await migrateToLatest(db);
-        console.log('Database migration completed successfully');
-        process.exit(0);
-    } catch (error) {
-        console.log('Database migration failed:', error);
-        process.exit(1);
-    } finally {
-        await db.destroy();
     }
 }

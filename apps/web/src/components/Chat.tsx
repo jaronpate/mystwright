@@ -1,18 +1,18 @@
 import { DBGameState } from "@mystwright/db";
-import { Bot, Send, PenBox } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { JUDGE_CHARACTER_ID } from "@mystwright/types";
+import { Bot, PenBox, Send } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useUserContext } from "../context/user-context";
 import { useWorldContext } from "../context/world-context";
 import "../styles/Chat.css";
 import { useApi } from "../utils/api";
 import Page from "./Page";
-import { JUDGE_CHARACTER_ID } from "@mystwright/types";
 
 export default function Chat() {
     const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+    const [_error, setError] = useState("");
 
     const inputElm = useRef<HTMLInputElement>(null);
 

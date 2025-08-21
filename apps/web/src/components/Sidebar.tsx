@@ -1,10 +1,10 @@
-import { Sparkles, BookOpen, Users, UserSquare2, ChevronDown, ChevronUp, AlertTriangle, Gavel, LogOut } from "lucide-react";
-import { useWorldContext } from "../context/world-context";
-import { useUserContext } from "../context/user-context";
+import type { DBWorld } from "@mystwright/db";
+import { AlertTriangle, BookOpen, ChevronDown, ChevronUp, Gavel, LogOut, Users } from "lucide-react";
 import { useState } from "react";
+import { useUserContext } from "../context/user-context";
+import { useWorldContext } from "../context/world-context";
 import "../styles/Sidebar.css";
 import Logo from '/icon.png';
-import type { DBWorld } from "@mystwright/db";
 
 type SidebarHeaderProps = {
     title: string;

@@ -1,15 +1,14 @@
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import Page from './components/Page';
-import './App.css';
 import { StrictMode } from 'react';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import './App.css';
 import AppIntro from './components/AppIntro';
-import Layout from './components/Layout';
-import MystwrightSidebar from './components/Sidebar';
 import Chat from './components/Chat';
+import Layout from './components/Layout';
 import Login from './components/Login';
-import Signup from './components/Signup';
-import { UserProvider, useUserContext } from './context/user-context';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import MystwrightSidebar from './components/Sidebar';
+import Signup from './components/Signup';
+import { UserProvider } from './context/user-context';
 
 function AppRoutes() {
     // const location = useLocation();

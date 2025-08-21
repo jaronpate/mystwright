@@ -1,9 +1,8 @@
-import { Sparkles } from "lucide-react";
-import Page from "./Page";
-import "../styles/AppIntro.css";
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import Logo from '/icon.png'
+import "../styles/AppIntro.css";
+import Page from "./Page";
+import Logo from '/icon.png';
 
 export default function AppIntro() {
     const [currentSlide, setCurrentSlide] = useState(0);

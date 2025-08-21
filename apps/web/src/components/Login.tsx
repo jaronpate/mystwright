@@ -1,9 +1,9 @@
-import { useState, useCallback } from "react";
-import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useCallback, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { useUserContext } from "../context/user-context";
+import "../styles/Auth.css";
 import { login } from "../utils/auth";
 import Page from "./Page";
-import "../styles/Auth.css";
 import Logo from '/icon.png';
 
 export default function Login() {
@@ -11,7 +11,6 @@ export default function Login() {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const navigate = useNavigate();
     const location = useLocation();
     const { setTokenSet, setUser } = useUserContext();
 
