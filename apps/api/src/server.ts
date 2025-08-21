@@ -15,6 +15,7 @@ async function startServer() {
         // Start the server
         serve({
             port: config.PORT,
+            hostname: '0.0.0.0',
             idleTimeout: 0,
             routes,
         });
