@@ -1,7 +1,7 @@
 import { TokenSet } from "@mystwright/db";
+import { baseURL } from './api';
 
 export const TOKEN_SET_KEY = "mystwright_token_set";
-const baseURL = import.meta.env.PROD ? `https://api.${window.location.host}` : 'http://localhost:3000';
 
 export type LocalTokenSet = Omit<TokenSet, 'expires_at'> & { expires_at: Date };
 
