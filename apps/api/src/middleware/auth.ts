@@ -67,10 +67,9 @@ export async function authMiddleware<T extends string = string>(req: APIRequest<
         const decoded = jwt.verify(token, config.JWT_SECRET as string) as unknown as JwtPayload;
         
         // Create a modified request with user data attached
-        const authenticatedReq = req.clone() as AuthenticatedRequest;
-        authenticatedReq.user = decoded;
+        req.user = decoded;
         
-        return authenticatedReq;
+        return req as AuthenticatedRequest<T>;
     } catch (error) {
         console.error('JWT verification error:', error);
         return errorResponse({

@@ -41,14 +41,10 @@ const constructRoute = <T extends string = string>(methods?: RouteDefinition<T>)
  */
 const constructHandler = <T extends string = string>(...handlers: Array<Handler<T>>) => {
     return async (req: APIRequest<T>) => {
-        let request = req;
         for (const handler of handlers) {
-            const response = await handler(request);
+            const response = await handler(req);
             if (response instanceof Response) {
                 return response;
-            } else {
-                response.params = request.params;
-                request = response;
             }
         }
         return jsonResponse({ message: "Not found" }, req, 404);
