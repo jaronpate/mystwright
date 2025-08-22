@@ -228,7 +228,7 @@ Create a mystery with a modern mystery novel tone
             // Intentionally not waiting for the write to finish to prevent longer load times
             writeRelative(import.meta.url, `../../../gens/${world.mystery.title}/world.json`, JSON.stringify(worldJson, null, 4));
 
-            console.log('Generating clue images...');
+            console.log('Generating images...');
             await Promise.all([
                 // TODO: Was rate limited
                 // ...world.clues.values().map(async (clue) => {
@@ -239,13 +239,13 @@ Create a mystery with a modern mystery novel tone
                 //         console.log(`Generated image for clue ${clue.name} (${clue.id})`);
                 //     }
                 // }),
-                ...world.characters.values().map(async (character) => {
-                    const image = await generateCharacterImage(world, character);
-                    await writeRelative(import.meta.url, `../../../gens/${world.mystery.title}/imgs/character/${character.id}-character-image.png`, image);
-                    console.log(`Generated image for character ${character.name} (${character.id})`);
-                })
+                // ...world.characters.values().map(async (character) => {
+                //     const image = await generateCharacterImage(world, character);
+                //     await writeRelative(import.meta.url, `../../../gens/${world.mystery.title}/imgs/character/${character.id}-character-image.png`, image);
+                //     console.log(`Generated image for character ${character.name} (${character.id})`);
+                // })
             ]);
-            console.log('All clue images generated successfully.');
+            console.log('All images generated successfully.');
 
             return world;
         } catch (error) {
