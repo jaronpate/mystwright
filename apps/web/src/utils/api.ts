@@ -1,5 +1,7 @@
 import { useUserContext } from '../context/user-context';
 
+const baseURL = import.meta.env.PROD ? `${window.location.protocol}://api.${window.location.host}` : 'http://localhost:3000';
+
 export function useApi() {
     const { tokenSet, setTokenSet } = useUserContext();
 
@@ -14,7 +16,6 @@ export function useApi() {
 
         let validTokenSet = tokenSet;
 
-        const baseURL = import.meta.env.PROD ? `${window.location.protocol}://api.${window.location.host}` : 'http://localhost:3000';
 
         if (tokenSet.expires_at && tokenSet.expires_at < new Date()) {
             const res = await fetch(`${baseURL}/api/v1/auth/token`, {

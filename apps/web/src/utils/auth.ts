@@ -1,6 +1,7 @@
 import { TokenSet } from "@mystwright/db";
 
 export const TOKEN_SET_KEY = "mystwright_token_set";
+const baseURL = import.meta.env.PROD ? `${window.location.protocol}://api.${window.location.host}` : 'http://localhost:3000';
 
 export type LocalTokenSet = Omit<TokenSet, 'expires_at'> & { expires_at: Date };
 
@@ -79,7 +80,7 @@ export async function signup(
     lastName?: string
 ): Promise<{ user: any; tokenSet: TokenSet } | { error: string }> {
     try {
-        const response = await fetch('/api/v1/auth/signup', {
+        const response = await fetch(`${baseURL}/api/v1/auth/signup`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -107,7 +108,7 @@ export async function signup(
 
 export async function refreshToken(refreshToken: string): Promise<TokenSet | null> {
     try {
-        const response = await fetch('/api/v1/auth/token', {
+        const response = await fetch(`${baseURL}/api/v1/auth/token`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -136,7 +137,7 @@ export async function refreshToken(refreshToken: string): Promise<TokenSet | nul
 
 export async function fetchUserProfile(accessToken: string): Promise<any | null> {
     try {
-        const response = await fetch('/api/v1/auth/profile', {
+        const response = await fetch(`${baseURL}/api/v1/auth/profile`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
