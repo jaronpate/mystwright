@@ -13,9 +13,10 @@ ENV NODE_ENV=production
 # Install dependencies using Bun
 RUN bun install
 
-RUN bun build apps/api/index.ts --outdir=apps/api/dist --target=bun --external=aws-sdk --external=mock-aws-s3 --external=nock
+# RUN bun build apps/api/index.ts --outdir=apps/api/dist --target=bun --external=aws-sdk --external=mock-aws-s3 --external=nock
 
 EXPOSE 3030
 
 # Start the application
-CMD ["bun", "run", "apps/api/dist/index.js"]
+# CMD ["bun", "run", "apps/api/dist/index.js"]
+CMD ["bun", "run-api"]
