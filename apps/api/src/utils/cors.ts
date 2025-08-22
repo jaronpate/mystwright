@@ -2,6 +2,7 @@
 export const ALLOWED_ORIGINS = [
     /^https?:\/\/localhost(:\d+)?$/,                // localhost with any port
     /^https?:\/\/127\.0\.0\.1(:\d+)?$/,             // 127.0.0.1 with any port
+    /^https?:\/\/mystwright\.com$/,                 // mystwright.com without subdomain
     /^https?:\/\/[a-zA-Z0-9-]+\.mystwright\.com$/,  // Any subdomain of mystwright.com
 ];
 
