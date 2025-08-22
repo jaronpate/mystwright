@@ -1,6 +1,6 @@
 import { useUserContext } from '../context/user-context';
 
-const baseURL = import.meta.env.PROD ? `${window.location.protocol}://api.${window.location.host}` : 'http://localhost:3000';
+const baseURL = import.meta.env.PROD ? `https://api.${window.location.host}` : 'http://localhost:3000';
 
 export function useApi() {
     const { tokenSet, setTokenSet } = useUserContext();
