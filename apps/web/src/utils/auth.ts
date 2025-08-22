@@ -52,7 +52,7 @@ export function isTokenValid(tokenSet: LocalTokenSet | null): boolean {
 
 export async function login(email: string, password: string): Promise<{ user: any; tokenSet: TokenSet } | { error: string }> {
     try {
-        const response = await fetch('/api/v1/auth/login', {
+        const response = await fetch(`${baseURL}/api/v1/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

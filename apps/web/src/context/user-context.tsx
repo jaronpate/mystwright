@@ -3,6 +3,7 @@
 import type { User, TokenSet } from "@mystwright/db";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { LocalTokenSet, TOKEN_SET_KEY } from "../utils/auth";
+import { baseURL } from "../utils/api";
 
 type UserContextType = {
     user: User | null
@@ -72,7 +73,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         try {
             if (tokenSet) {
                 if(tokenSet.expires_at.getTime() < Date.now()) {
-                    const res = await fetch('/api/v1/auth/token', {
+                    const res = await fetch(`${baseURL}/api/v1/auth/token`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -92,7 +93,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
                     }
                 }
 
-                const res = await fetch('/api/v1/auth/profile', {
+                const res = await fetch(`${baseURL}/api/v1/auth/profile`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${tokenSet.access_token}`,
