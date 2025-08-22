@@ -2,9 +2,7 @@
 export const ALLOWED_ORIGINS = [
     /^https?:\/\/localhost(:\d+)?$/,                // localhost with any port
     /^https?:\/\/127\.0\.0\.1(:\d+)?$/,             // 127.0.0.1 with any port
-    /^https?:\/\/[a-zA-Z0-9-]+\.fishhat\.dev$/,     // Any subdomain of fishhat.dev
-    /^https?:\/\/[a-zA-Z0-9-]+\.hat\.fish$/,        // Any subdomain of hat.fish
-    /^https?:\/\/[a-zA-Z0-9-]+\.pusledmd\.com$/,    // Any subdomain of pusledmd.com
+    /^https?:\/\/[a-zA-Z0-9-]+\.mystwright\.com$/,  // Any subdomain of mystwright.com
 ];
 
 /**
@@ -18,22 +16,27 @@ export function getCorsHeaders(request: Request): Record<string, string> {
     
     // Check if the origin is allowed
     const isAllowed = ALLOWED_ORIGINS.some(pattern => pattern.test(origin));
-    
-    // Set appropriate CORS headers
-    if (isAllowed) {
-        return {
-            'Access-Control-Allow-Origin': origin,
-            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-            'Access-Control-Allow-Credentials': 'true',
-            'Access-Control-Max-Age': '86400', // 24 hours
-        };
-    }
-    
-    // For non-allowed origins, return restrictive headers
-    return {
-        'Access-Control-Allow-Origin': '*', // Fallback to * for development
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
+
+    let headers: Record<string, string> = {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Surrogate-Control': 'no-store'
     };
+    
+    // TODO: Fix CORS issues properly instead of disabling it
+    // Looks like origin isn't being passed to us by the GKE Gateway, so we can't validate it properly
+    // Set appropriate CORS headers
+    // if (isAllowed) {
+        // TODO: Add back when CORS issues are resolved
+        // headers['Access-Control-Allow-Origin'] = origin;
+        headers['Access-Control-Allow-Origin'] = '*';  // TEMPORARY: Allow all origins for now, to avoid CORS issues during development and testing. Change this in production!
+        headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS, PUT, DELETE, PATCH, HEAD';
+        headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization';
+        // TODO: Add back when CORS issues are resolved
+        // headers['Access-Control-Allow-Credentials'] = 'true';
+        headers['Access-Control-Max-Age'] = '86400'; // 24 hours
+    // }
+
+    return headers;
 }

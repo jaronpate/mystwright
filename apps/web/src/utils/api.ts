@@ -14,8 +14,10 @@ export function useApi() {
 
         let validTokenSet = tokenSet;
 
+        const baseURL = import.meta.env.PROD ? `${window.location.protocol}://api.${window.location.host}` : 'http://localhost:3000';
+
         if (tokenSet.expires_at && tokenSet.expires_at < new Date()) {
-            const res = await fetch('/api/v1/auth/token', {
+            const res = await fetch(`${baseURL}/api/v1/auth/token`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -44,7 +46,7 @@ export function useApi() {
         const headers = new Headers(init?.headers || {});
         headers.set('Authorization', `Bearer ${validTokenSet.access_token}`);
 
-        const response = await fetch(input, {
+        const response = await fetch(`${baseURL}${input}`, {
             ...init,
             headers,
         });
