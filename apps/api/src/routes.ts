@@ -12,6 +12,23 @@ type ResponseHandler<T extends string = string> = (req: APIRequest<T>) => Promis
 type RouteDefinition<T extends string = string> = Partial<Record<'GET' | 'POST' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'HEAD', Array<Handler<T>> | Handler<T>>>;
 type Route<T extends string = string> = Partial<Record<'GET' | 'POST' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'HEAD', ResponseHandler<T>>>;
 
+const withCors = (resp: Response, req: Request): Response => {
+  const cors = getCorsHeaders(req);
+  const merged = new Headers(resp.headers);
+
+  for (const [k, v] of Object.entries(cors)) merged.set(k, v);
+
+  // Optional but good: expose headers your client code may need
+  if (!merged.has('Access-Control-Expose-Headers')) {
+    merged.set('Access-Control-Expose-Headers', 'Content-Range, Accept-Ranges, Content-Length, Content-Type');
+  }
+
+  // Caching correctness across origins
+  if (!merged.has('Vary')) merged.set('Vary', 'Origin');
+
+  return new Response(resp.body, { status: resp.status, statusText: resp.statusText, headers: merged });
+}
+
 /**
  * Constructs a route object with default OPTIONS method for CORS preflight requests
  * @param methods - Object with HTTP methods as keys and handler functions as values
@@ -44,7 +61,7 @@ const constructHandler = <T extends string = string>(...handlers: Array<Handler<
         for (const handler of handlers) {
             const response = await handler(req);
             if (response instanceof Response) {
-                return response;
+                return withCors(response, req);
             }
         }
         return jsonResponse({ message: "Not found" }, req, 404);

@@ -33,7 +33,7 @@ export function getCorsHeaders(request: Request): Record<string, string> {
         // headers['Access-Control-Allow-Origin'] = origin;
         headers['Access-Control-Allow-Origin'] = '*';  // TEMPORARY: Allow all origins for now, to avoid CORS issues during development and testing. Change this in production!
         headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS, PUT, DELETE, PATCH, HEAD';
-        headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization';
+        headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Range';
         // TODO: Add back when CORS issues are resolved
         // headers['Access-Control-Allow-Credentials'] = 'true';
         headers['Access-Control-Max-Age'] = '86400'; // 24 hours
