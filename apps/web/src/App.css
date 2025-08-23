@@ -116,24 +116,6 @@
     min-width: 0;
 }
 
-.character-avatar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background-color: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
-    font-weight: 500;
-    font-size: 0.9rem;
-}
-
-.card.active .character-avatar {
-    background-color: hsl(var(--primary-foreground));
-    color: hsl(var(--primary));
-}
-
 .nothing {
     display: flex;
     align-items: center;

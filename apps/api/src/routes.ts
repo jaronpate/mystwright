@@ -2,7 +2,7 @@ import { authController } from './controllers/authController';
 import { gameplayController } from './controllers/gameplayController';
 import { worldsController } from './controllers/worldsController';
 import { authMiddleware } from './middleware/auth';
-import { getCorsHeaders } from './utils/cors';
+import { getCorsHeaders, withCors } from './utils/cors';
 import type { APIRequest } from './utils/responses';
 import { jsonResponse, optionsResponse } from './utils/responses';
 
@@ -11,23 +11,6 @@ type ResponseHandler<T extends string = string> = (req: APIRequest<T>) => Promis
 
 type RouteDefinition<T extends string = string> = Partial<Record<'GET' | 'POST' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'HEAD', Array<Handler<T>> | Handler<T>>>;
 type Route<T extends string = string> = Partial<Record<'GET' | 'POST' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'HEAD', ResponseHandler<T>>>;
-
-const withCors = (resp: Response, req: Request): Response => {
-  const cors = getCorsHeaders(req);
-  const merged = new Headers(resp.headers);
-
-  for (const [k, v] of Object.entries(cors)) merged.set(k, v);
-
-  // Optional but good: expose headers your client code may need
-  if (!merged.has('Access-Control-Expose-Headers')) {
-    merged.set('Access-Control-Expose-Headers', 'Content-Range, Accept-Ranges, Content-Length, Content-Type');
-  }
-
-  // Caching correctness across origins
-  if (!merged.has('Vary')) merged.set('Vary', 'Origin');
-
-  return new Response(resp.body, { status: resp.status, statusText: resp.statusText, headers: merged });
-}
 
 /**
  * Constructs a route object with default OPTIONS method for CORS preflight requests
@@ -76,7 +59,7 @@ export const routes = {
     '/api/status': (req: Request) => {
         return new Response("OK", {
             headers: getCorsHeaders(req),
-            status: 200,
+            status: 204,
         });
     },
 

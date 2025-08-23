@@ -223,29 +223,36 @@ Create a mystery with a modern mystery novel tone
                 `${world.characters.size} characters,`,
                 `${world.clues.size} clues`
             );
+            console.log('Generating images...');
+
+            const styleSeed = await generateImageStyleSeed(world);
+            console.log('Using image style seed:', styleSeed);
+
+            // Generate images for clues and characters in parallel
+            await Promise.all([
+                ...world.clues.values().map(async (clue) => {
+                    if (clue.type === 'physical') {
+                        // Generate an image for the clue
+                        const { buffer, mime } = await generateClueImage(world, clue);
+                        const ext = mime.split('/')[1] ?? 'png';
+                        const url = await uploadImageToStorage(buffer, `${world.mystery.title}/clues/${clue.id}-clue-image.${ext}`);
+                        clue.image = url;
+                        console.log(`Generated image for clue ${clue.name} (${clue.id})`);
+                    }
+                }),
+                ...world.characters.values().map(async (character) => {
+                    const { buffer, mime } = await generateCharacterImage(world, character, styleSeed);
+                    const ext = mime.split('/')[1] ?? 'png';
+                    const url = await uploadImageToStorage(buffer, `${world.mystery.title}/characters/${character.id}-character-image.${ext}`);
+                    console.log(`Generated image for character ${character.name} (${character.id})`);
+                    character.image = url;
+                })
+            ]);
+            console.log('All images generated successfully.');
             
             // Write the generated world to a file
             // Intentionally not waiting for the write to finish to prevent longer load times
             writeRelative(import.meta.url, `../../../gens/${world.mystery.title}/world.json`, JSON.stringify(worldJson, null, 4));
-
-            console.log('Generating images...');
-            await Promise.all([
-                // TODO: Was rate limited
-                // ...world.clues.values().map(async (clue) => {
-                //     if (clue.type === 'physical') {
-                //         // Generate an image for the clue
-                //         const image = await generateClueImage(world, clue);
-                //         await writeRelative(import.meta.url, `../../../gens/${world.mystery.title}/imgs/clues/${clue.id}-clue-image.png`, image);
-                //         console.log(`Generated image for clue ${clue.name} (${clue.id})`);
-                //     }
-                // }),
-                // ...world.characters.values().map(async (character) => {
-                //     const image = await generateCharacterImage(world, character);
-                //     await writeRelative(import.meta.url, `../../../gens/${world.mystery.title}/imgs/character/${character.id}-character-image.png`, image);
-                //     console.log(`Generated image for character ${character.name} (${character.id})`);
-                // })
-            ]);
-            console.log('All images generated successfully.');
 
             return world;
         } catch (error) {
@@ -807,7 +814,7 @@ Currently you are to roleplay as the Judge in a courtroom.
 Provide a response to the user based on their guess.
 
 Reject a guess if it is not based on evidence or if it is not a valid guess. Request more evidence or information if needed.
-Reject a guess if it has insufficient evidence to support it. Request more evidence or information if needed.`
+Reject a guess if it has insufficient evidence to support it. Request more evidence or information if needed.`;
 
 // NOTE: adding this to the pompt causes the model to actually allow guesses with no evidence
 
@@ -848,7 +855,7 @@ Reject a guess if it has insufficient evidence to support it. Request more evide
     messages.push(...history);
 
     const response = await OpenRouter.generateCompletion<any, { solved: boolean; response: string }>(
-        'google/gemini-2.0-flash-001',
+        DEFAULT_WEAK_MODEL,
         messages,
         {
             schema: {
@@ -890,12 +897,144 @@ Reject a guess if it has insufficient evidence to support it. Request more evide
     };
 }
 
-export async function generateClueImage(world: World, clue: Clue): Promise<{ buffer: Buffer, url?: string }> {
-    const prompt = `\
+/**
+ * Generates a prompt seed describing the artistic style for generating images in the mystery world.
+ * @param world - The world object
+ * @returns A prompt seed describing the artistic style for generating images in the mystery world
+ */
+export async function generateImageStyleSeed(world: World): Promise<string> {
+    /**
+     * GOOD GENS SO FAR:
+     * For this mystery, imagine a world rendered in the style of classic pulp magazine covers, specifically inspired by the Golden Age of detective fiction. Think dramatic lighting, bold colors, and slightly exaggerated features reminiscent of artists like Norman Saunders and Margaret Brundage. There's a touch of film noir influence seeping in, with high contrast and a focus on shadow to heighten the suspense and intrigue.
+     */
+    const SYSTEM_PROMPT = `\
 You are Mystwright, a game master for a mystery text adventure.
-Your job is to generate a clue image based on the clue description.
+You are to provide a few scentences that describe the artistic style of images that will be created for the mystery world.
+This will be used as a seed for generating images for the mystery.
 
-Generate an image for the clue: ${clue.name}.
+<EXAMPLES>
+Painting & Traditional Media
+	•	oil painting
+	•	watercolor wash
+	•	acrylic on canvas
+	•	ink drawing
+	•	charcoal sketch
+	•	pastel illustration
+	•	gouache painting
+
+Historical Art Styles
+	•	renaissance painting
+	•	baroque masterpiece
+	•	rococo style
+	•	impressionist brushwork
+	•	cubist abstraction
+	•	surrealist dreamscape
+	•	futurist dynamic composition
+	•	art nouveau poster
+	•	art deco design
+
+Illustration & Graphic Styles
+	•	comic book inked
+	•	manga panel
+	•	storybook illustration
+	•	flat vector art
+	•	cut-paper collage
+	•	linocut print
+	•	silkscreen pop art
+
+Photography Styles
+	•	cinematic photography
+	•	film noir lighting
+	•	black and white portrait
+	•	polaroid snapshot
+	•	macro lens photography
+	•	long exposure night shot
+	•	vintage daguerreotype
+
+Digital & Futuristic
+	•	cyberpunk neon glow
+	•	synthwave aesthetic
+	•	vaporwave pastel retro
+	•	glitchcore digital distortion
+	•	low poly render
+	•	isometric pixel art
+	•	3D render in octane
+	•	unreal engine hyperrealism
+
+Mood & Atmosphere
+	•	gothic horror
+	•	dark fantasy
+	•	dreamcore surreal
+	•	whimsical ghibli-style
+	•	solarpunk utopia
+	•	steampunk industrial
+	•	psychedelic 70s poster
+
+Cultural & Regional
+	•	japanese ukiyo-e woodblock
+	•	chinese ink wash
+	•	islamic geometric pattern
+	•	african tribal mask design
+	•	aztec glyphic art
+	•	aboriginal dot painting
+</EXAMPLES>
+`;
+
+    const messages: Message[] = [
+        {
+            role: 'system',
+            content: SYSTEM_PROMPT
+        },
+    ];
+
+    const response = await OpenRouter.generateCompletion(
+        DEFAULT_WEAK_MODEL,
+        messages
+    );
+
+    return response;
+}
+
+// Similar to generateImageStyleSeed but wasn't constrained to artistic styles
+// Could still be useful for something else like getting the era, mood, or setting of the mystery
+// This could inform dialogue generation as well or something like that
+export async function generateWorldStyleSeed(world: World): Promise<string> {
+    const SYSTEM_PROMPT = `\
+You are Mystwright, a game master for a mystery text adventure.
+You are to provide a few scentences that describe the style of images that would fit the mystery world.
+This will be used as a seed for generating images for the mystery.
+The description should be concise but evocative. It should give a hint to the era and visual style of the world.
+
+<EXAMPLES>
+If the mystery is a noir detective story, the description might include terms like "dark", "shadowy", "high contrast", "rain-soaked streets", "vintage 1940s aesthetic".
+If the mystery is a cozy village mystery, the description might include terms like "warm", "inviting", "quaint village", "countryside", "autumn colors".
+If the mystery is a modern thriller, the description might include terms like "sleek", "urban", "nighttime cityscape", "neon lights", "contemporary fashion".
+If the mystery is a historical whodunit, the description might include terms like "period costumes", "cobblestone streets", "gas lamps", "Victorian architecture".
+</EXAMPLES>
+`;
+
+    const messages: Message[] = [
+        {
+            role: 'system',
+            content: SYSTEM_PROMPT
+        },
+        {
+            role: 'user',
+            content: `The mystery is: ${world.mystery.title}: ${world.mystery.description}.`
+        }
+    ];
+
+    const response = await OpenRouter.generateCompletion(
+        DEFAULT_WEAK_MODEL,
+        messages
+    );
+
+    return response;
+}
+
+export async function generateClueImage(world: World, clue: Clue): Promise<{ buffer: Buffer; mime: string }> {
+    const prompt = `\
+An image for the clue: ${clue.name}.
 The clue description is: ${clue.description}.
 Do not add any additional elements to the image.
 Do not quote the clue description in the image. Use it as a reference for the image.
@@ -904,64 +1043,49 @@ Add a border to the image so it looks like a photograph.
 The image should be a realistic representation of the clue, with no additional elements or distractions.
 The image should be clear and focused on the clue itself.`;
 
-    const result = await generateImageFromPrompt('black-forest-labs/flux-schnell', prompt);
+    // const result = await generateImageFromPrompt('black-forest-labs/flux-schnell', prompt);
+    const result = await generateImageFromPrompt('black-forest-labs/flux-krea-dev', prompt);
+    // const result = await generateImageFromPrompt('black-forest-labs/flux-dev', prompt);
+    // const result = await generateImageFromPrompt('black-forest-labs/flux-1.1-pro', prompt);
 
-    return { buffer: result.buffer, url: result.url };
-
-    // const result = await openai.images.generate({
-    //     model: "gpt-image-1",
-    //     prompt,
-    // });
-
-    // if (result.data?.[0] === undefined || result.data?.[0] === null) {
-    //     throw new Error('No image generated');
-    // }
-
-    // const image_base64 = result.data[0].b64_json;
-
-    // if (image_base64 === undefined || image_base64 === null) {
-    //     throw new Error('No image data returned');
-    // }
-
-    // const image_bytes = Buffer.from(image_base64, "base64");
-
-    // return image_bytes;
+    return { buffer: result.buffer, mime: result.mime };
 }
 
 // export async function generateWorldImage(world: World): Promise<Buffer> {}
 
-export async function generateCharacterImage(world: World, character: Character): Promise<Buffer> {
+export async function generateCharacterImage(world: World, character: Character, styleSeed: string = ''): Promise<{ buffer: Buffer; mime: string }> {
     const prompt = `\
-You are Mystwright, a game master for a mystery text adventure.
-Your job is to generate a character image based on the character description.
-Generate an image for the character: ${character.name}.
-The character description is: ${character.description}.
-The character is a ${character.role} in the mystery.
-The character's personality is ${character.personality}.
-For some context this is the current mystery world:
-<WORLD>
-${JSON.stringify(world, null, 4)}
-</WORLD>
-The image should be a realistic representation of the character, with no additional elements or distractions.
-The image should be clear and focused on the character itself.
-The image should be a portrait of the character, with a neutral background.`;
+Portrait of ${character.name}. ${character.description}. \
+${character.name}'s personality is ${character.personality}. \
+They are a character in the mystery ${world.mystery.title}: ${world.mystery.description}. \
+The image should be a realistic representation of the character, with no additional elements, borders, or distractions. \
+${styleSeed}`;
 
-    const result = await openai.images.generate({
-        model: "gpt-image-1",
-        prompt,
+    // const result = await generateImageFromPrompt('black-forest-labs/flux-schnell', prompt);
+    const result = await generateImageFromPrompt('black-forest-labs/flux-krea-dev', prompt, { aspect_ratio: '1:1' });
+    // const result = await generateImageFromPrompt('black-forest-labs/flux-dev', prompt);
+    // const result = await generateImageFromPrompt('black-forest-labs/flux-1.1-pro', prompt);
+
+    return { buffer: result.buffer, mime: result.mime };
+}
+
+export const MYSTWRIGHT_MEDIA_BUCKET = 'rough-resonance-124';
+
+export async function uploadImageToStorage(image: Buffer, filename: string): Promise<string> {
+    const bucket = new Bun.S3Client({
+        region: 'auto',
+        accessKeyId: process.env.S3_ACCESS_KEY_ID,
+        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+        endpoint: process.env.S3_ENDPOINT,
+        bucket: process.env.S3_BUCKET_NAME
     });
 
-    if (result.data?.[0] === undefined || result.data?.[0] === null) {
-        throw new Error('No image generated');
+    const filePath = `${crypto.randomUUID()}/${filename}`;
+    const file = bucket.file(filePath);
+    await file.write(image, { acl: 'public-read' });
+    if (file.bucket === MYSTWRIGHT_MEDIA_BUCKET) {
+        return `https://media.mystwright.com/${filePath}`;
+    } else {
+        return `https://${file.bucket}.fly.storage.tigris.dev/${filePath}`;
     }
-
-    const image_base64 = result.data[0].b64_json;
-
-    if (image_base64 === undefined || image_base64 === null) {
-        throw new Error('No image data returned');
-    }
-
-    const image_bytes = Buffer.from(image_base64, "base64");
-
-    return image_bytes;
 }

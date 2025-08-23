@@ -29,6 +29,7 @@ export interface Character {
     personality: string;
     voice: string;
     role: 'suspect' | 'witness' | 'victim';
+    image?: string; // URL to character image
     alibi?: string;
     knownClues?: ClueID[];         // IDs of clues they know about
 }
@@ -38,6 +39,7 @@ export interface Clue {
     name: string;
     description: string;
     type: 'physical' | 'testimony' | "other";
+    image?: string; // URL to clue image
 }
 
 export interface Solutuion {

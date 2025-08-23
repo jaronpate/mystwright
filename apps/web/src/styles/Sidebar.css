@@ -198,3 +198,28 @@
     justify-content: center;
     color: hsl(var(--destructive));
 }
+
+.character-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.card.active .character-avatar {
+    background-color: hsl(var(--primary-foreground));
+    color: hsl(var(--primary));
+}
+
+.character-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}

@@ -1,10 +1,10 @@
-import ReplicateClient, { type FileOutput } from "replicate";
+import ReplicateClient, { type FileOutput, type Prediction } from "replicate";
 
 export async function generateImageFromPrompt(
     model: `${string}/${string}`,
     input: string,
-    config: { apiKey?: string } = {}
-): Promise<{ url: string; blob: Blob, buffer: Buffer }> {
+    config: { apiKey?: string, aspect_ratio?: string } = {}
+): Promise<{ url: string; blob: Blob, mime: string, buffer: Buffer }> {
     const replicateAPIKey = config.apiKey ?? process.env.REPLICATE_API_TOKEN;
 
     if (replicateAPIKey === undefined || replicateAPIKey === null) {
@@ -13,9 +13,18 @@ export async function generateImageFromPrompt(
 
     const replicateClient = new ReplicateClient({ auth: replicateAPIKey });
 
-    const response = await replicateClient.run(model, {
-        input: { prompt: input }
-    }) as FileOutput[];
+    const predictionInput: Record<string, any> = {
+        prompt: input,
+        guidance: 8,
+        disable_safety_checker: true,
+        go_fast: true
+    }
+
+    if (config.aspect_ratio) {
+        predictionInput['aspect_ratio'] = config.aspect_ratio;
+    }
+
+    const response = await replicateClient.run(model, { input: predictionInput }) as FileOutput[];
 
     if (!response) {
         throw new Error('Failed to generate image');
@@ -47,6 +56,7 @@ export async function generateImageFromPrompt(
     return {
         url: image.url.toString(),
         blob: image.blob,
+        mime: image.blob.type,
         buffer
     }
 }
