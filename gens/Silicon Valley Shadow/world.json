@@ -1,0 +1,415 @@
+{
+    "characters": [
+        {
+            "alibi": "Claims to have been at a board game night with friends. Several witnesses confirm this.",
+            "description": "The victim's business partner. Ambitious and driven, but rumored to be in significant debt.",
+            "id": "alex_turner",
+            "knownClues": [
+                "turner_financials",
+                "witness_statement_board_game",
+                "business_records",
+                "victim_email_alex",
+                "turner_phone_records"
+            ],
+            "name": "Alex Turner",
+            "personality": "Ambitious and appears confident, but with a hint of desperation.",
+            "role": "suspect",
+            "voice": "cjVigY5qzO86Huf0OWal"
+        },
+        {
+            "alibi": "Says she was at home, working on a freelance project. No one can verify this.",
+            "description": "A freelance journalist and the victim's ex-girlfriend. Bitter about their breakup and a story he killed that would have been her big break.",
+            "id": "sarah_jenkins",
+            "knownClues": [
+                "jenkins_laptop",
+                "victim_deleted_article",
+                "social_media_posts",
+                "jenkins_phone_records",
+                "security_footage_office"
+            ],
+            "name": "Sarah Jenkins",
+            "personality": "Cynical and resentful, but fiercely independent.",
+            "role": "suspect",
+            "voice": "XrExE9yKIg1WjnnlVkGX"
+        },
+        {
+            "alibi": "Confirmed to be working a double shift at the local diner.",
+            "description": "A waitress at the diner across the street from the victim's office. Heard arguing from the office.",
+            "id": "emily_carter",
+            "knownClues": [
+                "argument_heard",
+                "diner_shift_schedule",
+                "carter_statement"
+            ],
+            "name": "Emily Carter",
+            "personality": "Observant and talkative, with a good memory for details.",
+            "role": "witness",
+            "voice": "cgSgspJ2msm6clMCkdW9"
+        },
+        {
+            "alibi": "None. Claims to have been taking a walk in the park, but no one saw him.",
+            "description": "A disgruntled former employee TechStartup, recently fired by Elias for underperformance.",
+            "id": "david_lee",
+            "knownClues": [
+                "lee_termination_letter",
+                "park_map",
+                "lee_statement",
+                "security_footage_park"
+            ],
+            "name": "David Lee",
+            "personality": "Bitter and resentful with fiery temper",
+            "role": "suspect",
+            "voice": "bIHbv24MWmeRgasZH58o"
+        },
+        {
+            "alibi": "Confirmed attendance at a conference out of state.",
+            "description": "TechStartups Head of Security and long-time friend. Seems genuinely distraught by the news.",
+            "id": "maria_Rodriguez",
+            "knownClues": [
+                "conference_ticket",
+                "security_system_logs",
+                "colleague_testimony",
+                "personal_photo_elias"
+            ],
+            "name": "Maria Rodriguez",
+            "personality": "Stern and analytical, but loyal.",
+            "role": "witness",
+            "voice": "SAz9YHcvj6GT2YYXdXww"
+        },
+        {
+            "alibi": "Unknown.",
+            "description": "Quiet Office Administrator at TechStartups.",
+            "id": "kevin_chen",
+            "knownClues": [
+                "note_to_admin",
+                "chen_statement",
+                "chen_financial_Records",
+                "business_records",
+                "knife_found"
+            ],
+            "name": "Kevin Chen",
+            "personality": "Quiet, reserved, keeps to himself.",
+            "role": "suspect",
+            "voice": "7ktJCfz71Z44ppWOelh3"
+        },
+        {
+            "alibi": null,
+            "description": "Founder and CEO of TechStartups, a successful tech company.",
+            "id": "elias_vance",
+            "knownClues": [],
+            "name": "Elias Vance",
+            "personality": "Driven, charismatic, and ruthless; demands excellence from employees.",
+            "role": "victim",
+            "voice": "null"
+        },
+        {
+            "alibi": "Claims to have been at home sick. No one saw him.",
+            "description": "Elias Vance's personal assistant, who is often seen running errands for him.",
+            "id": "peter_hayes",
+            "knownClues": [
+                "hayes_statement",
+                "hayes_bank_statement",
+                "note_to_admin"
+            ],
+            "name": "Peter Hayes",
+            "personality": "Nervous and eager to please, but seems to be hiding something.",
+            "role": "suspect",
+            "voice": "GBv7mTt0atIp3Br8iCZE"
+        },
+        {
+            "alibi": "Confirmed by security footage; reviewing office documents in the office at the time of death.",
+            "description": "CFO of TechStartups, responsible for managing finances and auditing various projects.",
+            "id": "cynthia_moore",
+            "knownClues": [
+                "moore_statement",
+                "business_records",
+                "security_footage_office"
+            ],
+            "name": "Cynthia Moore",
+            "personality": "Organized, efficient, and detail-oriented.",
+            "role": "witness",
+            "voice": "Xb7hH8MSUJpSbSDYk0k2"
+        }
+    ],
+    "clues": [
+        {
+            "description": "Financial records show a large, recent transfer from TechStartups to an offshore account under Alex Turner's name.",
+            "id": "turner_financials",
+            "name": "Alex Turner's Dubious Financial Records",
+            "type": "physical",
+            "image": "https://media.mystwright.com/77b5407e-e53e-4d35-b813-8caa74ce4cb0/Silicon Valley Shadow/clues/turner_financials-clue-image.webp"
+        },
+        {
+            "description": "Several people at the game night confirm Alex was there, but he left early, around 9 PM.",
+            "id": "witness_statement_board_game",
+            "name": "Witness statement from board game night",
+            "type": "testimony"
+        },
+        {
+            "description": "TechStartup's financial records indicate Elias Vance discovered irregularities (money being siphoned off from the main account) in the company's accounts just days before his death.",
+            "id": "business_records",
+            "name": "TechStartup's financial records",
+            "type": "physical",
+            "image": "https://media.mystwright.com/7ffd8ffa-3519-4614-a110-6dec9fce9384/Silicon Valley Shadow/clues/business_records-clue-image.webp"
+        },
+        {
+            "description": "An email from Elias to Alex, discussing financial discrepancies and demanding an explanation.",
+            "id": "victim_email_alex",
+            "name": "Incriminating email from Elias Vance",
+            "type": "other"
+        },
+        {
+            "description": "Alex's phone records show a brief call to a burner phone minutes after Elias's estimated time of death.",
+            "id": "turner_phone_records",
+            "name": "Suspicious phone records",
+            "type": "other"
+        },
+        {
+            "description": "Sarah's laptop contains drafts of a scathing article about Elias that never got published.",
+            "id": "jenkins_laptop",
+            "name": "Unpublished Article",
+            "type": "physical",
+            "image": "https://media.mystwright.com/ea93aa92-5d49-4ded-b91a-56e649aa5784/Silicon Valley Shadow/clues/jenkins_laptop-clue-image.webp"
+        },
+        {
+            "description": "Elias killed an investigative piece by Sarah that would have exposed a local politician.",
+            "id": "victim_deleted_article",
+            "name": "Deleted Article Details",
+            "type": "other"
+        },
+        {
+            "description": "Sarah's social media posts reveal angry rants about Elias destroying her career.",
+            "id": "social_media_posts",
+            "name": "Social Media Rants",
+            "type": "other"
+        },
+        {
+            "description": "Sarah's phone records show a call to Elias Vance the day of the murder",
+            "id": "jenkins_phone_records",
+            "name": "Sarah's Recent Call to Elias",
+            "type": "other"
+        },
+        {
+            "description": "Emily overheard raised voices coming from Elias's office around 8 PM that night.",
+            "id": "argument_heard",
+            "name": "Argument overheard",
+            "type": "testimony"
+        },
+        {
+            "description": "Diner employee shift schedule showing that Emily worked a double shift the night of the murder.",
+            "id": "diner_shift_schedule",
+            "name": "Diner Shift Schedule",
+            "type": "physical",
+            "image": "https://media.mystwright.com/62135ce5-c406-4c34-8fc8-304d3c983203/Silicon Valley Shadow/clues/diner_shift_schedule-clue-image.webp"
+        },
+        {
+            "description": "Emily overheard an argument.",
+            "id": "carter_statement",
+            "name": "Emily's claim that she heard argument",
+            "type": "testimony"
+        },
+        {
+            "description": "A formal letter of termination citing unsatisfactory conduct.",
+            "id": "lee_termination_letter",
+            "name": "David Lee Termination Letter",
+            "type": "physical",
+            "image": "https://media.mystwright.com/1c3381c3-8b84-4c7c-bdaa-0b17beab686a/Silicon Valley Shadow/clues/lee_termination_letter-clue-image.webp"
+        },
+        {
+            "description": "The victim was found dead in the park.",
+            "id": "park_map",
+            "name": "Park Map",
+            "type": "physical",
+            "image": "https://media.mystwright.com/6626d360-de06-41c4-89f0-1437dd24749f/Silicon Valley Shadow/clues/park_map-clue-image.webp"
+        },
+        {
+            "description": "David states he wanted to clear his head, but seemed agitated",
+            "id": "lee_statement",
+            "name": "David's Agitated Statement",
+            "type": "testimony"
+        },
+        {
+            "description": "Security footage shows David entering the park, but not exiting",
+            "id": "security_footage_park",
+            "name": "David was caught entering the park.",
+            "type": "physical",
+            "image": "https://media.mystwright.com/a7be11d9-158e-447e-b0c1-b5b6b85c868e/Silicon Valley Shadow/clues/security_footage_park-clue-image.webp"
+        },
+        {
+            "description": "Maria states Vance was a good guy, but demanded nothing less than excellence.",
+            "id": "colleague_testimony",
+            "name": "Maria's Claim",
+            "type": "testimony"
+        },
+        {
+            "description": "Conference tocken showing Maria was out of state.",
+            "id": "conference_ticket",
+            "name": "Conference Ticket",
+            "type": "physical",
+            "image": "https://media.mystwright.com/d06c0d7b-9c6e-4d85-9f4f-7a044f862f5e/Silicon Valley Shadow/clues/conference_ticket-clue-image.webp"
+        },
+        {
+            "description": "Security logs show Maria access from afar.",
+            "id": "security_system_logs",
+            "name": "Remote access log",
+            "type": "physical",
+            "image": "https://media.mystwright.com/9ac60c26-70e8-42d0-b8a4-c8679618c757/Silicon Valley Shadow/clues/security_system_logs-clue-image.webp"
+        },
+        {
+            "description": "A photo of Maria and Vance.",
+            "id": "personal_photo_elias",
+            "name": "Personal Photo",
+            "type": "physical",
+            "image": "https://media.mystwright.com/7ec5ef09-a5e0-42b5-8329-5f9b77a8149f/Silicon Valley Shadow/clues/personal_photo_elias-clue-image.webp"
+        },
+        {
+            "description": "Internal memo from Peter to Admin asking for a large wire transfer.",
+            "id": "note_to_admin",
+            "name": "Internal Memo",
+            "type": "physical",
+            "image": "https://media.mystwright.com/66fb3f06-ae80-4a53-b2d5-270189b64fcc/Silicon Valley Shadow/clues/note_to_admin-clue-image.webp"
+        },
+        {
+            "description": "Kevin Claims they did as they were told.",
+            "id": "chen_statement",
+            "name": "Kevin's Claim",
+            "type": "testimony"
+        },
+        {
+            "description": "Kevin Chen's financial records show recent unexplained deposits.",
+            "id": "chen_financial_Records",
+            "name": "Chen's Financial Records",
+            "type": "physical",
+            "image": "https://media.mystwright.com/899c2977-ff23-405b-9014-f34698ab33ec/Silicon Valley Shadow/clues/chen_financial_Records-clue-image.webp"
+        },
+        {
+            "description": "Peter claims he was home sick.",
+            "id": "hayes_statement",
+            "name": "Peter's Claim",
+            "type": "testimony"
+        },
+        {
+            "description": "Peter's bank statement revealing payments.",
+            "id": "hayes_bank_statement",
+            "name": "Peter's Bank Statement",
+            "type": "physical",
+            "image": "https://media.mystwright.com/be992adb-ab83-4cd9-a315-4670c0f9a06c/Silicon Valley Shadow/clues/hayes_bank_statement-clue-image.webp"
+        },
+        {
+            "description": "Footage showing Cynthia in the office when Vance was killed.",
+            "id": "security_footage_office",
+            "name": "Cynthia At Work",
+            "type": "physical",
+            "image": "https://media.mystwright.com/96994452-2ebd-405f-b5c9-8c907a268492/Silicon Valley Shadow/clues/security_footage_office-clue-image.webp"
+        },
+        {
+            "description": "Cynthia claims she was working when Vance was murdered.",
+            "id": "moore_statement",
+            "name": "Cynthia's Claim",
+            "type": "testimony"
+        },
+        {
+            "description": "A small knife with traces of Elias Vance's blood was found in Kevin Chen's desk drawer.",
+            "id": "knife_found",
+            "name": "Bloody Knife",
+            "type": "physical",
+            "image": "https://media.mystwright.com/93ef4fef-71b6-43c6-aac3-e6c1e8550bb0/Silicon Valley Shadow/clues/knife_found-clue-image.webp"
+        }
+    ],
+    "locations": [
+        {
+            "characters": [
+                "alex_turner",
+                "elias_vance",
+                "kevin_chen",
+                "peter_hayes",
+                "cynthia_moore",
+                "maria_Rodriguez"
+            ],
+            "clues": [
+                "business_records",
+                "note_to_admin"
+            ],
+            "connectedLocations": [
+                "vance_residence",
+                "diner",
+                "park"
+            ],
+            "description": "Sleek, modern office space with glass walls and minimalist decor.",
+            "id": "techstartup_office",
+            "name": "TechStartup Office"
+        },
+        {
+            "characters": [
+                "emily_carter"
+            ],
+            "clues": [
+                "argument_heard",
+                "diner_shift_schedule"
+            ],
+            "connectedLocations": [
+                "techstartup_office"
+            ],
+            "description": "A classic American diner; booths, checkered floors, and the smell of greasy food.",
+            "id": "diner",
+            "name": "Local Diner"
+        },
+        {
+            "characters": [
+                "elias_vance",
+                "sarah_jenkins"
+            ],
+            "clues": [],
+            "connectedLocations": [
+                "techstartup_office"
+            ],
+            "description": "A luxury apartment with a view of the city skyline.",
+            "id": "vance_residence",
+            "name": "Elias Vance's Apartment"
+        },
+        {
+            "characters": [
+                "david_lee",
+                "elias_vance"
+            ],
+            "clues": [
+                "lee_termination_letter",
+                "security_footage_park",
+                "park_map"
+            ],
+            "connectedLocations": [
+                "techstartup_office"
+            ],
+            "description": "A large urban park, lots of trees and walking paths",
+            "id": "park",
+            "name": "Urban Park"
+        },
+        {
+            "characters": [
+                "alex_turner"
+            ],
+            "clues": [
+                "turner_financials",
+                "turner_phone_records"
+            ],
+            "connectedLocations": [],
+            "description": "A modest apartment filled with gadgets and computer equipment.",
+            "id": "turner_apartment",
+            "name": "Alex Turner's Apartment"
+        }
+    ],
+    "mystery": {
+        "crime": "Murder",
+        "description": "Elias Vance, CEO of TechStartups, was found dead in a park near his office. The circumstances point to foul play.",
+        "location": "park",
+        "shortDescription": "The CEO of a rising tech company is found murdered.",
+        "time": "10:00 PM",
+        "title": "Silicon Valley Shadow",
+        "victim": "elias_vance"
+    },
+    "solution": {
+        "culpritId": "kevin_chen",
+        "method": "Kevin was instructed by Peter Hayes who was blackmailed to transfer money out fo the business into the blackmailer, Alex Turners account or he'll reveal Hayes's illicit affair. To get out of it Kevin killed him with a knife during one of Peter's errands, disposing of his body in the park.",
+        "motive": "Peter blackmailed Alex Turner with information he gained as personal assistant while working for him to siphon off money into an offshore account. Elias discovered irregularities in TechStartups finances, leading him to confront Alex Turner. Alex realized that Elias Vance was close to uncovering his embezzlement scheme, putting both his career and freedom at risk. In desperation, he enlisted help."
+    }
+}

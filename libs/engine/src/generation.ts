@@ -229,6 +229,9 @@ Create a mystery with a modern mystery novel tone
 
             const styleSeed = await generateImageStyleSeed(world);
 
+            console.log('Using style seed:');
+            console.log(styleSeed);
+
             // Generate images for clues and characters in parallel
             await Promise.all([
                 ...world.clues.values().map(async (clue) => {

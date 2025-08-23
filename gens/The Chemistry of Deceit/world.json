@@ -1,0 +1,364 @@
+{
+    "characters": [
+        {
+            "alibi": "Claims to have been at home working on his dissertation.",
+            "description": "A brooding and intense doctoral candidate with a penchant for late-night study sessions and a complicated relationship with Professor Eldridge.",
+            "id": "david_chen",
+            "knownClues": [
+                "clue_dissertation",
+                "clue_lab_coat",
+                "clue_argument",
+                "clue_security_footage",
+                "clue_eldridge_email",
+                "clue_financial_records"
+            ],
+            "name": "David Chen",
+            "personality": "Quiet and intelligent, but can be secretive and evasive when questioned about his relationship with the victim.",
+            "role": "suspect",
+            "voice": "GBv7mTt0atIp3Br8iCZE"
+        },
+        {
+            "alibi": "Claims to have been at the university library all evening.",
+            "description": "A sharp-tongued and ambitious faculty member who had several public disagreements with Professor Eldridge regarding research funding and academic credit. Known for her meticulous research and competitive nature.",
+            "id": "dr_amara_khan",
+            "knownClues": [
+                "clue_library_receipt",
+                "clue_lab_access_logs",
+                "clue_funding_proposal",
+                "clue_eldridge_notebook",
+                "clue_security_footage"
+            ],
+            "name": "Dr. Amara Khan",
+            "personality": "Assertive, driven, and doesn't shy away from confrontation. Presents a cool and detached demeanor.",
+            "role": "suspect",
+            "voice": "XrExE9yKIg1WjnnlVkGX"
+        },
+        {
+            "alibi": "Claims to have been at home sick, but cannot provide verification.",
+            "description": "The university's eccentric and tenured professor of theoretical physics, known for his unconventional teaching methods and rumored to have a gambling problem. Has been with the university for 30 years.",
+            "id": "professor_mark_jenkins",
+            "knownClues": [
+                "clue_sick_note",
+                "clue_casino_chip",
+                "clue_eldridge_notes"
+            ],
+            "name": "Professor Mark Jenkins",
+            "personality": "Flamboyant and unpredictable, often making cryptic remarks that are difficult to interpret. Seems genuinely upset by the professor's death.",
+            "role": "suspect",
+            "voice": "JBFqnCBsd6RMkjVDRZzb"
+        },
+        {
+            "alibi": "Confirmed by security footage; Left the lab at 6:00 PM.",
+            "description": "A meticulous and dedicated lab technician who worked closely with Professor Eldridge. Responsible for maintaining the lab equipment and assisting with experiments. A timid and reliable employee.",
+            "id": "sarah_miller",
+            "knownClues": [
+                "clue_broken_vial",
+                "clue_lab_schedule",
+                "clue_security_footage",
+                "clue_eldridge_calendar"
+            ],
+            "name": "Sarah Miller",
+            "personality": "Nervous and soft-spoken, eager to please authority figures. Appears genuinely shocked and saddened by the Professor's death.",
+            "role": "witness",
+            "voice": "cgSgspJ2msm6clMCkdW9"
+        },
+        {
+            "alibi": "Claims to have had dinner at a restaurant with their spouse",
+            "description": "A renowned professor of chemistry, admired and envied for his groundbreaking research in nanotechnology. He was found dead in his lab late at night.",
+            "id": "professor_alastair_eldridge",
+            "knownClues": [],
+            "name": "Professor Alastair Eldridge",
+            "personality": "Charismatic and brilliant, but also known to be demanding and uncompromising. Highly respected in his field.",
+            "role": "victim",
+            "voice": "onwK4e9ZLuTAKqWW03F9"
+        },
+        {
+            "alibi": "Valid employee records and security badge swipes confirm that the the security guard patrolled the north end of the campus during the entire period in question.",
+            "description": "A dutiful and observant security guard who was on duty the night of the murder. Routinely patrols the science building and is familiar with the staff and their schedules.",
+            "id": "officer_david_ramirez",
+            "knownClues": [
+                "clue_security_footage",
+                "clue_lab_access_logs"
+            ],
+            "name": "Officer David Ramirez",
+            "personality": "Serious and professional, takes his job very seriously. Eager to assist with the investigation.",
+            "role": "witness",
+            "voice": "cjVigY5qzO86Huf0OWal"
+        },
+        {
+            "alibi": "Claims to hace been at the local pub with friends.",
+            "description": "A recent graduate student and former advisee of Professor Eldridge, now working as a research assistant. Recently moved to a new apartment.",
+            "id": "emily_carter",
+            "knownClues": [
+                "clue_lab_coat",
+                "clue_argument",
+                "clue_eldridge_email",
+                "clue_financial_records",
+                "clue_apartment_receipt"
+            ],
+            "name": "Emily Carter",
+            "personality": "Excitable and friendly, seems genuinely upset about Eldridge's death, but shows signs of holding back information.",
+            "role": "suspect",
+            "voice": "FGY2WhTYpPnrIDTdsKH5"
+        },
+        {
+            "alibi": "Claims to have been at the movies with family. Has ticket stubs.",
+            "description": "Professor Eldridge's wife, an art curator at a local museum. Described as sophisticated and reserved. She seems to be holding back information.",
+            "id": "olivia_eldridge",
+            "knownClues": [
+                "clue_eldridge_will",
+                "clue_credit_card_statement",
+                "clue_movie_tickets"
+            ],
+            "name": "Olivia Eldridge",
+            "personality": "Stoic and composed, maintains a dignified demeanor despite the tragic circumstances. Holds a deep understanding of art and the art world.",
+            "role": "witness",
+            "voice": "Xb7hH8MSUJpSbSDYk0k2"
+        }
+    ],
+    "clues": [
+        {
+            "description": "A half-empty vial labeled 'Experimental Compound X-77'. Has a faint almond smell.",
+            "id": "clue_broken_vial",
+            "name": "Broken Vial",
+            "type": "physical",
+            "image": "https://media.mystwright.com/058268cc-2abd-4165-b08c-1d4554475391/The Chemistry of Deceit/clues/clue_broken_vial-clue-image.webp"
+        },
+        {
+            "description": "David Chen's doctoral dissertation proposal, heavily edited with scathing remarks by Professor Eldridge.",
+            "id": "clue_dissertation",
+            "name": "Dissertation Proposal",
+            "type": "physical",
+            "image": "https://media.mystwright.com/e793c4ee-f502-4c38-bd85-d61b6a85fa4e/The Chemistry of Deceit/clues/clue_dissertation-clue-image.webp"
+        },
+        {
+            "description": "A lab coat found in David Chen's locker with traces of Compound X-77.",
+            "id": "clue_lab_coat",
+            "name": "Lab Coat",
+            "type": "physical",
+            "image": "https://media.mystwright.com/df46acfb-9a0e-4b9d-998c-0a171ad7c28f/The Chemistry of Deceit/clues/clue_lab_coat-clue-image.webp"
+        },
+        {
+            "description": "Security footage shows David Chen and Professor Eldridge arguing heatedly outside the lab on the day of the murder.",
+            "id": "clue_argument",
+            "name": "Argument Footage",
+            "type": "testimony"
+        },
+        {
+            "description": "An email from Professor Eldridge to David Chen stating that he will not endorse his dissertation.",
+            "id": "clue_eldridge_email",
+            "name": "Email",
+            "type": "other"
+        },
+        {
+            "description": "Credit card statements with large gambling debts.",
+            "id": "clue_financial_records",
+            "name": "Financial Records",
+            "type": "physical",
+            "image": "https://media.mystwright.com/878867ad-34be-48a7-a6af-0ecf70d4aed4/The Chemistry of Deceit/clues/clue_financial_records-clue-image.webp"
+        },
+        {
+            "description": "A receipt from the university library, time-stamped during the period when the murder took place.",
+            "id": "clue_library_receipt",
+            "name": "Library Receipt",
+            "type": "physical",
+            "image": "https://media.mystwright.com/360bf2c1-d24c-4687-a353-6ee92f6fd575/The Chemistry of Deceit/clues/clue_library_receipt-clue-image.webp"
+        },
+        {
+            "description": "Log indicating Dr. Khan's swipe card was used to access the lab multiple times on the night of the murder.",
+            "id": "clue_lab_access_logs",
+            "name": "Lab Access Logs",
+            "type": "physical",
+            "image": "https://media.mystwright.com/8a1af2a0-6ae4-4a97-ade7-10418154b895/The Chemistry of Deceit/clues/clue_lab_access_logs-clue-image.webp"
+        },
+        {
+            "description": "A funding proposal authored by Dr. Khan that was rejected by Professor Eldridge in favor of another researcher's project.",
+            "id": "clue_funding_proposal",
+            "name": "Funding Proposal",
+            "type": "other"
+        },
+        {
+            "description": "Professor Eldridge's notebook containing notes on Dr. Khan's research, with several critical annotations.",
+            "id": "clue_eldridge_notebook",
+            "name": "Professor's Notebook",
+            "type": "physical",
+            "image": "https://media.mystwright.com/4de5a3ec-02ac-49f5-876e-d196c7c5ab1e/The Chemistry of Deceit/clues/clue_eldridge_notebook-clue-image.webp"
+        },
+        {
+            "description": "Security footage shows Dr. Khan entering and exiting the science building around the time of the murder.",
+            "id": "clue_security_footage",
+            "name": "Security Footage",
+            "type": "testimony"
+        },
+        {
+            "description": "A note from his doctor excusing him from teaching due to illness.",
+            "id": "clue_sick_note",
+            "name": "Sick Note",
+            "type": "physical",
+            "image": "https://media.mystwright.com/4f46adb6-1dea-455c-8e44-8f821be45761/The Chemistry of Deceit/clues/clue_sick_note-clue-image.webp"
+        },
+        {
+            "description": "A casino chip from a high-stakes poker game found in Professor Jenkins' office.",
+            "id": "clue_casino_chip",
+            "name": "Casino Chip",
+            "type": "physical",
+            "image": "https://media.mystwright.com/cb75d010-7bed-4c9b-aaf5-6d23fa8f72d6/The Chemistry of Deceit/clues/clue_casino_chip-clue-image.webp"
+        },
+        {
+            "description": "Scrawled notes referencing Professor Eldridge's research within Professor Jenkins' handwriting.",
+            "id": "clue_eldridge_notes",
+            "name": "Professor Jenkins' Notes",
+            "type": "physical",
+            "image": "https://media.mystwright.com/131a7342-0575-42e9-9a09-4ef972d1588c/The Chemistry of Deceit/clues/clue_eldridge_notes-clue-image.webp"
+        },
+        {
+            "description": "Lab schedule shows Professor Eldridge was scheduled to work late the night of the murder.",
+            "id": "clue_lab_schedule",
+            "name": "Lab Schedule",
+            "type": "physical",
+            "image": "https://media.mystwright.com/1638389b-4ad6-4069-8d69-60ccb18d6252/The Chemistry of Deceit/clues/clue_lab_schedule-clue-image.webp"
+        },
+        {
+            "description": "Calendar in Eldridge's office shows a cryptic note indicating a meeting.",
+            "id": "clue_eldridge_calendar",
+            "name": "Eldridge's Calendar",
+            "type": "physical",
+            "image": "https://media.mystwright.com/1976b630-9f23-43f7-8c0f-590f6061f61e/The Chemistry of Deceit/clues/clue_eldridge_calendar-clue-image.webp"
+        },
+        {
+            "description": "Evidence found in the victims lab coat and apartment that shows residue from a new apartment.",
+            "id": "clue_apartment_receipt",
+            "name": "Residue",
+            "type": "physical",
+            "image": "https://media.mystwright.com/6af00c0e-38a8-4349-ae63-21e360d49f7a/The Chemistry of Deceit/clues/clue_apartment_receipt-clue-image.webp"
+        },
+        {
+            "description": "The last will and testament of Professor Eldridge, detailing a major update to it the day before he died.",
+            "id": "clue_eldridge_will",
+            "name": "Last Will and Testament",
+            "type": "physical",
+            "image": "https://media.mystwright.com/6aff1eb3-ca2e-4bd7-930b-4cae894c6877/The Chemistry of Deceit/clues/clue_eldridge_will-clue-image.webp"
+        },
+        {
+            "description": "Credit card statements show numerous, expensive purchases of artwork.",
+            "id": "clue_credit_card_statement",
+            "name": "Credit Card Statement",
+            "type": "physical",
+            "image": "https://media.mystwright.com/7448c690-4aba-4dac-b5f8-9912cd7c59d5/The Chemistry of Deceit/clues/clue_credit_card_statement-clue-image.webp"
+        },
+        {
+            "description": "Movie Tickets to a movie.",
+            "id": "clue_movie_tickets",
+            "name": "Movie Tickets",
+            "type": "physical",
+            "image": "https://media.mystwright.com/dfcc6491-4036-47c5-b95b-0a2c35463403/The Chemistry of Deceit/clues/clue_movie_tickets-clue-image.webp"
+        }
+    ],
+    "locations": [
+        {
+            "characters": [
+                "professor_alastair_eldridge",
+                "sarah_miller",
+                "david_chen",
+                "dr_amara_khan",
+                "officer_david_ramirez"
+            ],
+            "clues": [
+                "clue_broken_vial",
+                "clue_lab_schedule",
+                "clue_lab_access_logs"
+            ],
+            "connectedLocations": [
+                "university_library",
+                "faculty_offices",
+                "jenkins_house"
+            ],
+            "description": "A state-of-the-art research facility filled with advanced equipment and scientific instruments. The air is thick with the smell of chemicals.",
+            "id": "science_building_lab",
+            "name": "Science Building Lab"
+        },
+        {
+            "characters": [
+                "dr_amara_khan",
+                "sarah_miller",
+                "officer_david_ramirez"
+            ],
+            "clues": [
+                "clue_library_receipt"
+            ],
+            "connectedLocations": [
+                "science_building_lab",
+                "faculty_offices"
+            ],
+            "description": "A quiet and expansive space filled with books and study carrels. The atmosphere is hushed and academic.",
+            "id": "university_library",
+            "name": "University Library"
+        },
+        {
+            "characters": [
+                "dr_amara_khan",
+                "professor_mark_jenkins",
+                "david_chen"
+            ],
+            "clues": [
+                "clue_funding_proposal",
+                "clue_eldridge_notebook",
+                "clue_dissertation",
+                "clue_eldridge_email"
+            ],
+            "connectedLocations": [
+                "science_building_lab",
+                "university_library",
+                "jenkins_house"
+            ],
+            "description": "A series of offices occupied by faculty members. Each office reflects the personality and research interests of its occupant.",
+            "id": "faculty_offices",
+            "name": "Faculty Offices"
+        },
+        {
+            "characters": [
+                "professor_mark_jenkins"
+            ],
+            "clues": [
+                "clue_sick_note",
+                "clue_casino_chip",
+                "clue_eldridge_notes"
+            ],
+            "connectedLocations": [
+                "science_building_lab",
+                "faculty_offices"
+            ],
+            "description": "A cluttered and untidy home filled trinkets and objects from around the world. The house has signs that it is not maintained well.",
+            "id": "jenkins_house",
+            "name": "Jenkins' House"
+        },
+        {
+            "characters": [
+                "olivia_eldridge"
+            ],
+            "clues": [
+                "clue_eldridge_will",
+                "clue_credit_card_statement",
+                "clue_movie_tickets"
+            ],
+            "connectedLocations": [],
+            "description": "A prestigious museum, dedicated to the fine arts and history",
+            "id": "art_museum",
+            "name": "Art Museum"
+        }
+    ],
+    "mystery": {
+        "crime": "Murder",
+        "description": "Professor Alastair Eldridge, a brilliant chemist, was found dead in his lab late at night. The scene suggests foul play, with a broken vial of a dangerous experimental compound nearby.",
+        "location": "science_building_lab",
+        "shortDescription": "A renowned chemistry professor is found dead in his lab, surrounded by dangerous experimental compounds.",
+        "time": "11:47 PM",
+        "title": "The Chemistry of Deceit",
+        "victim": "professor_alastair_eldridge"
+    },
+    "solution": {
+        "culpritId": "dr_amara_khan",
+        "method": "Dr. Khan, driven by professional jealousy and the fear of being overshadowed, poisoned Professor Eldridge with Compound X-77. She accessed the lab using her key card and administered the poison.",
+        "motive": "Dr. Khan was envious of Professor Eldridge's success and bitter about his rejection of her funding proposal. She feared her career would stagnate under his shadow."
+    }
+}
