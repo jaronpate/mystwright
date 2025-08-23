@@ -23,9 +23,9 @@ export const worldsController = {
             const newWorld: NewWorld = {
                 user_id: authReq.user.id,
                 title: world.mystery.title,
-                description: world.mystery.description || null,
-                // TODO: Merge WorldPayload & WorldPayload
-                payload: serializeWorldStructure(world) as unknown as WorldPayload
+                description: world.mystery.description,
+                short_description: world.mystery.shortDescription,
+                payload: serializeWorldStructure(world)
             };
             
             const createdWorld = await db.insertInto('worlds')
@@ -189,7 +189,8 @@ export const worldsController = {
             const newWorld: NewWorld = {
                 user_id: authReq.user.id,
                 title,
-                description: description || null,
+                description: description ?? 'No description...',
+                short_description: world.mystery.shortDescription ?? 'No short description...',
                 payload: world
             };
             

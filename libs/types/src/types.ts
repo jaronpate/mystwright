@@ -7,6 +7,7 @@ export type LocationID = Brand<string, 'location'>;
 export interface Mystery {
     title: string;
     description: string;
+    shortDescription: string;
     victim: string;
     crime: string;
     time: string;

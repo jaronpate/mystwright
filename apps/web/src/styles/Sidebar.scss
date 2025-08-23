@@ -31,15 +31,30 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
+    position: relative;
+
+    // Fade out effect at bottom of header
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: -25px;
+        left: 0;
+        right: 0;
+        height: 25px;
+        background: linear-gradient(to bottom, hsl(var(--card)), transparent);
+        pointer-events: none;
+        z-index: 10;
+    }
 }
 
 .sidebar-content {
     height: calc(100% - #{$sidebar-header-height});
     display: flex;
     flex-direction: column;
-    padding: 0 $spacing-lg $spacing-lg;
+    padding: $spacing-xs $spacing-lg $spacing-lg;
     overflow-y: auto;
     flex-grow: 1;
+    position: relative;
 }
 
 .sidebar-collapsable {
@@ -54,7 +69,7 @@
     }
 }
 
-.sidebar-item {
+.sidebar-item, .card-character {
     margin-bottom: $spacing-sm;
 
     &:last-child {
@@ -142,7 +157,21 @@
 .sidebar-footer {
     margin-top: auto;
     padding: $spacing-lg;
-    border-top: 1px solid hsl(var(--border));
+    position: relative;
+    // border-top: 1px solid hsl(var(--border));
+
+    // Fade out effect at top of footer
+    &::before {
+        content: '';
+        position: absolute;
+        top: -30px;
+        left: 0;
+        right: 0;
+        height: 30px;
+        background: linear-gradient(to top, hsl(var(--card)), transparent);
+        pointer-events: none;
+        z-index: 10;
+    }
 }
 
 .user-info {
@@ -216,4 +245,30 @@
 .card.active .character-avatar {
     background-color: hsl(var(--primary-foreground));
     color: hsl(var(--primary));
+}
+
+.card.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    
+    &.clickable {
+        cursor: not-allowed;
+    }
+    
+    &:hover {
+        opacity: 0.6;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spin {
+    animation: spin 1s linear infinite;
 }

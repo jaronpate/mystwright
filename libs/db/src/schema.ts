@@ -70,6 +70,7 @@ export interface WorldsTable {
     user_id: string;
     title: string;
     description: string | null;
+    short_description: string;
     payload: JSONColumnType<WorldPayload, WorldPayload, WorldPayload>;
 };
 

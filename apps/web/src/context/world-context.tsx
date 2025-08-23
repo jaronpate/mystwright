@@ -18,6 +18,8 @@ type WorldContextType = {
     setActiveCharacter: (id: string | null) => void
     isSolving: boolean
     setIsSolving: (isSolving: boolean) => void
+    createWorld: () => Promise<void>
+    isCreatingWorld: boolean
 };
 
 const WorldContext = createContext<WorldContextType | undefined>(undefined);
@@ -28,6 +30,7 @@ export function WorldProvider({ children }: { children: ReactNode }) {
     const [ activeGameStateId, setActiveGameStateId ] = useState<string| null>(null);
     const [ activeWorldId, setActiveWorldId ] = useState<string | null>();
     const [ isSolving, setIsSolving ] = useState<boolean>(false);
+    const [ isCreatingWorld, setIsCreatingWorld ] = useState<boolean>(false);
     const { user } = useUserContext();
     const apiFetch = useApi();
 
@@ -135,6 +138,26 @@ export function WorldProvider({ children }: { children: ReactNode }) {
 
     const activeCharacter = (activeWorld?.payload.characters.find((c) => c.id === activeCharacterId) ?? null) as Character | null;
 
+    const createWorld = async () => {
+        if (isCreatingWorld) return; // Prevent multiple simultaneous creations
+        
+        setIsCreatingWorld(true);
+        try {
+            const data = await apiFetch<{ world: DBWorld }>('/api/v1/worlds', { method: 'POST' });
+            const newWorld = data.world;
+            
+            // Add the new world to the list
+            setWorlds(prev => [newWorld, ...prev]);
+            
+            // Set the new world as active
+            setActiveWorldId(newWorld.id);
+        } catch (error) {
+            console.error("Error creating world:", error);
+        } finally {
+            setIsCreatingWorld(false);
+        }
+    };
+
     return (
         <WorldContext.Provider
             value={{
@@ -149,6 +172,8 @@ export function WorldProvider({ children }: { children: ReactNode }) {
                 setActiveCharacter,
                 isSolving,
                 setIsSolving,
+                createWorld,
+                isCreatingWorld,
             }}
         >
             {children}

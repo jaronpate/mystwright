@@ -273,7 +273,11 @@ export default function Chat() {
                             <div key={index} className={`message ${message.role}`}>
                                 {message.role === "assistant" ?
                                     <div className="message-avatar">
-                                        <Bot width={18} height={18} />
+                                        {activeCharacter ?
+                                            <img src={activeCharacter.image ? activeCharacter.image : '/character-placeholder.png'} alt={activeCharacter.name} />
+                                            :
+                                            <Bot width={24} height={24} />
+                                        }
                                     </div>
                                     : null}
                                 <div className="message-content">

@@ -105,7 +105,6 @@ Create a mystery with a modern mystery novel tone
                         properties: {
                             id: { type: 'string' },
                             name: { type: 'string' },
-                            shortDescription: { type: 'string' },
                             description: { type: 'string' },
                             connectedLocations: { 
                                 type: 'array', 
@@ -170,12 +169,13 @@ Create a mystery with a modern mystery novel tone
                     properties: {
                         title: { type: 'string' },
                         description: { type: 'string' },
+                        shortDescription: { type: 'string' },
                         victim: { type: 'string' },
                         crime: { type: 'string' },
                         time: { type: 'string' },
                         location: { type: 'string' }
                     },
-                    required: ['title', 'description', 'victim', 'crime', 'time', 'location'],
+                    required: ['title', 'description', 'shortDescription', 'victim', 'crime', 'time', 'location'],
                     additionalProperties: false
                 },
                 solution: {
