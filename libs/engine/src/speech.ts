@@ -1,7 +1,6 @@
 import { ElevenLabsClient } from "elevenlabs";
 import { ElevenLabsClient as ElevenLabsClientV2, play } from "@elevenlabs/elevenlabs-js";
 import { which } from "./util";
-import type { Readable } from "stream";
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;

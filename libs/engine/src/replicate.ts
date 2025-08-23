@@ -1,4 +1,4 @@
-import ReplicateClient, { type FileOutput, type Prediction } from "replicate";
+import ReplicateClient, { type FileOutput } from "replicate";
 
 export async function generateImageFromPrompt(
     model: `${string}/${string}`,
