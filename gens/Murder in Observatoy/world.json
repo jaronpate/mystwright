@@ -1,0 +1,391 @@
+{
+    "characters": [
+        {
+            "alibi": "Claims to have been at home working on a grant proposal all evening. No witnesses.",
+            "description": "Dr. Aris Thorne is a renowned but eccentric astrophysicist, known for his groundbreaking theories and his chaotic personal life. He funded the expedition.",
+            "id": "aris_thorne",
+            "knownClues": [
+                "thorne_receipt",
+                "thorne_financials"
+            ],
+            "name": "Aris Thorne",
+            "personality": "Brilliant, scatterbrained, and prone to dramatic pronouncements. He is deeply invested in the observatory's research, seeing it as his life's work.",
+            "role": "suspect",
+            "voice": "cjVigY5qzO86Huf0OWal"
+        },
+        {
+            "alibi": "She was supposedly calibrating the telescope equipment, but no one can vouch for her for more than a few minutes at a time.",
+            "description": "Dr. Lena Hanson is the observatory's lead technician, a meticulous and driven young woman with a reputation for being fiercely protective of her work. She was directly responsible for the victim's work.",
+            "id": "lena_hanson",
+            "knownClues": [
+                "hanson_tools",
+                "observatory_log"
+            ],
+            "name": "Lena Hanson",
+            "personality": "Precise, ambitious, and somewhat abrasive. She clashes with Dr. Thorne's more freewheeling approach to science.",
+            "role": "suspect",
+            "voice": "XrExE9yKIg1WjnnlVkGX"
+        },
+        {
+            "alibi": "Said he was asleep in his quarters, but the on-site security guard saw him walking outside near the observatory around 1 AM.",
+            "description": "Ben Carter is the head of security at the Black Ridge Observatory. He is ex-military and takes his job very seriously. He has also worked security for Thorne in the past.",
+            "id": "ben_carter",
+            "knownClues": [
+                "carter_security_log",
+                "carter_military_record"
+            ],
+            "name": "Ben Carter",
+            "personality": "Stern, observant, and by-the-book, but seemingly loyal. He is dedicated to keeping the observatory safe and secure.",
+            "role": "suspect",
+            "voice": "nPczCjzI2devNBz1zQrb"
+        },
+        {
+            "alibi": "She claims to have been stargazing alone at a nearby overlook all night. There is no one to confirm this.",
+            "description": "Maya Singh is a visiting astronomer from India, specializing in dark matter research. She is known as a quiet and very private person.",
+            "id": "maya_singh",
+            "knownClues": [
+                "singh_notebook",
+                "singh_travel_records"
+            ],
+            "name": "Maya Singh",
+            "personality": "Reserved, analytical, and intensely focused on her research. She keeps to herself and avoids social interaction.",
+            "role": "suspect",
+            "voice": "FGY2WhTYpPnrIDTdsKH5"
+        },
+        {
+            "alibi": "He was at the local bar, 'The Dusty Lens,' until closing time. Several patrons can confirm this.",
+            "description": "Jake Riley is a local handyman who occasionally does odd jobs at the observatory. He is looked at warily by the scientists although he insists on being part of the community.",
+            "id": "jake_riley",
+            "knownClues": [
+                "dusty_lens_receipt",
+                "riley_invoice"
+            ],
+            "name": "Jake Riley",
+            "personality": "Friendly, easygoing, and somewhat nosy. He is always eager to lend a hand, but sometimes crosses the line.",
+            "role": "witness",
+            "voice": "Bj9UqZbhQsanLzgalpEG"
+        },
+        {
+            "alibi": "Spent the evening in his quarters, preparing a presentation. His roommate, Neil, corroborates part of the story, but Neil admits falling asleep early.",
+            "description": "Neil Peterson is a young, ambitious graduate student working under Dr. Maxwell. He idolizes Maxwell and hopes to follow in his footsteps.",
+            "id": "neil_peterson",
+            "knownClues": [
+                "peterson_notes",
+                "peterson_laptop"
+            ],
+            "name": "Neil Peterson",
+            "personality": "Enthusiastic, driven, and eager to please. He is somewhat naive and hero-worships Dr. Maxwell.",
+            "role": "witness",
+            "voice": "bIHbv24MWmeRgasZH58o"
+        },
+        {
+            "alibi": null,
+            "description": "Dr. David Maxwell was a respected and accomplished astronomer at the Black Ridge Observatory, known for his research on exoplanets and his charismatic personality. His funding was being cut in a few weeks.",
+            "id": "david_maxwell",
+            "knownClues": [],
+            "name": "David Maxwell",
+            "personality": "Charismatic, driven, and respected. He was well-liked by his colleagues and known for his passion for astronomy.",
+            "role": "victim",
+            "voice": "JBFqnCBsd6RMkjVDRZzb"
+        },
+        {
+            "alibi": "She was at the staff social event at the observatory. Many attending scientists can confirm this.",
+            "description": "The observatory director who had recently informed Dr. Maxwell his funding could not be extended. She is known for being harsh but fair.",
+            "id": "elizabeth_ward",
+            "knownClues": [
+                "ward_emails",
+                "ward_personnel_file"
+            ],
+            "name": "Elizabeth Ward",
+            "personality": "Tough, efficient, and dedicated to the observatory. She is respected but feared by many of the staff.",
+            "role": "witness",
+            "voice": "1hlpeD1ydbI2ow0Tt3EW"
+        },
+        {
+            "alibi": "Was working late in the data processing center, analyzing images from the telescope.",
+            "description": "A quiet, unassuming data processor. He's worked at the observatory for over 20 years and knows the facility inside and out.",
+            "id": "gary_miller",
+            "knownClues": [
+                "miller_data_logs",
+                "miller_personnel_file"
+            ],
+            "name": "Gary Miller",
+            "personality": "Quiet, meticulous, and a creature of habit. He is a reliable employee who keeps to himself.",
+            "role": "witness",
+            "voice": "SAz9YHcvj6GT2YYXdXww"
+        },
+        {
+            "alibi": "Claims to have been at home sick in bed, but no clear evidence is present.",
+            "description": "A local reporter who has been sniffing around the observatory, hoping to break a big story. He is known for gossiping and embellishing",
+            "id": "paul_jenkins",
+            "knownClues": [
+                "jenkins_notebook",
+                "dusty_lens_receipt"
+            ],
+            "name": "Paul Jenkins",
+            "personality": "Nosy, persistent, and always looking for a story. He tends to exaggerate and sensationalize his reports.",
+            "role": "witness",
+            "voice": "onwK4e9ZLuTAKqWW03F9"
+        }
+    ],
+    "clues": [
+        {
+            "description": "A wrench, missing from Lena Hanson's toolbox. It has traces of blood on the handle.",
+            "id": "bloodied_wrench",
+            "name": "Bloodied Wrench",
+            "type": "physical",
+            "image": "https://media.mystwright.com/23c4edaf-5eff-45dc-913f-99e7867e1bf9/Murder in Observatoy/clues/bloodied_wrench-clue-image.webp"
+        },
+        {
+            "description": "A set of specialized tools used for calibrating the observatory's telescope. One wrench is missing.",
+            "id": "hanson_tools",
+            "name": "Lena Hanson's Toolbox",
+            "type": "physical",
+            "image": "https://media.mystwright.com/596326a1-cea3-47fe-83ac-f5e1b770ab1e/Murder in Observatoy/clues/hanson_tools-clue-image.webp"
+        },
+        {
+            "description": "The observatory's maintenance log, indicating that Lena Hanson was working on the telescope's calibration system on the night of the murder.",
+            "id": "observatory_log",
+            "name": "Observatory Log",
+            "type": "other"
+        },
+        {
+            "description": "A partially erased entry in Maya Singh's notebook, which indicates she knows of Dr. Thorne's debt problems.",
+            "id": "singh_notebook",
+            "name": "Maya Singh's Notebook",
+            "type": "other"
+        },
+        {
+            "description": "Maya Singh was seen arguing with Maxwell at 2 PM on the day of the murder. According to other staff, she was very upset about the lack of telescope time she was being allocated for her research.",
+            "id": "witness_statement",
+            "name": "Witness Statement",
+            "type": "testimony"
+        },
+        {
+            "description": "A recent receipt showing a large cash withdrawal from Aris Thorne's account.",
+            "id": "thorne_receipt",
+            "name": "Thorne's Withdrawal Receipt",
+            "type": "physical",
+            "image": "https://media.mystwright.com/10c21c49-a65b-4b55-8607-b0d33aa4d63d/Murder in Observatoy/clues/thorne_receipt-clue-image.webp"
+        },
+        {
+            "description": "Financial records indicating that the observatory is in severe debt, and Maxwell's research funding was about to be cut.",
+            "id": "thorne_financials",
+            "name": "Observatory Financial Records",
+            "type": "other"
+        },
+        {
+            "description": "A log showing that Ben Carter made his rounds near the observatory at 1 AM, but there is a gap in his rounds that lasts for 20 minutes.",
+            "id": "carter_security_log",
+            "name": "Security Log",
+            "type": "other"
+        },
+        {
+            "description": "Ben Carter's military record showing a dishonorable discharge for stealing and selling government property.",
+            "id": "carter_military_record",
+            "name": "Ben Carter's Military Record",
+            "type": "other"
+        },
+        {
+            "description": "A receipt from 'The Dusty Lens' bar near the observatory, dated the night of the murder. It is signed by Jake Riley.",
+            "id": "dusty_lens_receipt",
+            "name": "The Dusty Lens Receipt",
+            "type": "physical",
+            "image": "https://media.mystwright.com/a5ddf0ac-d0eb-46b8-98b0-f7a5cdf39298/Murder in Observatoy/clues/dusty_lens_receipt-clue-image.webp"
+        },
+        {
+            "description": "Neil Peterson's notes indicate that Maxwell was making a major breakthrough in his research, a discovery that other astronomers would be envious of.",
+            "id": "peterson_notes",
+            "name": "Peterson's Research Notes",
+            "type": "other"
+        },
+        {
+            "description": "Neil Peterson's laptop contains a draft of an email to a competing university, offering them Maxwell's research data in exchange for a research position.",
+            "id": "peterson_laptop",
+            "name": "Peterson's Laptop",
+            "type": "physical",
+            "image": "https://media.mystwright.com/445ac383-7afb-4dfc-ab23-9d508a8f7f9c/Murder in Observatoy/clues/peterson_laptop-clue-image.webp"
+        },
+        {
+            "description": "Elizabeth Ward's emails indicate that she had been under pressure from the university to cut costs at the observatory.",
+            "id": "ward_emails",
+            "name": "Ward's Emails",
+            "type": "other"
+        },
+        {
+            "description": "Elizabeth Ward's personnel file shows a past reprimand for workplace bullying.",
+            "id": "ward_personnel_file",
+            "name": "Ward's Personnel File",
+            "type": "other"
+        },
+        {
+            "description": "Gary Miller's data logs show unusual data manipulation on the night of the murder, specifically related to Maxwell's research data. Maxwell's results were adjusted to be slightly less significant.",
+            "id": "miller_data_logs",
+            "name": "Miller's Data Logs",
+            "type": "other"
+        },
+        {
+            "description": "Miller's personnel file shows he was passed over for promotion multiple times in favor of younger scientists. The recent cuts to Maxwell are being considered for his position.",
+            "id": "miller_personnel_file",
+            "name": "Miller's Personnel File",
+            "type": "other"
+        },
+        {
+            "description": "A log from reception at the Black Ridge Observatory showing Maya Singh never requested to use the nearby overlook on the night of the murder.",
+            "id": "reception_logbook",
+            "name": "Reception logbook",
+            "type": "other"
+        },
+        {
+            "description": "Maya Singh's travel records indicate she has significant gambling debts.",
+            "id": "singh_travel_records",
+            "name": "Singh's Travel Records",
+            "type": "other"
+        },
+        {
+            "description": "An invoice from Jake Riley to Aris Thorne for 'observatory maintenance'. The work was scheduled for the week before the murder. Was this for legitimate maintenance?",
+            "id": "riley_invoice",
+            "name": "Jake Riley's Invoice",
+            "type": "physical",
+            "image": "https://media.mystwright.com/5ed1f105-9b44-46d5-893b-93e6bb751c65/Murder in Observatoy/clues/riley_invoice-clue-image.webp"
+        },
+        {
+            "description": "A small notebook containing scribbled observations and questions about the observatory staff. There's an emphasis regarding Maxwell's work and its relation to others",
+            "id": "jenkins_notebook",
+            "name": "Jenkins's Notebook",
+            "type": "other"
+        }
+    ],
+    "locations": [
+        {
+            "characters": [
+                "david_maxwell",
+                "lena_hanson",
+                "aris_thorne",
+                "maya_singh",
+                "gary_miller"
+            ],
+            "clues": [
+                "bloodied_wrench",
+                "hanson_tools",
+                "observatory_log"
+            ],
+            "connectedLocations": [
+                "staff_quarters",
+                "data_processing_center",
+                "director_office",
+                "overlook",
+                "graduate_student_quarters"
+            ],
+            "description": "The heart of the observatory, housing the high-powered telescope and its sensitive calibration equipment. The site of Dr. Maxwell's murder.",
+            "id": "observatory",
+            "name": "Black Ridge Observatory"
+        },
+        {
+            "characters": [
+                "ben_carter",
+                "jake_riley"
+            ],
+            "clues": [
+                "carter_security_log",
+                "carter_military_record"
+            ],
+            "connectedLocations": [
+                "observatory",
+                "dusty_lens_bar"
+            ],
+            "description": "The living quarters for the staff at the observatory. Ben Carters quarters are here.",
+            "id": "staff_quarters",
+            "name": "On-Site Security Quarters"
+        },
+        {
+            "characters": [
+                "gary_miller"
+            ],
+            "clues": [
+                "miller_data_logs",
+                "miller_personnel_file"
+            ],
+            "connectedLocations": [
+                "observatory"
+            ],
+            "description": "Where the observatory's data is processed and analyzed. Gary Miller spends most of his time here.",
+            "id": "data_processing_center",
+            "name": "Data Processing Center"
+        },
+        {
+            "characters": [
+                "elizabeth_ward"
+            ],
+            "clues": [
+                "ward_emails",
+                "ward_personnel_file"
+            ],
+            "connectedLocations": [
+                "observatory"
+            ],
+            "description": "The office of Elizabeth Ward, the observatory's director. A place of power and important decisions.",
+            "id": "director_office",
+            "name": "Director's Office"
+        },
+        {
+            "characters": [
+                "jake_riley",
+                "paul_jenkins"
+            ],
+            "clues": [
+                "dusty_lens_receipt"
+            ],
+            "connectedLocations": [
+                "staff_quarters"
+            ],
+            "description": "A local bar near the observatory, a popular spot for the staff to unwind.",
+            "id": "dusty_lens_bar",
+            "name": "The Dusty Lens Bar"
+        },
+        {
+            "characters": [
+                "maya_singh"
+            ],
+            "clues": [
+                "singh_notebook",
+                "singh_travel_records",
+                "reception_logbook"
+            ],
+            "connectedLocations": [
+                "observatory"
+            ],
+            "description": "A scenic spot near the observatory, often used for stargazing. Offers a panoramic view of the night sky.",
+            "id": "overlook",
+            "name": "Nearby Overlook"
+        },
+        {
+            "characters": [
+                "neil_peterson"
+            ],
+            "clues": [
+                "peterson_notes",
+                "peterson_laptop"
+            ],
+            "connectedLocations": [
+                "observatory"
+            ],
+            "description": "Where Neil Peterson sleeps and works. A cluttered room filled with books and papers.",
+            "id": "graduate_student_quarters",
+            "name": "Graduate Student Quarters"
+        }
+    ],
+    "mystery": {
+        "crime": "Murder",
+        "description": "Dr. David Maxwell, a renowned astronomer at the Black Ridge Observatory, was found dead in the observatory control room. He was struck with a wrench. The observatory, isolated in the mountains, becomes the stage for a tense investigation as secrets and rivalries come to light.",
+        "location": "Black Ridge Observatory",
+        "time": "Midnight",
+        "title": "Murder in Observatoy",
+        "victim": "david_maxwell"
+    },
+    "solution": {
+        "culpritId": "gary_miller",
+        "method": "Gary Miller, driven by professional jealousy and fearing for his job, sabotaged Maxwell's data to make it less significant, which led him to murder Maxwell when Maxwell confronted him.",
+        "motive": "Professional jealousy and fear of losing his job. He was passed over for promotion multiple times in favor of younger scientists."
+    }
+}

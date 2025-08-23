@@ -1,89 +1,100 @@
+@import './variables';
+
 .sidebar {
     display: flex;
     flex-direction: column;
-    width: 350px;
+    width: $sidebar-width;
     background-color: hsl(var(--card));
     color: hsl(var(--card-foreground));
-    padding: 16px;
+    padding: $spacing-lg;
     height: 100%;
     flex-shrink: 0;
 
-    --sidebar-header-height: 60px;
+    .wordmark {
+        justify-content: flex-start;
+    }
 }
 
 .sidebar-inner {
     border: 1px solid hsl(var(--border));
-    border-radius: var(--radius);
+    border-radius: $border-radius;
     height: 100%;
     display: flex;
     flex-direction: column;
 }
 
 .sidebar-header {
-    padding: 16px;
-    font-size: 1.5rem;
-    font-weight: bold;
-    height: var(--sidebar-header-height);
+    padding: $spacing-lg;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    height: $sidebar-header-height;
     display: flex;
     align-items: center;
     justify-content: flex-start;
 }
 
 .sidebar-content {
-    height: calc(100% - var(--sidebar-header-height));
+    height: calc(100% - #{$sidebar-header-height});
     display: flex;
     flex-direction: column;
-    padding: 0 16px 16px;
+    padding: 0 $spacing-lg $spacing-lg;
     overflow-y: auto;
     flex-grow: 1;
 }
 
 .sidebar-collapsable {
-    margin-top: 16px;
+    margin-top: $spacing-lg;
 }
 
 .sidebar-items {
-    animation: slideDown 0.2s ease-out;
-}
+    animation: slideDown $animation-fast ease-out;
 
-.sidebar-items.closing {
-    animation: slideUp 0.2s ease-out;
+    &.closing {
+        animation: slideUp $animation-fast ease-out;
+    }
 }
 
 .sidebar-item {
-    margin-bottom: 8px;
-}
+    margin-bottom: $spacing-sm;
 
-.sidebar-item:last-child {
-    margin-bottom: 0;
+    &:last-child {
+        margin-bottom: 0;
+    }
 }
 
 .sidebar-title {
     display: flex;
     align-items: center;
     color: hsl(var(--foreground));
-    font-size: 0.8rem;
-    font-weight: 500;
-    margin-bottom: 16px;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    margin-bottom: $spacing-lg;
     cursor: pointer;
-    transition: all 0.2s ease;
-}
+    transition: all $transition-fast;
+    user-select: none;
 
-.sidebar-title:hover {
-    opacity: 0.8;
+    &:hover {
+        opacity: 0.8;
+    }
 }
 
 .sidebar-title-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 8px;
+    margin-right: $spacing-sm;
     color: hsl(var(--primary));
+    user-select: none;
+}
+
+.sidebar-title-text {
+    user-select: none;
 }
 
 .sidebar-chevron {
     color: hsl(var(--foreground));
-    transition: transform 0.2s ease;
+    transition: transform $transition-fast;
+    user-select: none;
 }
 
 @keyframes slideDown {
@@ -108,25 +119,8 @@
     }
 }
 
-.sidebar .wordmark {
-    justify-content: flex-start;
-}
-
-.sidebar-title {
-    user-select: none;
-}
-.sidebar-title-icon {
-    user-select: none;
-}
-.sidebar-chevron {
-    user-select: none;
-}
-.sidebar-title-text {
-    user-select: none;
-}
-
 .crime-detail {
-    padding: 12px;
+    padding: $spacing-md;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -134,20 +128,20 @@
 }
 
 .detail-title {
-    font-weight: 500;
-    font-size: 0.9rem;
+    font-weight: $font-weight-medium;
+    font-size: $font-size-base;
     color: hsl(var(--foreground));
 }
 
 .detail-value {
-    font-size: 0.8rem;
+    font-size: $font-size-xs;
     color: hsl(var(--muted-foreground));
-    margin-top: 4px;
+    margin-top: $spacing-xs;
 }
 
 .sidebar-footer {
     margin-top: auto;
-    padding: 16px;
+    padding: $spacing-lg;
     border-top: 1px solid hsl(var(--border));
 }
 
@@ -159,14 +153,14 @@
 }
 
 .user-name {
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
     color: hsl(var(--foreground));
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     flex: 1;
-    margin-right: 8px;
+    margin-right: $spacing-sm;
 }
 
 .logout-button {
@@ -177,19 +171,19 @@
     align-items: center;
     justify-content: center;
     color: hsl(var(--destructive));
-    padding: 8px;
-    border-radius: var(--radius);
-    transition: all 0.2s ease;
+    padding: $spacing-sm;
+    border-radius: $border-radius;
+    transition: all $transition-fast;
     flex-shrink: 0;
-}
 
-.logout-button:hover {
-    background-color: hsl(var(--destructive) / 0.1);
-    color: hsl(var(--destructive));
-}
+    &:hover {
+        background-color: hsl(var(--destructive) / 0.1);
+        color: hsl(var(--destructive));
+    }
 
-.logout-button:active {
-    transform: scale(0.95);
+    &:active {
+        transform: scale(0.95);
+    }
 }
 
 .logout-icon {
@@ -208,18 +202,18 @@
     border-radius: 50%;
     background-color: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
-    font-weight: 500;
-    font-size: 0.9rem;
+    font-weight: $font-weight-medium;
+    font-size: $font-size-base;
+
+    img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
 }
 
 .card.active .character-avatar {
     background-color: hsl(var(--primary-foreground));
     color: hsl(var(--primary));
-}
-
-.character-avatar img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
 }

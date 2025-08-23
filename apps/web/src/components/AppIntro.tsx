@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import "../styles/AppIntro.css";
+import "../styles/AppIntro.scss";
 import Page from "./Page";
 import Logo from '/icon.png';
 

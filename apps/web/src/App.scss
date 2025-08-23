@@ -1,0 +1,210 @@
+@import './styles/variables';
+
+.mystwright-app {
+    height: 100vh;
+    overflow: hidden;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    display: flex;
+    flex-direction: row;
+}
+
+.wordmark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: hsl(var(--foreground));
+    margin: 0;
+
+    svg {
+        margin-right: $spacing-sm;
+        color: hsl(var(--primary));
+    }
+
+    img {
+        width: 32px;
+        height: 32px;
+        margin-right: $spacing-sm;
+    }
+}
+
+.ff {
+    flex: 1;
+}
+
+.card {
+    background: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    border-radius: $border-radius;
+    padding: $spacing-md;
+    border: 1px solid hsl(var(--border));
+    display: flex;
+    align-items: center;
+
+    &.clickable {
+        cursor: pointer;
+        transition: all $transition-fast;
+
+        .card-title,
+        .card-subtitle {
+            user-select: none;
+        }
+
+        &:hover {
+            background: hsl(var(--accent));
+            box-shadow: $shadow-md;
+        }
+    }
+
+    &.active {
+        background: hsl(var(--primary));
+        color: hsl(var(--primary-foreground));
+        border: 1px solid hsl(var(--primary));
+
+        &:hover {
+            background: hsl(var(--primary));
+            box-shadow: $shadow-md;
+        }
+
+        .card-title {
+            color: hsl(var(--primary-foreground));
+        }
+
+        .card-subtitle {
+            color: hsl(var(--primary-foreground));
+        }
+    }
+
+    &.no-border {
+        border: none;
+    }
+}
+
+.card-title {
+    font-weight: $font-weight-medium;
+    font-size: $font-size-base;
+    color: hsl(var(--foreground));
+}
+
+.card-subtitle {
+    font-size: $font-size-xs;
+    color: hsl(var(--muted-foreground));
+    margin-top: $spacing-xs;
+}
+
+.card-character .card-subtitle {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 230px;
+}
+
+.card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: $spacing-md;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.nothing {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-lg;
+    font-size: $font-size-xs;
+    color: hsl(var(--muted-foreground) / 0.7);
+    border: 1px dashed hsl(var(--muted));
+    border-radius: $border-radius;
+}
+
+button {
+    cursor: pointer;
+    background: none;
+    border: none;
+    font: inherit;
+    color: inherit;
+    border-radius: $border-radius;
+    padding: 0.6rem 1rem;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: $font-weight-medium;
+    transition: all $transition-fast;
+
+    &.has-icon-left,
+    &.has-icon-right {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &.has-icon-left svg {
+        margin-right: $spacing-sm;
+    }
+
+    &.has-icon-right svg {
+        margin-left: $spacing-sm;
+    }
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.25);
+    }
+
+    &:active {
+        transform: translateY(1px);
+        background: rgba(255, 255, 255, 0.2);
+    }
+}
+
+.btn-primary {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border: none;
+    padding: $spacing-sm $spacing-lg;
+    border-radius: $border-radius;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: background-color $transition-fast;
+
+    &:hover {
+        background-color: hsl(var(--primary) / 0.9);
+    }
+}
+
+input {
+    background-color: hsl(var(--input));
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
+    border-radius: $border-radius;
+    padding: 0.5rem;
+    width: 100%;
+    height: 2.5rem;
+
+    &:focus {
+        outline: none;
+        border-color: hsl(var(--ring));
+        box-shadow: 0 0 0 2px hsl(var(--ring));
+    }
+
+    &::placeholder {
+        color: hsl(var(--muted-foreground));
+    }
+
+    &:disabled {
+        background-color: hsl(var(--muted));
+        color: hsl(var(--muted-foreground));
+        cursor: not-allowed;
+
+        &::placeholder {
+            color: hsl(var(--muted-foreground));
+        }
+    }
+}

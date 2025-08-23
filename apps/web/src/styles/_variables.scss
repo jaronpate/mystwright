@@ -1,0 +1,118 @@
+// CSS Custom Properties (keep these as they integrate with the CSS variables system)
+// These will be used via hsl(var(--primary)) etc.
+
+// Common measurements
+$sidebar-width: 350px;
+$sidebar-header-height: 60px;
+$border-radius: var(--radius);
+
+// Spacing
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 12px;
+$spacing-lg: 16px;
+$spacing-xl: 24px;
+$spacing-2xl: 32px;
+
+// Font sizes
+$font-size-xs: 0.8rem;
+$font-size-sm: 0.875rem;
+$font-size-base: 0.9rem;
+$font-size-lg: 1rem;
+$font-size-xl: 1.3rem;
+$font-size-2xl: 1.5rem;
+
+// Font weights
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// Transitions
+$transition-fast: 0.2s ease;
+$transition-medium: 0.3s ease;
+$transition-slow: 0.4s ease;
+
+// Gradients
+$gradient-primary: linear-gradient(135deg, hsl(270, 70%, 60%), hsl(280, 70%, 45%));
+$gradient-background: linear-gradient(135deg, hsl(270, 70%, 25%), hsl(280, 70%, 15%));
+
+// Shadows
+$shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.1);
+$shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 0 15px rgba(0, 0, 0, 0.2);
+$shadow-primary: 0 0 15px hsl(var(--primary) / 0.4);
+
+// Breakpoints
+$breakpoint-sm: 480px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+
+// Z-index layers
+$z-index-base: 1;
+$z-index-elevated: 2;
+$z-index-modal: 10;
+
+// Animation durations
+$animation-fast: 0.2s;
+$animation-medium: 0.4s;
+
+// Mixins for common patterns
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+@mixin transition($property: all, $duration: $transition-fast) {
+    transition: $property $duration;
+}
+
+@mixin button-base {
+    cursor: pointer;
+    background: none;
+    border: none;
+    font: inherit;
+    color: inherit;
+    border-radius: $border-radius;
+    @include transition();
+}
+
+@mixin card-base {
+    background: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    border-radius: $border-radius;
+    border: 1px solid hsl(var(--border));
+    padding: $spacing-md;
+}
+
+@mixin input-base {
+    background-color: hsl(var(--input));
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
+    border-radius: $border-radius;
+    padding: 0.5rem;
+    width: 100%;
+    
+    &:focus {
+        outline: none;
+        border-color: hsl(var(--ring));
+        box-shadow: 0 0 0 2px hsl(var(--ring));
+    }
+    
+    &::placeholder {
+        color: hsl(var(--muted-foreground));
+    }
+    
+    &:disabled {
+        background-color: hsl(var(--muted));
+        color: hsl(var(--muted-foreground));
+        cursor: not-allowed;
+    }
+}

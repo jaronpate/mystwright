@@ -1,0 +1,146 @@
+@import './variables';
+
+.dialog {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    background-color: hsl(var(--background));
+    padding-right: $spacing-lg;
+}
+
+.dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 5.5rem;
+    background-color: hsl(var(--background));
+    border-bottom: 1px solid hsl(var(--border) / 0.6);
+    padding: 0 2px; // Helps with looking aligned to rounded corners
+
+    .character-info {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-xs;
+    }
+
+    h2 {
+        font-size: $font-size-2xl;
+        font-weight: $font-weight-semibold;
+        color: hsl(var(--foreground));
+        margin: 0;
+    }
+
+    .character-title {
+        font-size: $font-size-base;
+        color: hsl(var(--muted-foreground));
+        margin: 0;
+    }
+}
+
+.dialog-actions {
+    display: flex;
+    gap: $spacing-sm;
+}
+
+.dialog-content {
+    flex: 1;
+    overflow: hidden;
+    border-radius: $spacing-sm;
+    background: $gradient-background;
+}
+
+.dialog-footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 6rem;
+    background-color: hsl(var(--background));
+    padding: 0 2px; // Helps with looking aligned to rounded corners
+
+    .chat {
+        width: 100%;
+
+        input {
+            width: 100%;
+            margin-right: 10px;
+        }
+    }
+
+    .tip {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+        color: hsl(var(--muted-foreground) / 0.8);
+        margin-top: $spacing-sm;
+        font-size: $font-size-xs;
+        font-style: italic;
+
+        p {
+            margin: 0;
+        }
+    }
+}
+
+.chat-messages {
+    padding: $spacing-lg;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    height: 100%;
+
+    .message {
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: $spacing-lg;
+        padding: $spacing-md;
+        background-color: hsl(var(--background) / 0.5);
+        border: 1px solid hsl(var(--muted));
+        border-radius: $border-radius;
+        color: hsl(var(--foreground));
+        max-width: 65%;
+        margin-bottom: $spacing-lg;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        &.assistant {
+            background: none;
+            border: none;
+
+            + .message.assistant {
+                margin-top: -$spacing-sm;
+            }
+        }
+
+        &.user {
+            align-self: flex-end;
+
+            + .message.user {
+                margin-top: -$spacing-sm;
+            }
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: $border-radius;
+            background-color: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            font-weight: $font-weight-medium;
+            font-size: $font-size-base;
+            flex-shrink: 0;
+        }
+    }
+}
+
+audio.character-voice {
+    display: none;
+}

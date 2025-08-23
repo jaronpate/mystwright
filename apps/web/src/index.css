@@ -18,7 +18,7 @@
     --muted-foreground: 270 20% 40%;
     --accent: 270 70% 95%;
     --accent-foreground: 270 50% 20%;
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84.2% 50.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 270 30% 90%;
     --input: 270 30% 90%;
@@ -42,7 +42,7 @@
     --muted-foreground: 270 20% 80%;
     --accent: 270 30% 25%;
     --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62.8% 50.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 270 30% 25%;
     --input: 270 30% 25%;
@@ -75,6 +75,7 @@
 
 html {
     background-color: hsl(var(--background));
+    -webkit-font-smoothing: antialiased;
 }
 
 body {

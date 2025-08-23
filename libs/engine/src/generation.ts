@@ -66,6 +66,7 @@ Rules:
 - For each character select an appropriate voice based on the info provided about the voice and the personality and description given to the character. Provide the 'Voice ID' for the selected voice in the JSON output.
 - There should be multiple ways to solve the mystery, but only one correct solution.
 - The character id ${JUDGE_CHARACTER_ID} is reserved. Do not use it for any of characters you create.
+- The shortDescription field should be a single sentence.
 
 ${availableVoices}
 
@@ -104,6 +105,7 @@ Create a mystery with a modern mystery novel tone
                         properties: {
                             id: { type: 'string' },
                             name: { type: 'string' },
+                            shortDescription: { type: 'string' },
                             description: { type: 'string' },
                             connectedLocations: { 
                                 type: 'array', 
@@ -226,7 +228,6 @@ Create a mystery with a modern mystery novel tone
             console.log('Generating images...');
 
             const styleSeed = await generateImageStyleSeed(world);
-            console.log('Using image style seed:', styleSeed);
 
             // Generate images for clues and characters in parallel
             await Promise.all([

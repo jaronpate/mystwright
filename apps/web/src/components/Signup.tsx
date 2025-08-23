@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useUserContext } from "../context/user-context";
 import { signup } from "../utils/auth";
 import Page from "./Page";
-import "../styles/Auth.css";
+import "../styles/Auth.scss";
 import Logo from '/icon.png';
 
 export default function Signup() {
@@ -15,10 +15,17 @@ export default function Signup() {
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
     const location = useLocation();
-    const { setTokenSet, setUser } = useUserContext();
+    const { user, loading: userLoading, setTokenSet, setUser } = useUserContext();
 
     // Get the intended destination from location state, default to /app
     const from = (location.state as any)?.from || '/app';
+
+    // Redirect if user is already logged in
+    useEffect(() => {
+        if (!userLoading && user) {
+            navigate(from, { replace: true });
+        }
+    }, [user, userLoading, navigate, from]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

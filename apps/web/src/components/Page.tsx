@@ -1,4 +1,4 @@
-import "../styles/Page.css";
+import "../styles/Page.scss";
 
 export default function Page({ children, padding }: { children?: React.ReactNode; padding?: number | string }) {
 

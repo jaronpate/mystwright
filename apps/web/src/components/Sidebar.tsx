@@ -3,7 +3,7 @@ import { AlertTriangle, BookOpen, ChevronDown, ChevronUp, Gavel, LogOut, Users }
 import { useState } from "react";
 import { useUserContext } from "../context/user-context";
 import { useWorldContext } from "../context/world-context";
-import "../styles/Sidebar.css";
+import "../styles/Sidebar.scss";
 import Logo from "/icon.png";
 
 type SidebarHeaderProps = {

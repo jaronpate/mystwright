@@ -4,7 +4,7 @@ import { Bot, PenBox, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useUserContext } from "../context/user-context";
 import { useWorldContext } from "../context/world-context";
-import "../styles/Chat.css";
+import "../styles/Chat.scss";
 import { useApi } from "../utils/api";
 import Page from "./Page";
 

@@ -1,6 +1,6 @@
 import { StrictMode } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import './App.css';
+import './App.scss';
 import AppIntro from './components/AppIntro';
 import Chat from './components/Chat';
 import Layout from './components/Layout';

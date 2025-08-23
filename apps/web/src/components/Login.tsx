@@ -1,7 +1,7 @@
-import { useCallback, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useUserContext } from "../context/user-context";
-import "../styles/Auth.css";
+import "../styles/Auth.scss";
 import { login } from "../utils/auth";
 import Page from "./Page";
 import Logo from '/icon.png';
@@ -12,10 +12,18 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const location = useLocation();
-    const { setTokenSet, setUser } = useUserContext();
+    const navigate = useNavigate();
+    const { user, loading: userLoading, setTokenSet, setUser } = useUserContext();
 
     // Get the intended destination from location state, default to /app
     const from = (location.state as any)?.from || '/app';
+
+    // Redirect if user is already logged in
+    useEffect(() => {
+        if (!userLoading && user) {
+            navigate(from, { replace: true });
+        }
+    }, [user, userLoading, navigate, from]);
 
     const handleSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
