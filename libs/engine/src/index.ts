@@ -3,21 +3,8 @@ export * from './speech';
 export * from './util';
 export * from './replicate';
 
-// (async () => {
-//     const { generateClueImage } = await import('./generation');
-//     const image = await generateClueImage({}, {
-//         name: 'Conference Ticket',
-//         description: `A plane ticket confirming Dr. Alvarez's attendance at a conference in Zurich.`,
-//     });
-
-//     console.log('Generated image:');
-//     console.log(image);
-//     // console.log(JSON.stringify(image, null, 4));
-// }
-// )().catch((error) => {
-//     console.error('Error initializing engine module:', error);
-// });
-
+// for testing --- local use only
+// Generate character images for all characters in a world
 // (async () => {
 //     const { deserializeWorldStructure } = await import('../../types');
 //     const { generateImageStyleSeed, generateCharacterImage } = await import('./generation');
