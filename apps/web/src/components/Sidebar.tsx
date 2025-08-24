@@ -8,10 +8,10 @@ import Logo from '/icon.png';
 
 type SidebarHeaderProps = {
     title: string;
-    icon: React.ReactNode;
+    icon?: React.ReactNode;
 };
 
-const SidebarHeader = ({ title, icon }: SidebarHeaderProps) => {
+export const SidebarHeader = ({ title, icon }: SidebarHeaderProps) => {
     return (
         <div className="sidebar-header">
             <div className="wordmark">
@@ -24,15 +24,15 @@ const SidebarHeader = ({ title, icon }: SidebarHeaderProps) => {
 
 type CollapsibleSectionProps = {
     title: string;
-    icon: React.ReactNode;
-    children:
+    icon?: React.ReactNode;
+    children?:
         | React.ReactNode
         | ((isOpen: boolean, setIsOpen: (value: React.SetStateAction<boolean>) => void) => React.ReactNode);
     alwaysShowWhenActive?: boolean;
     isActive?: boolean;
 };
 
-const CollapsibleSection = ({
+export const CollapsibleSection = ({
     title,
     icon,
     children,
@@ -60,7 +60,7 @@ const CollapsibleSection = ({
     return (
         <div className="sidebar-collapsable">
             <div className="sidebar-title" onClick={toggleSection}>
-                <div className="sidebar-title-icon">{icon}</div>
+                { icon && <div className="sidebar-title-icon">{icon}</div> }
                 <div className="sidebar-title-text">{title}</div>
                 <div className="ff"></div>
                 <div className="sidebar-title-icon sidebar-chevron">
@@ -82,7 +82,7 @@ const CollapsibleSection = ({
 
 type CardProps = {
     title: string;
-    description: string;
+    description?: string;
     active?: boolean;
     noBorder?: boolean;
     onClick?: () => void;
@@ -90,10 +90,10 @@ type CardProps = {
     disabled?: boolean;
 };
 
-const Card = ({ title, description, active, noBorder, onClick, icon, disabled }: CardProps) => {
+export const Card = ({ title, description, active, noBorder, onClick, icon, disabled }: CardProps) => {
     return (
-        <div className="sidebar-item" onClick={disabled ? undefined : onClick}>
             <div
+                onClick={disabled ? undefined : onClick}
                 className={`card ${onClick && !disabled ? 'clickable' : ''} ${active ? 'active' : ''} ${
                     noBorder ? 'no-border' : ''
                 } ${disabled ? 'disabled' : ''}`}
@@ -101,10 +101,9 @@ const Card = ({ title, description, active, noBorder, onClick, icon, disabled }:
                 {icon && <div className="card-icon">{icon}</div>}
                 <div className="card-content">
                     <div className="card-title">{title}</div>
-                    <div className="card-subtitle">{description}</div>
+                    { description && <div className="card-subtitle">{description}</div> }
                 </div>
             </div>
-        </div>
     );
 };
 
@@ -114,7 +113,7 @@ interface CrimeDetailsProps {
 
 const CrimeDetails = ({ world }: CrimeDetailsProps) => {
     if (!world) {
-        return <div className="nothing">No world selected</div>;
+        return <div className="nothing">No mystery selected</div>;
     }
 
     const victim = world.payload.characters.find(c => c.id === world.payload.mystery.victim);
@@ -199,13 +198,13 @@ export default function MystwrightSidebar() {
                                           onClick={createWorld}
                                           disabled={isCreatingWorld}
                                           icon={
-                                              <div className="character-avatar">
+                                              <>
                                                   {isCreatingWorld ? (
                                                       <Loader2 width={'16px'} height={'16px'} className="spin" />
                                                   ) : (
                                                       <Plus width={'16px'} height={'16px'} />
                                                   )}
-                                              </div>
+                                              </>
                                           }
                                           noBorder={true}
                                       />,
@@ -242,9 +241,7 @@ export default function MystwrightSidebar() {
                                           description="Generating your mystery..."
                                           disabled={true}
                                           icon={
-                                              <div className="character-avatar">
-                                                  <Loader2 width={'16px'} height={'16px'} className="spin" />
-                                              </div>
+                                                <Loader2 width={'16px'} height={'16px'} className="spin" />
                                           }
                                           noBorder={true}
                                       />
@@ -265,9 +262,7 @@ export default function MystwrightSidebar() {
                             onClick={() => talkToJudge()}
                             noBorder={true}
                             icon={
-                                <div className="character-avatar">
-                                    <Gavel width={'16px'} height={'16px'} />
-                                </div>
+                                <Gavel width={'16px'} height={'16px'} />
                             }
                         />
                     )}
@@ -280,7 +275,7 @@ export default function MystwrightSidebar() {
                     >
                         {isOpen =>
                             activeWorld === null ? (
-                                <div className="nothing">No world selected</div>
+                                <div className="nothing">No mystery selected</div>
                             ) : isOpen ? (
                                 // Show all characters when expanded
                                 activeWorld.payload.characters.map(
@@ -294,13 +289,13 @@ export default function MystwrightSidebar() {
                                                     onClick={() => talkToCharacter(character.id)}
                                                     noBorder={true}
                                                     icon={
-                                                        <div className="character-avatar">
+                                                        <>
                                                             {character.image ? (
                                                                 <img src={character.image} alt={character.name} />
                                                             ) : (
                                                                 character.name.charAt(0)
                                                             )}
-                                                        </div>
+                                                        </>
                                                     }
                                                 />
                                             </div>
@@ -332,7 +327,7 @@ export default function MystwrightSidebar() {
                         }
                         {/* {!activeWorld ? (
                             <div className="nothing">
-                                No world selected
+                                No mystery selected
                             </div>
                         ) : (
                             activeWorld.payload.characters.map((character) => character.role !== 'victim' && (

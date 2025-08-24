@@ -2,13 +2,12 @@ import { StrictMode } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import './App.scss';
 import AppIntro from './components/AppIntro';
-import Chat from './components/Chat';
 import Layout from './components/Layout';
 import Login from './components/Login';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import MystwrightSidebar from './components/Sidebar';
 import Signup from './components/Signup';
 import { UserProvider } from './context/user-context';
+import MystwrightGame from './components/Game';
 
 function AppRoutes() {
     // const location = useLocation();
@@ -39,9 +38,7 @@ function AppRoutes() {
             } />
             <Route path="/app" element={
                 <ProtectedRoute>
-                    <Layout sidebar={<MystwrightSidebar />}>
-                        <Chat />
-                    </Layout>
+                    <MystwrightGame />
                 </ProtectedRoute>
             } />
             {/* Add a catch-all route */}

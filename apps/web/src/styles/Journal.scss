@@ -1,0 +1,35 @@
+@use './variables' as *;
+
+.journal {
+    display: flex;
+    flex-direction: column;
+    width: $sidebar-width;
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    padding: $spacing-lg;
+    padding-left: 0;
+    height: 100%;
+    flex-shrink: 0;
+
+    &-inner {
+        border: 1px solid hsl(var(--border));
+        border-radius: $border-radius;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.clue-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}

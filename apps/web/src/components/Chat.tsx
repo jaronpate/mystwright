@@ -261,10 +261,11 @@ export default function Chat() {
                         </div>
                     </div>
                     <div className="dialog-actions">
-                        <button className="btn-primary has-icon-left">
+                        {/* TODO: Make open the journal on the right? */}
+                        {/* <button className="btn-primary has-icon-left">
                             <PenBox width={16} height={16} />
                             Journal
-                        </button>
+                        </button> */}
                     </div>
                 </div>
                 <div className="dialog-content">
