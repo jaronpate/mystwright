@@ -33,6 +33,7 @@ export async function generateWorld(config: { model?: string; } = {}): Promise<W
         }
     }
 
+    // TODO: Try removing or reworking the "Tone and inspiration" section. Seems to repeat results sometimes.
     const SYSTEM_PROMPT = `\
 You are Mystwright, a game master for a mystery text adventure.
 

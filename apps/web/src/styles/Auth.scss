@@ -1,4 +1,4 @@
-@import './variables';
+@use './variables' as *;
 
 .auth-container {
     backdrop-filter: blur(4px);
@@ -169,11 +169,11 @@
         padding: 1.5rem;
         min-width: 280px;
     }
-    
+
     .auth-title {
         font-size: 1.25rem;
     }
-    
+
     .auth-subtitle {
         font-size: $font-size-xs;
     }

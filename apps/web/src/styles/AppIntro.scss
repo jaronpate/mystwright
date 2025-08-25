@@ -1,4 +1,4 @@
-@import './variables';
+@use './variables' as *;
 
 .intro {
     backdrop-filter: blur(4px);

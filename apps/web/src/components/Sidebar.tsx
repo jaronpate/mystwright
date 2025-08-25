@@ -117,6 +117,7 @@ const CrimeDetails = ({ world }: CrimeDetailsProps) => {
     }
 
     const victim = world.payload.characters.find(c => c.id === world.payload.mystery.victim);
+    const location = world.payload.locations.find(l => l.id === world.payload.mystery.location);
 
     return (
         <>
@@ -134,7 +135,7 @@ const CrimeDetails = ({ world }: CrimeDetailsProps) => {
                 </div>
                 <div className="crime-detail">
                     <div className="detail-title">Location</div>
-                    <div className="detail-value">{world.payload.mystery.location}</div>
+                    <div className="detail-value">{location?.name ?? 'Unknown'}</div>
                 </div>
                 <div className="crime-detail">
                     <div className="detail-title">Time</div>

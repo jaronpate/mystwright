@@ -1,4 +1,4 @@
-@import './variables';
+@use './variables' as *;
 
 .sidebar {
     display: flex;
@@ -90,7 +90,6 @@
             }
         }
     }
-
 
     &:last-child {
         margin-bottom: 0;
@@ -246,7 +245,6 @@
     color: hsl(var(--destructive));
 }
 
-
 .card-icon {
     display: flex;
     align-items: center;
@@ -276,11 +274,11 @@
 .card.disabled {
     opacity: 0.6;
     cursor: not-allowed;
-    
+
     &.clickable {
         cursor: not-allowed;
     }
-    
+
     &:hover {
         opacity: 0.6;
     }
