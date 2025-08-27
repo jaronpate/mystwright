@@ -6,6 +6,7 @@ import { useUserContext } from "../context/user-context";
 import { useWorldContext } from "../context/world-context";
 import "../styles/Chat.scss";
 import { useApi } from "../utils/api";
+import { isMobileDevice } from "../utils/device";
 import Page from "./Page";
 
 interface ChatProps {
@@ -176,7 +177,7 @@ export default function Chat({ onOpenRightSidebar, onOpenLeftSidebar }: ChatProp
             const character_id = isSolving ? JUDGE_CHARACTER_ID : activeCharacter!.id;
 
             setInput("");
-            if (inputElm.current) {
+            if (inputElm.current && !isMobileDevice()) {
                 inputElm.current.focus();
             }
 
@@ -231,7 +232,7 @@ export default function Chat({ onOpenRightSidebar, onOpenLeftSidebar }: ChatProp
             } finally {
                 setLoading(false);
                 setTimeout(() => {
-                    if (inputElm.current) {
+                    if (inputElm.current && !isMobileDevice()) {
                         inputElm.current.focus();
                     }
                 }, 100);
