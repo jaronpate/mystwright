@@ -2,7 +2,6 @@ import { ElevenLabsClient } from "elevenlabs";
 import { ElevenLabsClient as ElevenLabsClientV2 } from "@elevenlabs/elevenlabs-js";
 import { which } from "./util";
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 
 const elevenlabs = new ElevenLabsClient({
@@ -16,7 +15,6 @@ const elevenlabsV2 = new ElevenLabsClientV2({
 // export async function createVoiceStreamForText(voice: string, text: string): Promise<Readable | ReadableStream<Uint8Array>> {
 export async function createVoiceStreamForText(voice: string, text: string): Promise<ReadableStream<Uint8Array>> {
     try {
-        // TODO: This returns a 400? No error message though
         const audio = await elevenlabsV2.textToSpeech.stream(voice, {
             text,
             voiceSettings: {
@@ -27,6 +25,12 @@ export async function createVoiceStreamForText(voice: string, text: string): Pro
             },
             modelId: 'eleven_flash_v2_5'
         });
+
+        // TODO: Testing cheaper models on Replicate
+        // const audio = await generateAudioStreamFromText(
+        //     "resemble-ai/chatterbox",
+        //     text
+        // );
 
         return audio as unknown as ReadableStream<Uint8Array>;
     } catch (error) {

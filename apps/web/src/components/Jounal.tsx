@@ -6,7 +6,12 @@ import { useWorldContext } from '../context/world-context';
 import '../styles/Journal.scss';
 import { Card, CollapsibleSection, SidebarHeader } from './Sidebar';
 
-export default function MystwrightJounal() {
+interface MystwrightJournalProps {
+    isOpen?: boolean;
+    onClose?: () => void;
+}
+
+export default function MystwrightJounal({ isOpen = true, onClose }: MystwrightJournalProps) {
     const { user } = useUserContext();
     const { activeWorld, activeGameState } = useWorldContext();
 
@@ -25,9 +30,9 @@ export default function MystwrightJounal() {
     }
 
     return (
-        <div className="journal">
+        <div className={`journal ${isOpen ? 'open' : ''}`}>
             <div className="journal-inner">
-                <SidebarHeader title="Journal" icon={<PenBox width={'24px'} height={'24px'} />} />
+                <SidebarHeader title="Journal" icon={<PenBox width={'24px'} height={'24px'} />} onClose={onClose} />
                 <div className="sidebar-content">
                     <CollapsibleSection
                         title="Discoved Clues"

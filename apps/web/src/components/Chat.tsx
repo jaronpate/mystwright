@@ -1,6 +1,6 @@
 import { DBGameState } from "@mystwright/db";
 import { JUDGE_CHARACTER_ID } from "@mystwright/types";
-import { Bot, PenBox, Send } from "lucide-react";
+import { Bot, Menu, PenBox, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useUserContext } from "../context/user-context";
 import { useWorldContext } from "../context/world-context";
@@ -8,7 +8,12 @@ import "../styles/Chat.scss";
 import { useApi } from "../utils/api";
 import Page from "./Page";
 
-export default function Chat() {
+interface ChatProps {
+    onOpenRightSidebar: () => void;
+    onOpenLeftSidebar: () => void;
+}
+
+export default function Chat({ onOpenRightSidebar, onOpenLeftSidebar }: ChatProps) {
     const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
@@ -239,33 +244,37 @@ export default function Chat() {
             <audio ref={audioElm} className="character-voice" autoPlay></audio>
             <div className="dialog">
                 <div className="dialog-header">
-                    <div className="character-info">
-                        {/* <h2>{activeCharacter ? activeCharacter.name : `Welcome, ${user?.first_name ? user?.first_name : 'Investigator'}`}</h2> */}
-                        <h2>
-                            {
-                                activeCharacter ?
-                                    activeCharacter.name :
-                                        isSolving ?
-                                            'The Judge' : 
-                                            `Welcome, ${user?.first_name ? user?.first_name : 'Investigator'}`
-                            }
-                        </h2>
-                        <div className="character-title">
-                            {
-                                activeCharacter ?
-                                    activeCharacter.description :
-                                        isSolving ? 
-                                            'Make your case to the Judge' : 
-                                            'The world is your oyster'
-                            }
+                    <button className="btn-primary has-icon-only" id="menu-btn" onClick={onOpenLeftSidebar}>
+                        <Menu width={20} height={20} />
+                    </button>
+                    <div className="header-title">
+                        <div className="character-info">
+                            {/* <h2>{activeCharacter ? activeCharacter.name : `Welcome, ${user?.first_name ? user?.first_name : 'Investigator'}`}</h2> */}
+                            <h2>
+                                {
+                                    activeCharacter ?
+                                        activeCharacter.name :
+                                            isSolving ?
+                                                'The Judge' : 
+                                                `Welcome, ${user?.first_name ? user?.first_name : 'Investigator'}`
+                                }
+                            </h2>
+                            <div className="character-title">
+                                {
+                                    activeCharacter ?
+                                        activeCharacter.description :
+                                            isSolving ? 
+                                                'Make your case to the Judge' : 
+                                                'The world is your oyster'
+                                }
+                            </div>
                         </div>
                     </div>
                     <div className="dialog-actions">
-                        {/* TODO: Make open the journal on the right? */}
-                        {/* <button className="btn-primary has-icon-left">
+                        <button className="btn-primary has-icon-left" id="journal-btn" onClick={onOpenRightSidebar}>
                             <PenBox width={16} height={16} />
                             Journal
-                        </button> */}
+                        </button>
                     </div>
                 </div>
                 <div className="dialog-content">

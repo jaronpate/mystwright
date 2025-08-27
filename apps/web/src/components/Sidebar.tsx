@@ -1,5 +1,5 @@
 import type { DBWorld } from '@mystwright/db';
-import { AlertTriangle, BookOpen, ChevronDown, ChevronUp, Gavel, Loader2, LogOut, Plus, Users } from 'lucide-react';
+import { AlertTriangle, BookOpen, ChevronDown, ChevronUp, Gavel, Loader2, LogOut, Plus, Users, X } from 'lucide-react';
 import { useState } from 'react';
 import { useUserContext } from '../context/user-context';
 import { useWorldContext } from '../context/world-context';
@@ -9,15 +9,21 @@ import Logo from '/icon.png';
 type SidebarHeaderProps = {
     title: string;
     icon?: React.ReactNode;
+    onClose?: () => void;
 };
 
-export const SidebarHeader = ({ title, icon }: SidebarHeaderProps) => {
+export const SidebarHeader = ({ title, icon, onClose }: SidebarHeaderProps) => {
     return (
         <div className="sidebar-header">
             <div className="wordmark">
                 {icon}
                 <div className="text-large">{title}</div>
             </div>
+            {onClose && (
+                <button className="mobile-close-button" onClick={onClose} aria-label="Close sidebar">
+                    <X size={20} />
+                </button>
+            )}
         </div>
     );
 };
@@ -146,7 +152,12 @@ const CrimeDetails = ({ world }: CrimeDetailsProps) => {
     );
 };
 
-export default function MystwrightSidebar() {
+interface MystwrightSidebarProps {
+    isOpen?: boolean;
+    onClose?: () => void;
+}
+
+export default function MystwrightSidebar({ isOpen = true, onClose }: MystwrightSidebarProps) {
     const { worlds, setActiveWorld, setActiveCharacter, activeWorld, activeCharacter, isSolving, setIsSolving, createWorld, isCreatingWorld } =
         useWorldContext();
     const { user, logout } = useUserContext();
@@ -171,7 +182,7 @@ export default function MystwrightSidebar() {
     };
 
     return (
-        <div className="sidebar">
+        <div className={`sidebar ${isOpen ? 'open' : ''}`}>
             <div className="sidebar-inner">
                 <SidebarHeader
                     title="Mystwright"
@@ -179,6 +190,7 @@ export default function MystwrightSidebar() {
                         // <Sparkles width={'24px'} height={'24px'} />
                         <img src={Logo} alt="Mystwright Logo" />
                     }
+                    onClose={onClose}
                 />
                 <div className="sidebar-content">
                     {/* Worlds */}

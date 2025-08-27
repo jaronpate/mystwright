@@ -10,6 +10,31 @@
     padding-left: 0;
     height: 100%;
     flex-shrink: 0;
+    transition: transform $transition-medium;
+
+    @media (max-width: $breakpoint-md) {
+        position: fixed;
+        top: 0;
+        right: 0;
+        z-index: 1001;
+        width: 100vw;
+        max-width: 400px;
+        height: 100vh;
+        padding-left: $spacing-lg;
+        transform: translateX(100%);
+        box-shadow: $shadow-lg;
+
+        &.open {
+            transform: translateX(0);
+        }
+    }
+
+    @media (max-width: $breakpoint-sm) {
+        width: 100vw;
+        max-width: none;
+        padding-left: $spacing-lg;
+        padding-right: $spacing-lg;
+    }
 
     &-inner {
         border: 1px solid hsl(var(--border));

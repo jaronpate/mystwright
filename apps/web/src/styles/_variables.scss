@@ -45,8 +45,8 @@ $shadow-primary: 0 0 15px hsl(var(--primary) / 0.4);
 
 // Breakpoints
 $breakpoint-sm: 480px;
-$breakpoint-md: 768px;
-$breakpoint-lg: 1024px;
+$breakpoint-md: 1200px; // Increased to prevent chat from getting too compressed
+$breakpoint-lg: 1440px;
 
 // Z-index layers
 $z-index-base: 1;

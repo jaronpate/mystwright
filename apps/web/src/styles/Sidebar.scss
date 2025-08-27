@@ -9,9 +9,33 @@
     padding: $spacing-lg;
     height: 100%;
     flex-shrink: 0;
+    transition: transform $transition-medium;
 
     .wordmark {
         justify-content: flex-start;
+    }
+
+    @media (max-width: $breakpoint-md) {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1001;
+        width: 100vw;
+        max-width: 400px;
+        height: 100vh;
+        transform: translateX(-100%);
+        box-shadow: $shadow-lg;
+
+        &.open {
+            transform: translateX(0);
+        }
+    }
+
+    @media (max-width: $breakpoint-sm) {
+        width: 100vw;
+        max-width: none;
+        padding-left: $spacing-lg;
+        padding-right: $spacing-lg;
     }
 }
 
@@ -30,7 +54,7 @@
     height: $sidebar-header-height;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
     position: relative;
 
     // Fade out effect at bottom of header
@@ -44,6 +68,35 @@
         background: linear-gradient(to bottom, hsl(var(--card)), transparent);
         pointer-events: none;
         z-index: 10;
+    }
+}
+
+.mobile-close-button {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background-color: hsl(var(--muted));
+    color: hsl(var(--muted-foreground));
+    border: none;
+    border-radius: $border-radius;
+    cursor: pointer;
+    transition: all $transition-fast;
+    padding: 0;
+
+    &:hover {
+        background-color: hsl(var(--destructive) / 0.1);
+        color: hsl(var(--destructive));
+        transform: scale(1.05);
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+
+    @media (max-width: $breakpoint-md) {
+        display: flex;
     }
 }
 

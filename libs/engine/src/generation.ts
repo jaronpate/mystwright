@@ -77,7 +77,6 @@ Tone and inspiration: grounded, deductive, and in the spirit of classic detectiv
     const WORLD_GENERATION_PROMPT = `\
 Create a mystery with a modern mystery novel tone
     `;
-    // const model = config.model ?? 'openai/o4-mini-high';
     const maxAttempts = 5; // Maximum number of attempts to generate a valid world
     let attempts = 0;
     let worldJson: WorldPayload | null = null;
@@ -238,7 +237,7 @@ Create a mystery with a modern mystery novel tone
                 ...world.clues.values().map(async (clue) => {
                     if (clue.type === 'physical') {
                         // Generate an image for the clue
-                        const { buffer, mime } = await generateClueImage(world, clue);
+                        const { buffer, mime } = await generateClueImage(world, clue, styleSeed);
                         const ext = mime.split('/')[1] ?? 'png';
                         const url = await uploadImageToStorage(buffer, `${world.mystery.title}/clues/${clue.id}-clue-image.${ext}`);
                         clue.image = url;
@@ -249,15 +248,17 @@ Create a mystery with a modern mystery novel tone
                     const { buffer, mime } = await generateCharacterImage(world, character, styleSeed);
                     const ext = mime.split('/')[1] ?? 'png';
                     const url = await uploadImageToStorage(buffer, `${world.mystery.title}/characters/${character.id}-character-image.${ext}`);
-                    console.log(`Generated image for character ${character.name} (${character.id})`);
                     character.image = url;
+                    console.log(`Generated image for character ${character.name} (${character.id})`);
                 })
             ]);
             console.log('All images generated successfully.');
             
             // Write the generated world to a file
             // Intentionally not waiting for the write to finish to prevent longer load times
-            writeRelative(import.meta.url, `../../../gens/${world.mystery.title}/world.json`, JSON.stringify(worldJson, null, 4));
+            if (import.meta.env.DEV) {
+                writeRelative(import.meta.url, `../../../gens/${world.mystery.title}/world.json`, JSON.stringify(worldJson, null, 4));
+            }
 
             return world;
         } catch (error) {
@@ -902,86 +903,53 @@ Reject a guess if it has insufficient evidence to support it. Request more evide
     };
 }
 
+// GOOD IMAGE SEED GENS SO FAR:
+const PULP_FICTION_SEED = `\
+For this image, imagine a world rendered in the style of classic pulp magazine covers, specifically inspired by the Golden Age of detective fiction. \
+Think dramatic lighting, bold colors, and slightly exaggerated features reminiscent of artists like Norman Saunders and Margaret Brundage. \
+There's a touch of film noir influence seeping in, with high contrast and a focus on shadow to heighten the suspense and intrigue.`;
+
+const VICTORIAN_MYSTERY_SEED = `\
+For this image, envision a photorealistic painting in the style of early 20th-century Impressionism, touched with the melancholic atmosphere of a foggy London evening. \
+Capture the scene with delicate brushstrokes and a muted color palette, focusing on the ethereal quality of light filtering through the mist-laden air. \
+There should be a hint of something sinister lurking beneath the surface, suggested by subtle distortions and unsettling shadows.`;
+
+const GREAT_GATSPY_SEED = `\
+For this image, picture a heavily stylized scene reminiscent of Art Deco posters from the 1930s, with sharp lines, geometric shapes, and a limited but vibrant color palette. \
+The characters are elegant and elongated, almost caricatured, with an emphasis on fashion and dramatic posing. \
+There's a sense of opulence and mystery, with hidden details and symbolic motifs woven into the design.`;
+
+const WHIMSICAL_DARK_VICTORIAN_SEED = `\
+For this image, envision a world rendered in a darkly whimsical style reminiscent of Edward Gorey's illustrations, imbued with the subtle, unsettling atmosphere of a Victorian-era daguerreotype. \
+Imagine finely detailed cross-hatching, muted tones, and an emphasis on the macabre, all while maintaining a sense of understated elegance. \
+A faint touch of surrealism should hint at something strange lurking just beyond the surface of polite society.`;
+
+const SIN_CITY_SEED = `\
+For this image, visualize a grim and gritty scene rendered in the style of hard-boiled comic noir, similar to Frank Miller's \"Sin City\" but with a touch of Edward Hopper's stark realism. \
+Think angular shadows, stark black and white contrasts punctuated by selective bursts of vibrant color (perhaps a single red object), and a focus on the urban decay and moral ambiguity of the setting. \
+The emotions conveyed by the image are tension, despair, and a simmering undercurrent of violence.`;
+
 /**
  * Generates a prompt seed describing the artistic style for generating images in the mystery world.
  * @param world - The world object
  * @returns A prompt seed describing the artistic style for generating images in the mystery world
  */
 export async function generateImageStyleSeed(world: World): Promise<string> {
-    /**
-     * GOOD GENS SO FAR:
-     * For this mystery, imagine a world rendered in the style of classic pulp magazine covers, specifically inspired by the Golden Age of detective fiction. Think dramatic lighting, bold colors, and slightly exaggerated features reminiscent of artists like Norman Saunders and Margaret Brundage. There's a touch of film noir influence seeping in, with high contrast and a focus on shadow to heighten the suspense and intrigue.
-     */
     const SYSTEM_PROMPT = `\
 You are Mystwright, a game master for a mystery text adventure.
 You are to provide a few scentences that describe the artistic style of images that will be created for the mystery world.
-This will be used as a seed for generating images for the mystery.
+This will be used as a seed for generating images for the mystery. It should start with "For this image..."
 
 <EXAMPLES>
-Painting & Traditional Media
-	•	oil painting
-	•	watercolor wash
-	•	acrylic on canvas
-	•	ink drawing
-	•	charcoal sketch
-	•	pastel illustration
-	•	gouache painting
+${PULP_FICTION_SEED}
 
-Historical Art Styles
-	•	renaissance painting
-	•	baroque masterpiece
-	•	rococo style
-	•	impressionist brushwork
-	•	cubist abstraction
-	•	surrealist dreamscape
-	•	futurist dynamic composition
-	•	art nouveau poster
-	•	art deco design
+${VICTORIAN_MYSTERY_SEED}
 
-Illustration & Graphic Styles
-	•	comic book inked
-	•	manga panel
-	•	storybook illustration
-	•	flat vector art
-	•	cut-paper collage
-	•	linocut print
-	•	silkscreen pop art
+${GREAT_GATSPY_SEED}
 
-Photography Styles
-	•	cinematic photography
-	•	film noir lighting
-	•	black and white portrait
-	•	polaroid snapshot
-	•	macro lens photography
-	•	long exposure night shot
-	•	vintage daguerreotype
+${WHIMSICAL_DARK_VICTORIAN_SEED}
 
-Digital & Futuristic
-	•	cyberpunk neon glow
-	•	synthwave aesthetic
-	•	vaporwave pastel retro
-	•	glitchcore digital distortion
-	•	low poly render
-	•	isometric pixel art
-	•	3D render in octane
-	•	unreal engine hyperrealism
-
-Mood & Atmosphere
-	•	gothic horror
-	•	dark fantasy
-	•	dreamcore surreal
-	•	whimsical ghibli-style
-	•	solarpunk utopia
-	•	steampunk industrial
-	•	psychedelic 70s poster
-
-Cultural & Regional
-	•	japanese ukiyo-e woodblock
-	•	chinese ink wash
-	•	islamic geometric pattern
-	•	african tribal mask design
-	•	aztec glyphic art
-	•	aboriginal dot painting
+${SIN_CITY_SEED}
 </EXAMPLES>
 `;
 
@@ -1037,21 +1005,16 @@ If the mystery is a historical whodunit, the description might include terms lik
     return response;
 }
 
-export async function generateClueImage(world: World, clue: Clue): Promise<{ buffer: Buffer; mime: string }> {
+export async function generateClueImage(world: World, clue: Clue, styleSeed: string = ''): Promise<{ buffer: Buffer; mime: string }> {
     const prompt = `\
-An image for the clue: ${clue.name}.
-The clue description is: ${clue.description}.
-Do not add any additional elements to the image.
-Do not quote the clue description in the image. Use it as a reference for the image.
-The image should in the style of a photograph of evidence taken at a crime scene.
-Add a border to the image so it looks like a photograph.
-The image should be a realistic representation of the clue, with no additional elements or distractions.
-The image should be clear and focused on the clue itself.`;
+An image that looks like a photograph of evidence taken at a crime scene for the clue: ${clue.name}. \
+${clue.description} \
+NO WHITE BORDER. FILL THE IMAGE CORNER TO CORNER \
+The image should be a realistic representation of the clue, with no additional elements or distractions. \
+The image should be clear and focused on the clue itself.\
+${styleSeed}`;
 
-    // const result = await generateImageFromPrompt('black-forest-labs/flux-schnell', prompt);
-    const result = await generateImageFromPrompt('black-forest-labs/flux-krea-dev', prompt);
-    // const result = await generateImageFromPrompt('black-forest-labs/flux-dev', prompt);
-    // const result = await generateImageFromPrompt('black-forest-labs/flux-1.1-pro', prompt);
+    const result = await generateImageFromPrompt('google/imagen-4-ultra', prompt);
 
     return { buffer: result.buffer, mime: result.mime };
 }
@@ -1060,16 +1023,13 @@ The image should be clear and focused on the clue itself.`;
 
 export async function generateCharacterImage(world: World, character: Character, styleSeed: string = ''): Promise<{ buffer: Buffer; mime: string }> {
     const prompt = `\
-Portrait of ${character.name}. ${character.description}. \
+JUST A CHARACTER PORTRAIT of ${character.name}. ${character.description}. \
 ${character.name}'s personality is ${character.personality}. \
-They are a character in the mystery ${world.mystery.title}: ${world.mystery.description}. \
 The image should be a realistic representation of the character, with no additional elements, borders, or distractions. \
 ${styleSeed}`;
 
-    // const result = await generateImageFromPrompt('black-forest-labs/flux-schnell', prompt);
-    const result = await generateImageFromPrompt('black-forest-labs/flux-krea-dev', prompt, { aspect_ratio: '1:1' });
-    // const result = await generateImageFromPrompt('black-forest-labs/flux-dev', prompt);
-    // const result = await generateImageFromPrompt('black-forest-labs/flux-1.1-pro', prompt);
+    const result = await generateImageFromPrompt('google/imagen-4-ultra', prompt);
+
 
     return { buffer: result.buffer, mime: result.mime };
 }

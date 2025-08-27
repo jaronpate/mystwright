@@ -1,5 +1,27 @@
 @use './variables' as *;
 
+#journal-btn {
+    display: none;
+
+    @media (max-width: $breakpoint-md) {
+        display: flex;
+    }
+}
+
+#menu-btn {
+    display: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 auto;
+
+    @media (max-width: $breakpoint-md) {
+        display: flex;
+    }
+}
+
 .dialog {
     flex: 1;
     display: flex;
@@ -8,6 +30,11 @@
     width: 100%;
     background-color: hsl(var(--background));
     padding-right: $spacing-lg;
+
+    @media (max-width: $breakpoint-md) {
+        padding-right: $spacing-md;
+        padding-left: $spacing-md;
+    }
 }
 
 .dialog-header {
@@ -19,6 +46,12 @@
     border-bottom: 1px solid hsl(var(--border) / 0.6);
     padding: 0 2px; // Helps with looking aligned to rounded corners
     gap: $spacing-md;
+
+    .header-title {
+        display: flex;
+        align-items: center;
+        flex: 1;
+    }
 
     .character-info {
         display: flex;
