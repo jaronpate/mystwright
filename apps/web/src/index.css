@@ -86,7 +86,7 @@ body {
 }
 
 #root {
-    height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));

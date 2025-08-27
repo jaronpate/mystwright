@@ -1,7 +1,7 @@
 @use './styles/variables' as *;
 
 .mystwright-app {
-    height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
@@ -19,7 +19,7 @@
 
 .mobile-overlay {
     display: none;
-    
+
     @media (max-width: $breakpoint-md) {
         display: block;
         position: fixed;
