@@ -1,23 +1,144 @@
-import type { WorldPayload, Character, Clue, ClueID, GameState, Memory, Message, World } from "@mystwright/types";
-import { DEFAULT_WEAK_MODEL, deserializeWorldStructure, JUDGE_CHARACTER_ID, JUDGE_VOICE } from "@mystwright/types";
-import { ElevenLabsClient } from "elevenlabs";
-import OpenAI from "openai";
-import { OpenRouter } from "./openrouter";
-import { writeRelative } from "./util";
-import { generateImageFromPrompt } from "./replicate";
+import type {
+    Character,
+    Clue,
+    ClueID,
+    GameState,
+    Memory,
+    Message,
+    ValidationError,
+    ValidationResult,
+    World,
+    WorldPayload,
+} from '@mystwright/types';
+import {
+    DEFAULT_WEAK_MODEL,
+    deserializeWorldStructure,
+    JUDGE_CHARACTER_ID,
+    JUDGE_VOICE,
+    WorldValidationError,
+} from '@mystwright/types';
+import { ElevenLabsClient } from 'elevenlabs';
+import OpenAI from 'openai';
+import { OpenRouter } from './openrouter';
+import { generateImageFromPrompt } from './replicate';
+import { writeRelative } from './util';
 
 const openai = new OpenAI();
 const elevenlabs = new ElevenLabsClient({ apiKey: process.env.ELEVENLABS_API_KEY });
 
-/**
- * Generates a mystery and world by sending a request to OpenRouter's API
- * using structured JSON output format. If validation fails, it will
- * request more content from the model until we have a valid world.
- * @param config - Optional configuration object with API key and model
- */
-export async function generateWorld(config: { model?: string; } = {}): Promise<World> {
-    const { voices } = await elevenlabs.voices.getAll();
+// Constants
+const MAX_GENERATION_ATTEMPTS = 5;
+const GENERATION_TEMPERATURE = 1.5; // 0-2, higher values = more creative
+const VERBOSITY = 'high'; // 'low' | 'medium' | 'high'
 
+// Schema for world generation
+const WORLD_GENERATION_SCHEMA = {
+    name: 'mystery',
+    strict: true,
+    schema: {
+        type: 'object',
+        properties: {
+            locations: {
+                type: 'array',
+                items: {
+                    type: 'object',
+                    properties: {
+                        id: { type: 'string' },
+                        name: { type: 'string' },
+                        description: { type: 'string' },
+                        connectedLocations: {
+                            type: 'array',
+                            items: { type: 'string' },
+                        },
+                        clues: {
+                            type: 'array',
+                            items: { type: 'string' },
+                        },
+                        characters: {
+                            type: 'array',
+                            items: { type: 'string' },
+                        },
+                    },
+                    required: ['id', 'name', 'description', 'connectedLocations', 'clues', 'characters'],
+                    additionalProperties: false,
+                },
+            },
+            characters: {
+                type: 'array',
+                items: {
+                    type: 'object',
+                    properties: {
+                        id: { type: 'string' },
+                        name: { type: 'string' },
+                        description: { type: 'string' },
+                        personality: { type: 'string' },
+                        voice: { type: 'string' },
+                        role: {
+                            type: 'string',
+                            enum: ['suspect', 'witness', 'victim'],
+                        },
+                        alibi: { type: ['string', 'null'] },
+                        knownClues: {
+                            type: 'array',
+                            items: { type: 'string' },
+                        },
+                    },
+                    required: ['id', 'name', 'description', 'personality', 'voice', 'role', 'alibi', 'knownClues'],
+                    additionalProperties: false,
+                },
+            },
+            clues: {
+                type: 'array',
+                items: {
+                    type: 'object',
+                    properties: {
+                        id: { type: 'string' },
+                        name: { type: 'string' },
+                        description: { type: 'string' },
+                        type: {
+                            type: 'string',
+                            enum: ['physical', 'testimony', 'other'],
+                        },
+                    },
+                    required: ['id', 'name', 'description', 'type'],
+                    additionalProperties: false,
+                },
+            },
+            mystery: {
+                type: 'object',
+                properties: {
+                    title: { type: 'string' },
+                    description: { type: 'string' },
+                    shortDescription: { type: 'string' },
+                    victim: { type: 'string' },
+                    crime: { type: 'string' },
+                    time: { type: 'string' },
+                    location_id: { type: 'string' },
+                },
+                required: ['title', 'description', 'shortDescription', 'victim', 'crime', 'time', 'location_id'],
+                additionalProperties: false,
+            },
+            solution: {
+                type: 'object',
+                properties: {
+                    culpritId: { type: 'string' },
+                    motive: { type: 'string' },
+                    method: { type: 'string' },
+                },
+                required: ['culpritId', 'motive', 'method'],
+                additionalProperties: false,
+            },
+        },
+        required: ['locations', 'characters', 'clues', 'mystery', 'solution'],
+        additionalProperties: false,
+    },
+};
+
+/**
+ * Builds the available voices string for world generation prompts
+ */
+async function buildAvailableVoicesString(): Promise<string> {
+    const { voices } = await elevenlabs.voices.getAll();
     let availableVoices = `Available voices:\n\n`;
 
     for (const voice of voices) {
@@ -33,8 +154,14 @@ export async function generateWorld(config: { model?: string; } = {}): Promise<W
         }
     }
 
-    // TODO: Try removing or reworking the "Tone and inspiration" section. Seems to repeat results sometimes.
-    const SYSTEM_PROMPT = `\
+    return availableVoices;
+}
+
+/**
+ * Builds the system prompt for world generation
+ */
+function buildWorldGenerationSystemPrompt(availableVoices: string): string {
+    return `\
 You are Mystwright, a game master for a mystery text adventure.
 
 You generate vivid descriptions and guide the user through a mystery, revealing clues gradually and never giving away the solution outright
@@ -73,244 +200,48 @@ ${availableVoices}
 
 Tone and inspiration: grounded, deductive, and in the spirit of classic detective fiction like Sherlock Holmes and Agatha Christie.
     `;
+}
 
-    const WORLD_GENERATION_PROMPT = `\
-Create a mystery with a modern mystery novel tone
-    `;
-    const maxAttempts = 5; // Maximum number of attempts to generate a valid world
-    let attempts = 0;
-    let worldJson: WorldPayload | null = null;
-    let previousMessages: Array<Message> = [
-        {
-            role: 'system',
-            content: SYSTEM_PROMPT
-        },
-        {
-            role: 'user',
-            content: WORLD_GENERATION_PROMPT
-        }
-    ];
-    let validationError: Error | null = null;
+/**
+ * Creates validation error feedback message from ValidationResult
+ */
+function createValidationErrorFeedback(validationResult: ValidationResult): string {
+    let missingContent = '';
 
-    const schema = {
-        name: 'mystery',
-        strict: true,
-        schema: {
-            type: 'object',
-            properties: {
-                locations: {
-                    type: 'array',
-                    items: {
-                        type: 'object',
-                        properties: {
-                            id: { type: 'string' },
-                            name: { type: 'string' },
-                            description: { type: 'string' },
-                            connectedLocations: { 
-                                type: 'array', 
-                                items: { type: 'string' }
-                            },
-                            clues: { 
-                                type: 'array', 
-                                items: { type: 'string' }
-                            },
-                            characters: { 
-                                type: 'array', 
-                                items: { type: 'string' }
-                            }
-                        },
-                        required: ['id', 'name', 'description', 'connectedLocations', 'clues', 'characters'],
-                        additionalProperties: false
-                    }
-                },
-                characters: {
-                    type: 'array',
-                    items: {
-                        type: 'object',
-                        properties: {
-                            id: { type: 'string' },
-                            name: { type: 'string' },
-                            description: { type: 'string' },
-                            personality: { type: 'string' },
-                            voice: { type: 'string' },
-                            role: { 
-                                type: 'string', 
-                                enum: ['suspect', 'witness', 'victim']
-                            },
-                            alibi: { type: ['string', 'null'] },
-                            knownClues: {
-                                type: 'array',
-                                items: { type: 'string' }
-                            }
-                        },
-                        required: ['id', 'name', 'description', 'personality', 'voice', 'role', 'alibi', 'knownClues'],
-                        additionalProperties: false
-                    }
-                },
-                clues: {
-                    type: 'array',
-                    items: {
-                        type: 'object',
-                        properties: {
-                            id: { type: 'string' },
-                            name: { type: 'string' },
-                            description: { type: 'string' },
-                            type: { 
-                                type: 'string', 
-                                enum: ['physical', 'testimony', 'other']
-                            }
-                        },
-                        required: ['id', 'name', 'description', 'type'],
-                        additionalProperties: false
-                    }
-                },
-                mystery: {
-                    type: 'object',
-                    properties: {
-                        title: { type: 'string' },
-                        description: { type: 'string' },
-                        shortDescription: { type: 'string' },
-                        victim: { type: 'string' },
-                        crime: { type: 'string' },
-                        time: { type: 'string' },
-                        location: { type: 'string' }
-                    },
-                    required: ['title', 'description', 'shortDescription', 'victim', 'crime', 'time', 'location'],
-                    additionalProperties: false
-                },
-                solution: {
-                    type: 'object',
-                    properties: {
-                        culpritId: { type: 'string' },
-                        motive: { type: 'string' },
-                        method: { type: 'string' }
-                    },
-                    required: ['culpritId', 'motive', 'method'],
-                    additionalProperties: false
-                }
-            },
-            required: ['locations', 'characters', 'clues', 'mystery', 'solution'],
-            additionalProperties: false
-        }
-    };
-
-    while (attempts < maxAttempts) {
-        attempts++;
-        console.log(`Attempt ${attempts} of ${maxAttempts} to generate valid world`);
-        
-        try {
-            // Parse the JSON content from the response
-            worldJson = await OpenRouter.generateCompletion(
-                config.model ?? DEFAULT_WEAK_MODEL,
-                previousMessages,
-                { schema }
-            ) as WorldPayload;
-
-            console.log(`Attempt ${attempts} - parsing complete. Validating...`);
-            
-            // Log summary of the generated content
-            console.log(`Generated: ${worldJson.locations.length} locations, ${worldJson.characters.length} characters, ${worldJson.clues.length} clues`);
-
-            // Validate the response structure
-            validateWorldStructure(worldJson);
-            
-            // If we reach this point, validation passed
-            console.log("World validation successful after", attempts, "attempts");
-            
-            // Convert to our internal world structure
-            const world = deserializeWorldStructure(worldJson);
-            console.log(
-                'Final world structure contains:', 
-                `${world.locations.size} locations,`,
-                `${world.characters.size} characters,`,
-                `${world.clues.size} clues`
-            );
-            console.log('Generating images...');
-
-            const styleSeed = await generateImageStyleSeed(world);
-
-            console.log('Using style seed:');
-            console.log(styleSeed);
-
-            // Generate images for clues and characters in parallel
-            await Promise.all([
-                ...world.clues.values().map(async (clue) => {
-                    if (clue.type === 'physical') {
-                        // Generate an image for the clue
-                        const { buffer, mime } = await generateClueImage(world, clue, styleSeed);
-                        const ext = mime.split('/')[1] ?? 'png';
-                        const url = await uploadImageToStorage(buffer, `${world.mystery.title}/clues/${clue.id}-clue-image.${ext}`);
-                        clue.image = url;
-                        console.log(`Generated image for clue ${clue.name} (${clue.id})`);
-                    }
-                }),
-                ...world.characters.values().map(async (character) => {
-                    const { buffer, mime } = await generateCharacterImage(world, character, styleSeed);
-                    const ext = mime.split('/')[1] ?? 'png';
-                    const url = await uploadImageToStorage(buffer, `${world.mystery.title}/characters/${character.id}-character-image.${ext}`);
-                    character.image = url;
-                    console.log(`Generated image for character ${character.name} (${character.id})`);
-                })
-            ]);
-            console.log('All images generated successfully.');
-            
-            // Write the generated world to a file
-            // Intentionally not waiting for the write to finish to prevent longer load times
-            if (import.meta.env.DEV) {
-                writeRelative(import.meta.url, `../../../gens/${world.mystery.title}/world.json`, JSON.stringify(worldJson, null, 4));
+    // Process each validation error to provide specific guidance
+    for (const error of validationResult.errors) {
+        if (error.type === 'INSUFFICIENT_COUNT') {
+            missingContent += `- ${error.suggestion}\n`;
+        } else if (error.type === 'INVALID_REFERENCE') {
+            missingContent += `- FIX invalid references: ${error.message}\n`;
+            missingContent += `  ${error.suggestion}\n`;
+        } else if (error.type === 'MISSING_CULPRIT') {
+            missingContent += `- FIX culprit reference: ${error.suggestion}\n`;
+        } else if (error.type === 'MISSING_STRUCTURE') {
+            missingContent += `- FIX structural issue: ${error.message}\n`;
+            missingContent += `  ${error.suggestion}\n`;
+        } else {
+            // Generic fallback for any unrecognized error
+            missingContent += `- FIX: ${error.message}\n`;
+            if (error.suggestion) {
+                missingContent += `  ${error.suggestion}\n`;
             }
+        }
+    }
 
-            return world;
-        } catch (error) {
-            validationError = error as Error;
-            console.warn(`Attempt ${attempts} failed:`, validationError.message);
-            
-            if (attempts < maxAttempts && worldJson) {
-                // Add the partial result and error message to the conversation
-                previousMessages.push({
-                    role: 'assistant', 
-                    content: JSON.stringify(worldJson)
-                });
-                
-                // Analyze validation error to provide specific guidance
-                let missingContent = '';
-                
-                // Check for specific error types and provide targeted guidance
-                if (validationError.message.includes('Not enough locations')) {
-                    missingContent += `- ADD ${5 - worldJson.locations.length} more locations (currently have ${worldJson.locations.length}, need at least 5)\n`;
-                    missingContent += '  For each new location, include connections to existing locations\n';
-                }
-                
-                if (validationError.message.includes('Not enough characters')) {
-                    missingContent += `- ADD ${8 - worldJson.characters.length} more characters (currently have ${worldJson.characters.length}, need at least 8)\n`;
-                    missingContent += '  Include a mix of suspects and witnesses with detailed descriptions and alibis\n';
-                }
-                
-                if (validationError.message.includes('Not enough clues')) {
-                    missingContent += `- ADD ${15 - worldJson.clues.length} more clues (currently have ${worldJson.clues.length}, need at least 15)\n`;
-                    missingContent += '  Include both physical evidence and testimony clues\n';
-                }
-                
-                // Check for reference errors
-                if (validationError.message.includes('references non-existent')) {
-                    missingContent += '- FIX invalid references: ' + validationError.message + '\n';
-                    missingContent += '  Either add the missing referenced items or update the references to existing items\n';
-                }
-                
-                // Culprit exists check
-                if (validationError.message.includes('Culprit with ID')) {
-                    missingContent += '- FIX culprit reference: ensure the culpritId in solution matches an existing character ID\n';
-                }
-                
-                // Add a generic message if no specific issues were identified
-                if (!missingContent) {
-                    missingContent = `- FIX the following issue: ${validationError.message}\n`;
-                }
-                
-                // Ask for improvements based on the specific issues
-                previousMessages.push({
-                    role: 'user',
-                    content: `\
+    // Fallback if no specific issues were processed
+    if (!missingContent && validationResult.errors.length > 0) {
+        missingContent = validationResult.errors.map(error => `- FIX: ${error.message}`).join('\n') + '\n';
+    }
+
+    return missingContent;
+}
+
+/**
+ * Creates the retry prompt for world generation improvements
+ */
+function createRetryPrompt(missingContent: string): string {
+    return `\
 Your mystery world is good but needs some additions. Please ADD TO the existing world (don't replace it):
 
 ${missingContent}
@@ -322,45 +253,215 @@ Important instructions:
 4. Make sure all IDs are unique and all references are valid
 5. Return the COMPLETE JSON with both existing and new content combined
 
-Your response should be a single, complete JSON object containing the original content plus the new additions.`
-                });
-            } else if (attempts >= maxAttempts) {
-                console.error("Max attempts reached. Failed to generate valid world.");
-                throw new Error(`Failed to generate valid world after ${maxAttempts} attempts: ${validationError.message}`);
+Your response should be a single, complete JSON object containing the original content plus the new additions.`;
+}
+
+/**
+ * Generates a mystery and world by sending a request to OpenRouter's API
+ * using structured JSON output format. If validation fails, it will
+ * request more content from the model until we have a valid world.
+ * @param config - Optional configuration object with API key and model
+ */
+export async function generateWorld(config: { model?: string } = {}): Promise<World> {
+    const availableVoices = await buildAvailableVoicesString();
+    const systemPrompt = buildWorldGenerationSystemPrompt(availableVoices);
+
+    const worldGenerationPrompt = `Create a mystery with a modern mystery novel tone`;
+
+    let attempts = 0;
+    let worldJson: WorldPayload | null = null;
+    let previousMessages: Array<Message> = [
+        {
+            role: 'system',
+            content: systemPrompt,
+        },
+        {
+            role: 'user',
+            content: worldGenerationPrompt,
+        },
+    ];
+    let validationError: Error | null = null;
+
+    while (attempts < MAX_GENERATION_ATTEMPTS) {
+        attempts++;
+        console.log(`Attempt ${attempts} of ${MAX_GENERATION_ATTEMPTS} to generate valid world`);
+
+        try {
+            // Parse the JSON content from the response
+            worldJson = (await OpenRouter.generateCompletion(config.model ?? DEFAULT_WEAK_MODEL, previousMessages, {
+                schema: WORLD_GENERATION_SCHEMA,
+                temperature: GENERATION_TEMPERATURE,
+                verbosity: VERBOSITY,
+            })) as WorldPayload;
+
+            console.log(`Attempt ${attempts} - parsing complete. Validating...`);
+
+            // Log summary of the generated content
+            console.log(
+                `Generated: ${worldJson.locations.length} locations, ${worldJson.characters.length} characters, ${worldJson.clues.length} clues`,
+            );
+
+            // Validate the response structure
+            const validationResult = validateWorldStructure(worldJson);
+
+            // If there are validation errors, throw a custom error to continue the retry loop
+            if (!validationResult.isValid) {
+                throw new WorldValidationError(validationResult, worldJson);
+            }
+
+            // If we reach this point, validation passed
+            console.log(`World validation successful after ${attempts} attempt${attempts > 1 ? 's' : ''}.`);
+
+            // Convert to our internal world structure
+            const world = deserializeWorldStructure(worldJson);
+
+            console.log(
+                'Final world structure contains:',
+                `${world.locations.size} locations,`,
+                `${world.characters.size} characters,`,
+                `${world.clues.size} clues`,
+            );
+            console.log('Generating images...');
+
+            const styleSeed = await generateImageStyleSeed(world);
+
+            console.log('Using style seed:');
+            console.log(styleSeed);
+
+            // Generate images for clues and characters in parallel
+            await Promise.all([
+                ...world.clues.values().map(async clue => {
+                    if (clue.type === 'physical') {
+                        // Generate an image for the clue
+                        const { buffer, mime } = await generateClueImage(world, clue, styleSeed);
+                        const ext = mime.split('/')[1] ?? 'png';
+                        const url = await uploadImageToStorage(
+                            buffer,
+                            `${world.mystery.title}/clues/${clue.id}-clue-image.${ext}`,
+                        );
+                        clue.image = url;
+                        console.log(`Generated image for clue ${clue.name} (${clue.id})`);
+                    }
+                }),
+                ...world.characters.values().map(async character => {
+                    const { buffer, mime } = await generateCharacterImage(world, character, styleSeed);
+                    const ext = mime.split('/')[1] ?? 'png';
+                    const url = await uploadImageToStorage(
+                        buffer,
+                        `${world.mystery.title}/characters/${character.id}-character-image.${ext}`,
+                    );
+                    character.image = url;
+                    console.log(`Generated image for character ${character.name} (${character.id})`);
+                }),
+            ]);
+
+            console.log('All images generated successfully.');
+
+            // Write the generated world to a file for inspection in development
+            if (!import.meta.env.PROD) {
+                writeRelative(
+                    import.meta.url,
+                    `../../../gens/${world.mystery.title}/world.json`,
+                    JSON.stringify(worldJson, null, 4),
+                );
+            }
+
+            return world;
+        } catch (error) {
+            if (error instanceof WorldValidationError) {
+                const validationError = error;
+                console.warn(`Attempt ${attempts} failed:`, validationError.message);
+
+                if (attempts < MAX_GENERATION_ATTEMPTS && worldJson) {
+                    // Add the partial result and error message to the conversation
+                    previousMessages.push({
+                        role: 'assistant',
+                        content: JSON.stringify(worldJson),
+                    });
+
+                    // Get validation result to create comprehensive missingContent message
+                    const validationResult = validateWorldStructure(worldJson);
+                    const missingContent = createValidationErrorFeedback(validationResult);
+                    const retryPrompt = createRetryPrompt(missingContent);
+
+                    // Ask for improvements based on the specific issues
+                    previousMessages.push({
+                        role: 'user',
+                        content: retryPrompt,
+                    });
+                } else if (attempts >= MAX_GENERATION_ATTEMPTS) {
+                    console.error('Max attempts reached. Failed to generate valid world.');
+                    throw new Error(
+                        `Failed to generate valid world after ${MAX_GENERATION_ATTEMPTS} attempts: ${validationError.message}`,
+                    );
+                }
+            } else {
+                console.error(`Unexpected error during world generation on attempt ${attempts}:`, error);
+                throw error;
             }
         }
     }
 
-    throw new Error("Failed to generate valid world");
+    throw new Error('Failed to generate valid world');
 }
 
 /**
  * Validates that the world structure matches the expected format and contains the required elements.
  * @param world - The world object to validate
- * @throws Will throw an error if the world structure is invalid or incomplete.
- * @throws Will throw an error if the world structure is missing required elements.
- * @throws Will throw an error if the world structure contains invalid references.
+ * @returns ValidationResult containing validation status and detailed error information
  */
-export function validateWorldStructure(world: WorldPayload): void {
+export function validateWorldStructure(world: WorldPayload): ValidationResult {
+    const errors: ValidationError[] = [];
+
     // Check if all required arrays and objects exist
     if (!world.locations || !Array.isArray(world.locations)) {
-        throw new Error('Missing or invalid locations array');
+        errors.push({
+            type: 'MISSING_STRUCTURE',
+            message: 'Missing or invalid locations array',
+            field: 'locations',
+            suggestion: 'Provide a valid locations array',
+        });
     }
-    
+
     if (!world.characters || !Array.isArray(world.characters)) {
-        throw new Error('Missing or invalid characters array');
+        errors.push({
+            type: 'MISSING_STRUCTURE',
+            message: 'Missing or invalid characters array',
+            field: 'characters',
+            suggestion: 'Provide a valid characters array',
+        });
     }
-    
+
     if (!world.clues || !Array.isArray(world.clues)) {
-        throw new Error('Missing or invalid clues array');
+        errors.push({
+            type: 'MISSING_STRUCTURE',
+            message: 'Missing or invalid clues array',
+            field: 'clues',
+            suggestion: 'Provide a valid clues array',
+        });
     }
-    
+
     if (!world.mystery || typeof world.mystery !== 'object') {
-        throw new Error('Missing or invalid mystery object');
+        errors.push({
+            type: 'MISSING_STRUCTURE',
+            message: 'Missing or invalid mystery object',
+            field: 'mystery',
+            suggestion: 'Provide a valid mystery object',
+        });
     }
-    
+
     if (!world.solution || typeof world.solution !== 'object') {
-        throw new Error('Missing or invalid solution object');
+        errors.push({
+            type: 'MISSING_STRUCTURE',
+            message: 'Missing or invalid solution object',
+            field: 'solution',
+            suggestion: 'Provide a valid solution object',
+        });
+    }
+
+    // If basic structure is invalid, return early to avoid further errors
+    if (errors.length > 0) {
+        return { isValid: false, errors };
     }
 
     console.log('Validating world structure...');
@@ -370,64 +471,138 @@ export function validateWorldStructure(world: WorldPayload): void {
 
     // Make sure there is enough data in each array
     if (world.locations.length < 5) {
-        throw new Error('Not enough locations (minimum 5 required)');
+        errors.push({
+            type: 'INSUFFICIENT_COUNT',
+            message: 'Not enough locations (minimum 5 required)',
+            field: 'locations',
+            expected: 5,
+            actual: world.locations.length,
+            suggestion: `Add ${5 - world.locations.length} more locations with connections to existing locations`,
+        });
     }
-    
+
     if (world.characters.length < 8) {
-        throw new Error('Not enough characters (minimum 8 required)');
+        errors.push({
+            type: 'INSUFFICIENT_COUNT',
+            message: 'Not enough characters (minimum 8 required)',
+            field: 'characters',
+            expected: 8,
+            actual: world.characters.length,
+            suggestion: `Add ${8 - world.characters.length} more characters including suspects and witnesses`,
+        });
     }
 
     if (world.clues.length < 15) {
-        throw new Error('Not enough clues (minimum 15 required)');
+        errors.push({
+            type: 'INSUFFICIENT_COUNT',
+            message: 'Not enough clues (minimum 15 required)',
+            field: 'clues',
+            expected: 15,
+            actual: world.clues.length,
+            suggestion: `Add ${15 - world.clues.length} more clues including physical evidence and testimony`,
+        });
     }
-    
+
     // Validate that the culprit exists in the characters array
     const culpritExists = world.characters.some(character => character.id === world.solution.culpritId);
     if (!culpritExists) {
-        throw new Error(`Culprit with ID ${world.solution.culpritId} not found in characters array`);
+        errors.push({
+            type: 'MISSING_CULPRIT',
+            message: `Culprit with ID ${world.solution.culpritId} not found in characters array`,
+            field: 'solution.culpritId',
+            expected: 'Valid character ID',
+            actual: world.solution.culpritId,
+            suggestion: 'Ensure the culpritId matches an existing character ID',
+        });
     }
-    
+
     // Validate that connected locations actually exist
     for (const location of world.locations) {
         for (const connectedId of location.connectedLocations) {
             const connectedExists = world.locations.some(loc => loc.id === connectedId);
             if (!connectedExists) {
-                throw new Error(`Location ${location.name} references non-existent connected location ${connectedId}`);
+                errors.push({
+                    type: 'INVALID_REFERENCE',
+                    message: `Location ${location.name} references non-existent connected location ${connectedId}`,
+                    field: `locations[${location.id}].connectedLocations`,
+                    expected: 'Valid location ID',
+                    actual: connectedId,
+                    suggestion: 'Either add the missing location or update the reference to an existing location',
+                });
             }
         }
     }
-    
+
     // Validate that clues referenced in locations exist
     for (const location of world.locations) {
         for (const clueId of location.clues) {
             const clueExists = world.clues.some(clue => clue.id === clueId);
             if (!clueExists) {
-                throw new Error(`Location ${location.name} references non-existent clue ${clueId}`);
+                errors.push({
+                    type: 'INVALID_REFERENCE',
+                    message: `Location ${location.name} references non-existent clue ${clueId}`,
+                    field: `locations[${location.id}].clues`,
+                    expected: 'Valid clue ID',
+                    actual: clueId,
+                    suggestion: 'Either add the missing clue or update the reference to an existing clue',
+                });
             }
         }
     }
-    
+
     // Validate that characters referenced in locations exist
     for (const location of world.locations) {
         for (const characterId of location.characters) {
             const characterExists = world.characters.some(character => character.id === characterId);
             if (!characterExists) {
-                throw new Error(`Location ${location.name} references non-existent character ${characterId}`);
+                errors.push({
+                    type: 'INVALID_REFERENCE',
+                    message: `Location ${location.name} references non-existent character ${characterId}`,
+                    field: `locations[${location.id}].characters`,
+                    expected: 'Valid character ID',
+                    actual: characterId,
+                    suggestion: 'Either add the missing character or update the reference to an existing character',
+                });
             }
         }
     }
-    
+
     // Validate that knownClues referenced by characters exist
     for (const character of world.characters) {
         if (character.knownClues) {
             for (const clueId of character.knownClues) {
                 const clueExists = world.clues.some(clue => clue.id === clueId);
                 if (!clueExists) {
-                    throw new Error(`Character ${character.name} references non-existent clue ${clueId}`);
+                    errors.push({
+                        type: 'INVALID_REFERENCE',
+                        message: `Character ${character.name} references non-existent clue ${clueId}`,
+                        field: `characters[${character.id}].knownClues`,
+                        expected: 'Valid clue ID',
+                        actual: clueId,
+                        suggestion: 'Either add the missing clue or update the reference to an existing clue',
+                    });
                 }
             }
         }
     }
+
+    // Validate that the mystery location exists
+    const mysteryLocationExists = world.locations.some(location => location.id === world.mystery.location_id);
+    if (!mysteryLocationExists) {
+        errors.push({
+            type: 'INVALID_REFERENCE',
+            message: `Mystery references non-existent location ${world.mystery.location_id}`,
+            field: 'mystery.location_id',
+            expected: 'Valid location ID',
+            actual: world.mystery.location_id,
+            suggestion: 'Ensure the location_id matches an existing location ID',
+        });
+    }
+
+    return {
+        isValid: errors.length === 0,
+        errors,
+    };
 }
 
 /**
@@ -440,9 +615,15 @@ export function validateWorldStructure(world: WorldPayload): void {
  * @param options.model - The model to use for generating the dialogue
  * @returns The generated dialogue response from the character
  */
-export async function getNextDialogueWithCharacter(character: Character, world: World, state: GameState, input?: string, options: { model?: string; } = {}): Promise<{ response: string; state: GameState }> {
+export async function getNextDialogueWithCharacter(
+    character: Character,
+    world: World,
+    state: GameState,
+    input?: string,
+    options: { model?: string } = {},
+): Promise<{ response: string; state: GameState }> {
     if (character.role === 'victim') {
-        return { response: "You cannot speak with the victim.", state };
+        return { response: 'You cannot speak with the victim.', state };
     }
 
     // Initialize dialogue history if it doesn't exist
@@ -451,7 +632,7 @@ export async function getNextDialogueWithCharacter(character: Character, world: 
     }
 
     const dialogueHistory = state.dialogueHistory[character.id]!;
-    
+
     // Build the context for the dialogue
     let knownCluesDescription = null;
     if (character.knownClues && character.knownClues.length > 0) {
@@ -463,7 +644,7 @@ export async function getNextDialogueWithCharacter(character: Character, world: 
             .filter(Boolean)
             .join(', ');
     }
-    
+
     const cluesFoundByPlayer = state.cluesFound
         .map(clueId => {
             const clue = world.clues.get(clueId);
@@ -471,6 +652,12 @@ export async function getNextDialogueWithCharacter(character: Character, world: 
         })
         .filter(Boolean)
         .join(', ');
+
+    const location = world.locations.get(world.mystery.location_id);
+
+    if (!location) {
+        throw new Error(`Crime location with ID ${world.mystery.location_id} not found in world locations.`);
+    }
 
     // Create prompt based on character role and context
     let prompt = `\
@@ -501,7 +688,7 @@ You are a ${character.role} in this mystery.
 The victim is: ${world.mystery.victim}
 The crime is: ${world.mystery.crime}
 The time of the crime is: ${world.mystery.time}
-The location of the crime is: ${world.mystery.location}
+The location of the crime is: ${location.name}, ${location.description}.
 The user is currently in a conversation with you.
 
 This is the current mystery world:
@@ -520,13 +707,17 @@ ${JSON.stringify(state, null, 4)}
 
 The user knows the following clues:
 <USER_KNOWN_CLUES>
-${JSON.stringify(state.cluesFound.map(id => world.clues.get(id)), null, 4)}
+${JSON.stringify(
+    state.cluesFound.map(id => world.clues.get(id)),
+    null,
+    4,
+)}
 </USER_KNOWN_CLUES>
 
 Your alibi is: ${character.alibi ?? 'No alibi provided'}. 
 You know about these clues: ${knownCluesDescription ?? 'No specific clues'}. 
 The user has found these clues: ${cluesFoundByPlayer ?? 'No clues yet'}.\n`;
-    
+
     // Customize prompt based on character role and user progress
     if (character.role === 'suspect') {
         prompt += `\
@@ -545,15 +736,15 @@ If there is no existing conversation start by intoducing yourself to the user.`;
     const messages: Message[] = [
         {
             role: 'system',
-            content: prompt
+            content: prompt,
         },
-        ...dialogueHistory
+        ...dialogueHistory,
     ];
 
     if (input) {
         messages.push({
             role: 'user',
-            content: input
+            content: input,
         });
     }
 
@@ -583,14 +774,14 @@ If there is no existing conversation start by intoducing yourself to the user.`;
         // Add the user input to the character's history
         dialogueHistory.push({
             role: 'user',
-            content: input
+            content: input,
         });
     }
 
     // Add the new dialogue to the character's history
     dialogueHistory.push({
         role: 'assistant',
-        content: newDialogue
+        content: newDialogue,
     });
 
     const newState = await updateGameState(world, state);
@@ -605,10 +796,7 @@ If there is no existing conversation start by intoducing yourself to the user.`;
  * @param state - The current game state
  */
 export async function updateGameState(world: World, state: GameState): Promise<GameState> {
-    await Promise.all([
-        updateKnownClues(world, state),
-        updateMemories(world, state)
-    ]);
+    await Promise.all([updateKnownClues(world, state), updateMemories(world, state)]);
 
     return state;
 }
@@ -648,7 +836,11 @@ ${JSON.stringify(state.memories, null, 4)}
 </MEMORY>
 The user knows the following clues:
 <USER_KNOWN_CLUES>
-${JSON.stringify(state.cluesFound.map(id => world.clues.get(id)), null, 4)}
+${JSON.stringify(
+    state.cluesFound.map(id => world.clues.get(id)),
+    null,
+    4,
+)}
 </USER_KNOWN_CLUES>
 The user is currently in a conversation with ${character.name} and has the following dialogue history:
 <CONVERSATION>
@@ -669,29 +861,28 @@ ${JSON.stringify(state, null, 4)}
                                 properties: {
                                     origin_id: { type: 'string' },
                                     origin_type: { type: 'string', enum: ['character'] },
-                                    content: { type: 'string' }
+                                    content: { type: 'string' },
                                 },
                                 required: ['origin_id', 'origin_type', 'content'],
-                                additionalProperties: false
-                            }
-                        }
+                                additionalProperties: false,
+                            },
+                        },
                     };
 
-
-                    const memories = await OpenRouter.generateCompletion(
+                    const memories = (await OpenRouter.generateCompletion(
                         DEFAULT_WEAK_MODEL,
                         [
                             {
                                 role: 'system',
-                                content: SYSTEM_PROMPT
+                                content: SYSTEM_PROMPT,
                             },
                             {
                                 role: 'user',
-                                content: `Provide a list of new memories or facts that the user has learned during the game. Or that characters have created.`
-                            }
+                                content: `Provide a list of new memories or facts that the user has learned during the game. Or that characters have created.`,
+                            },
                         ],
-                        { schema: memory_schema }
-                    ) as Array<Memory>;
+                        { schema: memory_schema },
+                    )) as Array<Memory>;
 
                     // Check if there are any new memories
                     if (memories !== null && memories !== undefined && Array.isArray(memories)) {
@@ -732,14 +923,24 @@ The user is currently in a conversation with ${character.name} and has the follo
 ${JSON.stringify(conversation, null, 4)}
 </CONVERSATION>
 This character knows the following clues:
-${(character.knownClues) && (`\
+${
+    character.knownClues &&
+    `\
 <CHARACTER_KNOWN_CLUES>
-${JSON.stringify(character.knownClues.map(id => world.clues.get(id)), null, 4)}
-</CHARACTER_KNOWN_CLUES>`
+${JSON.stringify(
+    character.knownClues.map(id => world.clues.get(id)),
+    null,
+    4,
 )}
+</CHARACTER_KNOWN_CLUES>`
+}
 The user knows the following clues:
 <USER_KNOWN_CLUES>
-${JSON.stringify(state.cluesFound.map(id => world.clues.get(id)), null, 4)}
+${JSON.stringify(
+    state.cluesFound.map(id => world.clues.get(id)),
+    null,
+    4,
+)}
 </USER_KNOWN_CLUES>
 This is the current mystery world:
 <WORLD>
@@ -752,26 +953,26 @@ ${JSON.stringify(world, null, 4)}
                         schema: {
                             type: 'array',
                             items: {
-                                type: 'string'
+                                type: 'string',
                             },
-                            additionalProperties: false
-                        }
+                            additionalProperties: false,
+                        },
                     };
 
-                    const clues = await OpenRouter.generateCompletion(
+                    const clues = (await OpenRouter.generateCompletion(
                         DEFAULT_WEAK_MODEL,
                         [
                             {
                                 role: 'system',
-                                content: SYSTEM_PROMPT
+                                content: SYSTEM_PROMPT,
                             },
                             {
                                 role: 'user',
-                                content: `Provide a list of new clues that the user has learned during the game. Or that characters have revealed.`
-                            }
+                                content: `Provide a list of new clues that the user has learned during the game. Or that characters have revealed.`,
+                            },
                         ],
-                        { schema: clues_schema }
-                    ) as Array<ClueID>;
+                        { schema: clues_schema },
+                    )) as Array<ClueID>;
 
                     // Check if there are any new clues
                     if (clues !== null && clues !== undefined && Array.isArray(clues)) {
@@ -807,7 +1008,11 @@ export function revealClue(world: World, state: GameState, clueId: ClueID): void
     }
 }
 
-export async function attemptSolve(world: World, state: GameState, input: string): Promise<{ solved: boolean; response: string; state: GameState }> {
+export async function attemptSolve(
+    world: World,
+    state: GameState,
+    input: string,
+): Promise<{ solved: boolean; response: string; state: GameState }> {
     const SYSTEM_PROMPT = `\
 You are Mystwright, a game master for a mystery text adventure.
 The user is making a guess for the solution to the mystery.
@@ -822,27 +1027,27 @@ Provide a response to the user based on their guess.
 Reject a guess if it is not based on evidence or if it is not a valid guess. Request more evidence or information if needed.
 Reject a guess if it has insufficient evidence to support it. Request more evidence or information if needed.`;
 
-// NOTE: adding this to the pompt causes the model to actually allow guesses with no evidence
+    // NOTE: adding this to the pompt causes the model to actually allow guesses with no evidence
 
-// If the guess is correct, respond with a positive confirmation and a brief explanation of how the user solved the mystery and the solved boolean should be set to true.
-// If the guess is incorrect, respond with a negative confirmation and a brief explanation of why the guess is incorrect.
-// If the guess is correct but with insufficient evidence, respond with a neutral confirmation and a brief explanation of what is missing. The mystery is not considered solved in this case.
+    // If the guess is correct, respond with a positive confirmation and a brief explanation of how the user solved the mystery and the solved boolean should be set to true.
+    // If the guess is incorrect, respond with a negative confirmation and a brief explanation of why the guess is incorrect.
+    // If the guess is correct but with insufficient evidence, respond with a neutral confirmation and a brief explanation of what is missing. The mystery is not considered solved in this case.
 
-// There are some rules to follow:
+    // There are some rules to follow:
 
-// - The response should be in the first person, as if you are the Judge.
-// - The response should be clear and concise, without unnecessary details.
-// - The response should be in the tone of a courtroom judge, maintaining a formal and authoritative demeanor.
-// - The users supplied guess MUST have enough evidence to support it, or it should be considered incorrect.
-// - DO NOT allow the user to ask for hints or clues. They must provide a guess based on the evidence they have gathered.
-// - DO NOT provide any additional information or context outside of the response to the user's guess.
-// - DO NOT allow a guess made with no evidence and just names to be considered a solved.
+    // - The response should be in the first person, as if you are the Judge.
+    // - The response should be clear and concise, without unnecessary details.
+    // - The response should be in the tone of a courtroom judge, maintaining a formal and authoritative demeanor.
+    // - The users supplied guess MUST have enough evidence to support it, or it should be considered incorrect.
+    // - DO NOT allow the user to ask for hints or clues. They must provide a guess based on the evidence they have gathered.
+    // - DO NOT provide any additional information or context outside of the response to the user's guess.
+    // - DO NOT allow a guess made with no evidence and just names to be considered a solved.
 
     const messages: Message[] = [
         {
             role: 'system',
-            content: SYSTEM_PROMPT
-        }
+            content: SYSTEM_PROMPT,
+        },
     ];
 
     let history = state.dialogueHistory[JUDGE_CHARACTER_ID];
@@ -851,12 +1056,10 @@ Reject a guess if it has insufficient evidence to support it. Request more evide
         history = state.dialogueHistory[JUDGE_CHARACTER_ID] = [];
     }
 
-    history.push(
-        {
-            role: 'user',
-            content: input
-        }
-    );
+    history.push({
+        role: 'user',
+        content: input,
+    });
 
     messages.push(...history);
 
@@ -871,35 +1074,31 @@ Reject a guess if it has insufficient evidence to support it. Request more evide
                     type: 'object',
                     properties: {
                         solved: { type: 'boolean' },
-                        response: { type: 'string' }
+                        response: { type: 'string' },
                     },
                     required: ['solved', 'response'],
-                    additionalProperties: false
-                }
-            }
-        }
+                    additionalProperties: false,
+                },
+            },
+        },
     );
 
-    history.push(
-        {
-            role: 'assistant',
-            content: response.response
-        }
-    );
+    history.push({
+        role: 'assistant',
+        content: response.response,
+    });
 
-    messages.push(
-        {
-            role: 'assistant',
-            content: response.response
-        }
-    );
+    messages.push({
+        role: 'assistant',
+        content: response.response,
+    });
 
     state.solved = response.solved;
 
     return {
         solved: response.solved,
         response: response.response,
-        state
+        state,
     };
 }
 
@@ -956,14 +1155,14 @@ ${SIN_CITY_SEED}
     const messages: Message[] = [
         {
             role: 'system',
-            content: SYSTEM_PROMPT
+            content: SYSTEM_PROMPT,
         },
     ];
 
-    const response = await OpenRouter.generateCompletion(
-        DEFAULT_WEAK_MODEL,
-        messages
-    );
+    const response = await OpenRouter.generateCompletion(DEFAULT_WEAK_MODEL, messages, {
+        temperature: GENERATION_TEMPERATURE,
+        verbosity: VERBOSITY,
+    });
 
     return response;
 }
@@ -989,23 +1188,24 @@ If the mystery is a historical whodunit, the description might include terms lik
     const messages: Message[] = [
         {
             role: 'system',
-            content: SYSTEM_PROMPT
+            content: SYSTEM_PROMPT,
         },
         {
             role: 'user',
-            content: `The mystery is: ${world.mystery.title}: ${world.mystery.description}.`
-        }
+            content: `The mystery is: ${world.mystery.title}: ${world.mystery.description}.`,
+        },
     ];
 
-    const response = await OpenRouter.generateCompletion(
-        DEFAULT_WEAK_MODEL,
-        messages
-    );
+    const response = await OpenRouter.generateCompletion(DEFAULT_WEAK_MODEL, messages);
 
     return response;
 }
 
-export async function generateClueImage(world: World, clue: Clue, styleSeed: string = ''): Promise<{ buffer: Buffer; mime: string }> {
+export async function generateClueImage(
+    world: World,
+    clue: Clue,
+    styleSeed: string = '',
+): Promise<{ buffer: Buffer; mime: string }> {
     const prompt = `\
 An image that looks like a photograph of evidence taken at a crime scene for the clue: ${clue.name}. \
 ${clue.description} \
@@ -1021,7 +1221,11 @@ ${styleSeed}`;
 
 // export async function generateWorldImage(world: World): Promise<Buffer> {}
 
-export async function generateCharacterImage(world: World, character: Character, styleSeed: string = ''): Promise<{ buffer: Buffer; mime: string }> {
+export async function generateCharacterImage(
+    world: World,
+    character: Character,
+    styleSeed: string = '',
+): Promise<{ buffer: Buffer; mime: string }> {
     const prompt = `\
 JUST A CHARACTER PORTRAIT of ${character.name}. ${character.description}. \
 ${character.name}'s personality is ${character.personality}. \
@@ -1029,7 +1233,6 @@ The image should be a realistic representation of the character, with no additio
 ${styleSeed}`;
 
     const result = await generateImageFromPrompt('google/imagen-4-ultra', prompt);
-
 
     return { buffer: result.buffer, mime: result.mime };
 }
@@ -1042,7 +1245,7 @@ export async function uploadImageToStorage(image: Buffer, filename: string): Pro
         accessKeyId: process.env.S3_ACCESS_KEY_ID,
         secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
         endpoint: process.env.S3_ENDPOINT,
-        bucket: process.env.S3_BUCKET_NAME
+        bucket: process.env.S3_BUCKET_NAME,
     });
 
     const filePath = `${crypto.randomUUID()}/${filename}`;

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
 import Chat from "./Chat";
 import Layout from "./Layout";
 import MystwrightSidebar from "./Sidebar";

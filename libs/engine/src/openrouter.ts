@@ -1,16 +1,19 @@
-import type { OpenRouterChatCompletionResponse, Tool } from "@mystwright/types";
+import type { OpenRouterChatCompletionResponse, Tool } from '@mystwright/types';
 
-export async function generateCompletion<T extends Record<string, any> | undefined = undefined, K = T extends undefined ? string : Record<string, any> | Array<Record<string, any>>>(
+export async function generateCompletion<
+    T extends Record<string, any> | undefined = undefined,
+    K = T extends undefined ? string : Record<string, any> | Array<Record<string, any>>,
+>(
     model: string,
     previousMessages: { role: 'system' | 'user' | 'assistant'; content: string }[],
-    config: { apiKey?: string, schema?: T, tools?: Array<Tool> } = {}
+    config: { apiKey?: string; schema?: T; tools?: Array<Tool>; temperature?: number; verbosity?: string } = {},
 ): Promise<K> {
     const openrouterAPIKey = config.apiKey ?? process.env.OPENROUTER_API_KEY;
 
     if (openrouterAPIKey === undefined || openrouterAPIKey === null) {
         throw new Error('OpenRouter API key is required');
     }
-    
+
     const body: {
         model: string;
         messages: { role: 'system' | 'user' | 'assistant'; content: string }[];
@@ -21,27 +24,35 @@ export async function generateCompletion<T extends Record<string, any> | undefin
     } = {
         model,
         messages: previousMessages,
-    }
+    };
 
     if (config.schema) {
         body.response_format = {
             type: 'json_schema',
-            json_schema: config.schema
-        }
+            json_schema: config.schema,
+        };
     }
 
     if (config.tools) {
         body.messages.push({
             role: 'system',
-            content: `You have access to the following tools: ${config.tools.map(tool => tool.name).join(', ')}.`
+            content: `You have access to the following tools: ${config.tools.map(tool => tool.name).join(', ')}.`,
         });
 
         for (const tool of config.tools) {
             body.messages.push({
                 role: 'system',
-                content: `Use the tool ${tool.name} when: ${tool.when}.`
+                content: `Use the tool ${tool.name} when: ${tool.when}.`,
             });
         }
+    }
+
+    if (config.temperature !== undefined) {
+        (body as any).temperature = config.temperature;
+    }
+
+    if (config.verbosity !== undefined) {
+        (body as any).verbosity = config.verbosity;
     }
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -50,9 +61,9 @@ export async function generateCompletion<T extends Record<string, any> | undefin
             // 'X-Title': 'Mystwright',
             // 'HTTP-Referer': 'https://mystwright.com',
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${openrouterAPIKey}`
+            Authorization: `Bearer ${openrouterAPIKey}`,
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
     });
 
     if (!response.ok) {
@@ -60,7 +71,7 @@ export async function generateCompletion<T extends Record<string, any> | undefin
         throw new Error(`OpenRouter API error: ${response.status} ${JSON.stringify(errorData)}`);
     }
 
-    const data = await response.json() as OpenRouterChatCompletionResponse;
+    const data = (await response.json()) as OpenRouterChatCompletionResponse;
 
     // console.log('OpenRouter API response:', JSON.stringify(data, null, 4));
 
@@ -68,7 +79,7 @@ export async function generateCompletion<T extends Record<string, any> | undefin
         console.error('OpenRouter API error:', data.error);
         throw new Error(`OpenRouter API error: ${data.error.message}`);
     }
-    
+
     if (!data.choices || !data.choices[0]?.message?.content) {
         throw new Error('Invalid response format from OpenRouter API');
     }
@@ -86,5 +97,5 @@ export async function generateCompletion<T extends Record<string, any> | undefin
 }
 
 export const OpenRouter = {
-    generateCompletion
-}
+    generateCompletion,
+};

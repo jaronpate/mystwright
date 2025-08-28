@@ -11,7 +11,7 @@ export interface Mystery {
     victim: string;
     crime: string;
     time: string;
-    location: string;
+    location_id: LocationID;
 }
 
 export interface Location {
@@ -122,3 +122,66 @@ export type Tool = {
     parameters: Record<string, any>;
     handler: (args: any) => Promise<any>;
 };
+
+export type ValidationErrorType = 
+    | 'MISSING_STRUCTURE'
+    | 'INSUFFICIENT_COUNT'
+    | 'INVALID_REFERENCE'
+    | 'MISSING_CULPRIT'
+    | 'INVALID_DATA';
+
+export interface ValidationError {
+    type: ValidationErrorType;
+    message: string;
+    field?: string;
+    expected?: string | number;
+    actual?: string | number;
+    suggestion?: string;
+}
+
+export interface ValidationResult {
+    isValid: boolean;
+    errors: ValidationError[];
+}
+
+export class WorldValidationError extends Error {
+    public readonly validationResult: ValidationResult;
+    public readonly worldPayload: WorldPayload;
+
+    constructor(validationResult: ValidationResult, worldPayload: WorldPayload, message?: string) {
+        const errorMessage = message || `World validation failed: ${validationResult.errors.map(e => e.message).join('; ')}`;
+        super(errorMessage);
+        
+        this.name = 'WorldValidationError';
+        this.validationResult = validationResult;
+        this.worldPayload = worldPayload;
+        
+        // Maintains proper stack trace for where our error was thrown (only available on V8)
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, WorldValidationError);
+        }
+    }
+
+    /**
+     * Get errors of a specific type
+     */
+    getErrorsByType(type: ValidationErrorType): ValidationError[] {
+        return this.validationResult.errors.filter(error => error.type === type);
+    }
+
+    /**
+     * Check if validation result contains errors of a specific type
+     */
+    hasErrorType(type: ValidationErrorType): boolean {
+        return this.validationResult.errors.some(error => error.type === type);
+    }
+
+    /**
+     * Get a formatted error message for display
+     */
+    getFormattedErrorMessage(): string {
+        return this.validationResult.errors
+            .map(error => `[${error.type}] ${error.message}${error.suggestion ? ` (${error.suggestion})` : ''}`)
+            .join('\n');
+    }
+}

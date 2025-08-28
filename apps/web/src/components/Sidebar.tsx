@@ -123,7 +123,10 @@ const CrimeDetails = ({ world }: CrimeDetailsProps) => {
     }
 
     const victim = world.payload.characters.find(c => c.id === world.payload.mystery.victim);
-    const location = world.payload.locations.find(l => l.id === world.payload.mystery.location);
+    const location = world.payload.locations.find(l => l.id === world.payload.mystery.location_id);
+
+    console.log('world.payload.mystery.location', world.payload.mystery.location_id);
+    console.log('location', location);
 
     return (
         <>
@@ -131,7 +134,7 @@ const CrimeDetails = ({ world }: CrimeDetailsProps) => {
                 <div className="crime-detail">
                     <div className="detail-title">Victim</div>
                     <div className="detail-value">{victim ? victim.name : 'Unknown'}</div>
-                    <div className="detail-value">{victim ? victim.description : 'No description...'}</div>
+                    {/* <div className="detail-value">{victim ? victim.description : 'No description...'}</div> */}
                 </div>
             </div>
             <div className="flex">
@@ -147,6 +150,10 @@ const CrimeDetails = ({ world }: CrimeDetailsProps) => {
                     <div className="detail-title">Time</div>
                     <div className="detail-value">{world.payload.mystery.time}</div>
                 </div>
+            </div>
+            <div className="crime-detail">
+                <div className="detail-title">Description</div>
+                <div className="detail-value">{world.payload.mystery.description}</div>
             </div>
         </>
     );
