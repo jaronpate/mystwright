@@ -18,7 +18,7 @@ export async function createVoiceStreamForText(voice: string, text: string): Pro
         const audio = await elevenlabsV2.textToSpeech.stream(voice, {
             text,
             voiceSettings: {
-                stability: 0.3,
+                stability: 0.25,
                 speed: 1.15,
                 style: 0.5,
                 similarityBoost: 0.85,
