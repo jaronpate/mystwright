@@ -115,13 +115,10 @@
 .card-subtitle {
     font-size: $font-size-xs;
     color: hsl(var(--muted-foreground));
-}
-
-.card-character .card-subtitle {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 230px;
+    width: 100%;
 }
 
 .card-icon {

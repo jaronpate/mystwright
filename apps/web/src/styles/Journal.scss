@@ -17,8 +17,8 @@
         top: 0;
         right: 0;
         z-index: 1001;
-        width: 100vw;
-        max-width: 400px;
+        width: 100dvw;
+        max-width: 450px;
         height: 100dvh;
         padding-left: $spacing-lg;
         transform: translateX(100%);
@@ -30,7 +30,7 @@
     }
 
     @media (max-width: $breakpoint-sm) {
-        width: 100vw;
+        width: 100dvw;
         max-width: none;
         padding-left: $spacing-lg;
         padding-right: $spacing-lg;

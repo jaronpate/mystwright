@@ -45,18 +45,21 @@
     background-color: hsl(var(--background));
     border-bottom: 1px solid hsl(var(--border) / 0.6);
     padding: 0 2px; // Helps with looking aligned to rounded corners
-    gap: $spacing-md;
+    gap: $spacing-lg;
 
     .header-title {
         display: flex;
         align-items: center;
         flex: 1;
+        min-width: 0;
     }
 
     .character-info {
         display: flex;
         flex-direction: column;
         gap: $spacing-xs;
+        flex: 1;
+        min-width: 0;
     }
 
     h2 {
@@ -70,6 +73,11 @@
         font-size: $font-size-base;
         color: hsl(var(--muted-foreground));
         margin: 0;
+        // TODO: no wrap is needed to trigger ellipsis, but causes the header to grow to 100vw
+        // white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
     }
 }
 
@@ -137,6 +145,10 @@
         color: hsl(var(--foreground));
         max-width: 65%;
         margin-bottom: $spacing-lg;
+
+        @media (max-width: $breakpoint-md) {
+            max-width: 100%;
+        }
 
         &:last-child {
             margin-bottom: 0;

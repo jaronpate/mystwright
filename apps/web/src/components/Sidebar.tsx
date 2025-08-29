@@ -1,117 +1,10 @@
 import type { DBWorld } from '@mystwright/db';
-import { AlertTriangle, BookOpen, ChevronDown, ChevronUp, Gavel, Loader2, LogOut, Plus, Users, X } from 'lucide-react';
-import { useState } from 'react';
+import { AlertTriangle, BookOpen, Gavel, Loader2, LogOut, Plus, Users } from 'lucide-react';
 import { useUserContext } from '../context/user-context';
 import { useWorldContext } from '../context/world-context';
 import '../styles/Sidebar.scss';
+import { Card, CollapsibleSection, SidebarHeader } from './ui';
 import Logo from '/icon.png';
-
-type SidebarHeaderProps = {
-    title: string;
-    icon?: React.ReactNode;
-    onClose?: () => void;
-};
-
-export const SidebarHeader = ({ title, icon, onClose }: SidebarHeaderProps) => {
-    return (
-        <div className="sidebar-header">
-            <div className="wordmark">
-                {icon}
-                <div className="text-large">{title}</div>
-            </div>
-            {onClose && (
-                <button className="mobile-close-button" onClick={onClose} aria-label="Close sidebar">
-                    <X size={20} />
-                </button>
-            )}
-        </div>
-    );
-};
-
-type CollapsibleSectionProps = {
-    title: string;
-    icon?: React.ReactNode;
-    children?:
-        | React.ReactNode
-        | ((isOpen: boolean, setIsOpen: (value: React.SetStateAction<boolean>) => void) => React.ReactNode);
-    alwaysShowWhenActive?: boolean;
-    isActive?: boolean;
-};
-
-export const CollapsibleSection = ({
-    title,
-    icon,
-    children,
-    alwaysShowWhenActive = false,
-    isActive = false,
-}: CollapsibleSectionProps) => {
-    const [isOpen, setIsOpen] = useState(true);
-    const [isAnimating, setIsAnimating] = useState(false);
-
-    const toggleSection = () => {
-        if (isOpen) {
-            setIsAnimating(true);
-            setTimeout(() => {
-                setIsOpen(false);
-                setIsAnimating(false);
-            }, 200);
-        } else {
-            setIsOpen(true);
-        }
-    };
-
-    // Determine if content should be shown
-    const showContent = isOpen || (alwaysShowWhenActive && isActive) || isAnimating;
-
-    return (
-        <div className="sidebar-collapsable">
-            <div className="sidebar-title" onClick={toggleSection}>
-                { icon && <div className="sidebar-title-icon">{icon}</div> }
-                <div className="sidebar-title-text">{title}</div>
-                <div className="ff"></div>
-                <div className="sidebar-title-icon sidebar-chevron">
-                    {isOpen ? (
-                        <ChevronDown width={'16px'} height={'16px'} />
-                    ) : (
-                        <ChevronUp width={'16px'} height={'16px'} />
-                    )}
-                </div>
-            </div>
-            {showContent && (
-                <div className={`sidebar-items ${isAnimating ? 'closing' : ''}`}>
-                    {typeof children === 'function' ? children(isOpen, setIsOpen) : children}
-                </div>
-            )}
-        </div>
-    );
-};
-
-type CardProps = {
-    title: string;
-    description?: string;
-    active?: boolean;
-    noBorder?: boolean;
-    onClick?: () => void;
-    icon?: React.ReactNode;
-    disabled?: boolean;
-};
-
-export const Card = ({ title, description, active, noBorder, onClick, icon, disabled }: CardProps) => {
-    return (
-            <div
-                onClick={disabled ? undefined : onClick}
-                className={`card ${onClick && !disabled ? 'clickable' : ''} ${active ? 'active' : ''} ${
-                    noBorder ? 'no-border' : ''
-                } ${disabled ? 'disabled' : ''}`}
-            >
-                {icon && <div className="card-icon">{icon}</div>}
-                <div className="card-content">
-                    <div className="card-title">{title}</div>
-                    { description && <div className="card-subtitle">{description}</div> }
-                </div>
-            </div>
-    );
-};
 
 interface CrimeDetailsProps {
     world: DBWorld | null;
@@ -124,9 +17,6 @@ const CrimeDetails = ({ world }: CrimeDetailsProps) => {
 
     const victim = world.payload.characters.find(c => c.id === world.payload.mystery.victim);
     const location = world.payload.locations.find(l => l.id === world.payload.mystery.location_id);
-
-    console.log('world.payload.mystery.location', world.payload.mystery.location_id);
-    console.log('location', location);
 
     return (
         <>
@@ -165,8 +55,17 @@ interface MystwrightSidebarProps {
 }
 
 export default function MystwrightSidebar({ isOpen = true, onClose }: MystwrightSidebarProps) {
-    const { worlds, setActiveWorld, setActiveCharacter, activeWorld, activeCharacter, isSolving, setIsSolving, createWorld, isCreatingWorld } =
-        useWorldContext();
+    const {
+        worlds,
+        setActiveWorld,
+        setActiveCharacter,
+        activeWorld,
+        activeCharacter,
+        isSolving,
+        setIsSolving,
+        createWorld,
+        isCreatingWorld,
+    } = useWorldContext();
     const { user, logout } = useUserContext();
 
     const talkToJudge = () => {
@@ -204,69 +103,61 @@ export default function MystwrightSidebar({ isOpen = true, onClose }: Mystwright
                     <CollapsibleSection
                         title="Worlds"
                         icon={<BookOpen width={'16px'} height={'16px'} />}
-                        alwaysShowWhenActive={true}
-                        isActive={activeWorld !== null}
-                    >
-                        {(isOpen, setIsOpen) =>
-                            isOpen
-                                ? // Show all worlds when expanded
-                                  [
-                                      <Card
-                                          key="create-new"
-                                          title={isCreatingWorld ? "Creating..." : "Create New Mystery"}
-                                          description={isCreatingWorld ? "Generating your mystery..." : "Start a new adventure"}
-                                          onClick={createWorld}
-                                          disabled={isCreatingWorld}
-                                          icon={
-                                              <>
-                                                  {isCreatingWorld ? (
-                                                      <Loader2 width={'16px'} height={'16px'} className="spin" />
-                                                  ) : (
-                                                      <Plus width={'16px'} height={'16px'} />
-                                                  )}
-                                              </>
-                                          }
-                                          noBorder={true}
-                                      />,
-                                      ...worlds.map(world => (
-                                          <Card
-                                              key={world.id}
-                                              title={world.title}
-                                              description={world.short_description}
-                                              active={activeWorld?.id === world.id}
-                                              onClick={() => {
-                                                  setActiveCharacter(null);
-                                                  setActiveWorld(world.id);
-                                                  setIsOpen(false);
-                                              }}
-                                          />
-                                      ))
-                                  ]
-                                : // Show only active world when collapsed or create button when creating
-                                  activeWorld ? (
-                                      <Card
-                                          key={activeWorld.id}
-                                          title={activeWorld.title}
-                                          description={activeWorld.short_description ?? 'No description...'}
-                                          active={true}
-                                          onClick={() => {
-                                              setActiveCharacter(null);
-                                              setActiveWorld(activeWorld.id);
-                                          }}
-                                      />
-                                  ) : isCreatingWorld ? (
-                                      <Card
-                                          key="create-new"
-                                          title="Creating..."
-                                          description="Generating your mystery..."
-                                          disabled={true}
-                                          icon={
-                                                <Loader2 width={'16px'} height={'16px'} className="spin" />
-                                          }
-                                          noBorder={true}
-                                      />
-                                  ) : null
+                        displayWhenCollapsed={
+                            activeWorld ? (
+                                <Card
+                                    key={activeWorld.id}
+                                    title={activeWorld.title}
+                                    description={activeWorld.short_description ?? 'No description...'}
+                                    active={true}
+                                    onClick={() => {
+                                        setActiveCharacter(null);
+                                        setActiveWorld(activeWorld.id);
+                                    }}
+                                />
+                            ) : isCreatingWorld ? (
+                                <Card
+                                    key="create-new"
+                                    title="Creating..."
+                                    description="Generating your mystery..."
+                                    disabled={true}
+                                    icon={<Loader2 width={'16px'} height={'16px'} className="spin" />}
+                                    noBorder={true}
+                                />
+                            ) : null
                         }
+                    >
+                        <Card
+                            key="create-new"
+                            title={isCreatingWorld ? 'Creating...' : 'Create New Mystery'}
+                            description={
+                                isCreatingWorld ? 'Generating your mystery...' : 'Start a new adventure'
+                            }
+                            onClick={createWorld}
+                            disabled={isCreatingWorld}
+                            icon={
+                                <>
+                                    {isCreatingWorld ? (
+                                        <Loader2 width={'16px'} height={'16px'} className="spin" />
+                                    ) : (
+                                        <Plus width={'16px'} height={'16px'} />
+                                    )}
+                                </>
+                            }
+                            noBorder={true}
+                        />
+                        {worlds.map(world => (
+                            <Card
+                                key={world.id}
+                                title={world.title}
+                                description={world.short_description}
+                                active={activeWorld?.id === world.id}
+                                onClick={() => {
+                                    setActiveCharacter(null);
+                                    setActiveWorld(world.id);
+                                }}
+                            />
+                        ))}
                     </CollapsibleSection>
                     {/* Crime Details */}
                     <CollapsibleSection title="Crime Details" icon={<AlertTriangle width={'16px'} height={'16px'} />}>
@@ -281,92 +172,63 @@ export default function MystwrightSidebar({ isOpen = true, onClose }: Mystwright
                             active={isSolving}
                             onClick={() => talkToJudge()}
                             noBorder={true}
-                            icon={
-                                <Gavel width={'16px'} height={'16px'} />
-                            }
+                            icon={<Gavel width={'16px'} height={'16px'} />}
                         />
                     )}
                     {/* Characters */}
                     <CollapsibleSection
                         title="Characters"
                         icon={<Users width={'16px'} height={'16px'} />}
-                        alwaysShowWhenActive={true}
-                        isActive={activeCharacter !== null}
-                    >
-                        {isOpen =>
-                            activeWorld === null ? (
-                                <div className="nothing">No mystery selected</div>
-                            ) : isOpen ? (
-                                // Show all characters when expanded
-                                activeWorld.payload.characters.map(
-                                    character =>
-                                        character.role !== 'victim' && (
-                                            <div className="card-character" key={character.id}>
-                                                <Card
-                                                    title={character.name}
-                                                    description={character.description}
-                                                    active={activeCharacter?.id === character.id}
-                                                    onClick={() => talkToCharacter(character.id)}
-                                                    noBorder={true}
-                                                    icon={
-                                                        <>
-                                                            {character.image ? (
-                                                                <img src={character.image} alt={character.name} />
-                                                            ) : (
-                                                                character.name.charAt(0)
-                                                            )}
-                                                        </>
-                                                    }
-                                                />
-                                            </div>
-                                        ),
-                                )
-                            ) : (
-                                // Show only active character when collapsed
-                                activeCharacter && (
-                                    <div className="card-character">
-                                        <Card
-                                            title={activeCharacter.name}
-                                            description={activeCharacter.description}
-                                            active={true}
-                                            onClick={() => talkToCharacter(activeCharacter.id)}
-                                            noBorder={true}
-                                            icon={
-                                                <div className="character-avatar">
-                                                    {activeCharacter.image ? (
-                                                        <img src={activeCharacter.image} alt={activeCharacter.name} />
-                                                    ) : (
-                                                        activeCharacter.name.charAt(0)
-                                                    )}
-                                                </div>
-                                            }
-                                        />
-                                    </div>
-                                )
-                            )
-                        }
-                        {/* {!activeWorld ? (
-                            <div className="nothing">
-                                No mystery selected
-                            </div>
-                        ) : (
-                            activeWorld.payload.characters.map((character) => character.role !== 'victim' && (
-                                <div className="card-character" key={character.id}>
+                        displayWhenCollapsed={
+                            activeCharacter ? (
+                                <div className="card-character">
                                     <Card
-                                        title={character.name}
-                                        description={character.description}
-                                        active={activeCharacter?.id === character.id}
-                                        onClick={() => setActiveCharacter(character.id)}
+                                        title={activeCharacter.name}
+                                        description={activeCharacter.description}
+                                        active={true}
+                                        onClick={() => talkToCharacter(activeCharacter.id)}
                                         noBorder={true}
                                         icon={
                                             <div className="character-avatar">
-                                                {character.name.charAt(0)}
+                                                {activeCharacter.image ? (
+                                                    <img src={activeCharacter.image} alt={activeCharacter.name} />
+                                                ) : (
+                                                    activeCharacter.name.charAt(0)
+                                                )}
                                             </div>
                                         }
                                     />
                                 </div>
-                            ))
-                        )} */}
+                            ) : null
+                        }
+                    >
+                        {activeWorld === null ? (
+                            <div className="nothing">No mystery selected</div>
+                        ) : (
+                            activeWorld.payload.characters.map(
+                                character =>
+                                    character.role !== 'victim' && (
+                                        <div className="card-character" key={character.id}>
+                                            <Card
+                                                title={character.name}
+                                                description={character.description}
+                                                active={activeCharacter?.id === character.id}
+                                                onClick={() => talkToCharacter(character.id)}
+                                                noBorder={true}
+                                                icon={
+                                                    <>
+                                                        {character.image ? (
+                                                            <img src={character.image} alt={character.name} />
+                                                        ) : (
+                                                            character.name.charAt(0)
+                                                        )}
+                                                    </>
+                                                }
+                                            />
+                                        </div>
+                                    ),
+                            )
+                        )}
                     </CollapsibleSection>
                 </div>
 
